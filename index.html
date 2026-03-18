@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -251,6 +250,11 @@ html, body {
 .modal-btns { display: flex; gap: 9px; justify-content: flex-end; }
 .btn-cancel { padding: 9px 16px; background: var(--blue-pale); border: none; border-radius: 9px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.83rem; cursor: pointer; color: var(--text-mid); }
 .btn-ok { padding: 9px 16px; background: var(--red); color: white; border: none; border-radius: 9px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.83rem; cursor: pointer; }
+.th-text { display: inline-block; border-radius: 5px; padding: 2px 4px; transition: background 0.15s; }
+.th-editable { cursor: pointer; }
+.th-editable:hover { background: rgba(37,99,235,0.12); }
+.th-editable:focus { outline: none; background: var(--blue-light); box-shadow: 0 0 0 2px var(--blue-bright); }
+.th-edit-hint { font-size: 0.6rem; color: rgba(10,31,92,0.35); font-weight: 600; display: block; margin-top: 1px; letter-spacing: 0.05em; }
 </style>
 </head>
 <body>
@@ -339,7 +343,9 @@ html, body {
             <div class="sec-label">Ratiba ya Wiki / Weekly Schedule</div>
             <table class="tbl">
               <thead><tr>
-                <th>Wakati / Time</th><th>Jina / Name</th><th>Kazi / Role</th>
+                <th><span id="wh1" class="th-text">Wakati / Time</span></th>
+                <th><span id="wh2" class="th-text">Jina / Name</span></th>
+                <th><span id="wh3" class="th-text">Kazi / Role</span></th>
                 <th id="wth" style="display:none;width:36px;"></th>
               </tr></thead>
               <tbody id="w-tbody"></tbody>
@@ -364,7 +370,9 @@ html, body {
             <div class="sec-label">Mpango wa Ibada / Order of Service</div>
             <table class="tbl">
               <thead><tr>
-                <th>Wakati / Time</th><th>Shughuli / Activity</th><th>Kiongozi / Leader</th>
+                <th><span id="kh1" class="th-text">Wakati / Time</span></th>
+                <th><span id="kh2" class="th-text">Shughuli / Activity</span></th>
+                <th><span id="kh3" class="th-text">Kiongozi / Leader</span></th>
                 <th id="kth" style="display:none;width:36px;"></th>
               </tr></thead>
               <tbody id="k-tbody"></tbody>
@@ -435,7 +443,12 @@ html, body {
           <div class="card-body">
             <div class="sec-label">Click any cell to edit • Bonyeza kubadilisha</div>
             <table class="tbl">
-              <thead><tr><th>Time</th><th>Name</th><th>Role</th><th style="width:40px;"></th></tr></thead>
+              <thead><tr>
+                <th><span id="awh1" class="th-text">Time</span></th>
+                <th><span id="awh2" class="th-text">Name</span></th>
+                <th><span id="awh3" class="th-text">Role</span></th>
+                <th style="width:40px;"></th>
+              </tr></thead>
               <tbody id="aw-body"></tbody>
             </table>
             <div class="add-row" style="margin-top:13px;">
@@ -451,7 +464,12 @@ html, body {
           <div class="card-body">
             <div class="sec-label">Click any cell to edit • Bonyeza kubadilisha</div>
             <table class="tbl">
-              <thead><tr><th>Time</th><th>Activity</th><th>Leader</th><th style="width:40px;"></th></tr></thead>
+              <thead><tr>
+                <th><span id="akh1" class="th-text">Time</span></th>
+                <th><span id="akh2" class="th-text">Activity</span></th>
+                <th><span id="akh3" class="th-text">Leader</span></th>
+                <th style="width:40px;"></th>
+              </tr></thead>
               <tbody id="ak-body"></tbody>
             </table>
             <div class="add-row" style="margin-top:13px;">
@@ -548,7 +566,15 @@ html, body {
 // ══════════════════════
 //  DATA
 // ══════════════════════
-const K={admins:'mom_a4',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4'};
+const K={admins:'mom_a4',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4',headers:'mom_h4'};
+
+// Default headers
+const DEF_HEADERS = {
+  wh1:'Wakati / Time', wh2:'Jina / Name',    wh3:'Kazi / Role',
+  kh1:'Wakati / Time', kh2:'Shughuli / Activity', kh3:'Kiongozi / Leader',
+  awh1:'Time',         awh2:'Name',          awh3:'Role',
+  akh1:'Time',         akh2:'Activity',       akh3:'Leader',
+};
 
 const DW=[
   {time:'7:00 AM',name:'Mzee Yohana',role:'Ufunguzi / Opening'},
@@ -674,6 +700,7 @@ function goMain(){
   document.getElementById('k-addrow').style.display=ck?'block':'none';
   document.getElementById('u-form').style.display=cu?'flex':'none';
   renderW();renderK();renderNames();
+  loadHeaders();
   show('main');
 }
 
@@ -771,6 +798,7 @@ function openAdmin(){
   const sup=CU.role==='super';
   document.getElementById('atn-users').style.display=sup?'inline-block':'none';
   renderAW();renderAK();renderNames();if(sup)renderUsers();
+  loadHeaders();
   switchATab('schedules');
   show('admin');
 }
@@ -900,6 +928,47 @@ window.addEventListener('storage',e=>{
 setInterval(renderNames,5000);
 
 // ══════════════════════
+//  EDITABLE HEADERS
+// ══════════════════════
+function loadHeaders(){
+  const h = ld(K.headers, DEF_HEADERS);
+  const isSuper = CU && CU.role === 'super';
+  const ids = ['wh1','wh2','wh3','kh1','kh2','kh3','awh1','awh2','awh3','akh1','akh2','akh3'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = h[id] || DEF_HEADERS[id];
+    if(isSuper){
+      el.classList.add('th-editable');
+      el.setAttribute('contenteditable','true');
+      el.setAttribute('title','Click to edit / Bonyeza kubadilisha');
+      el.onblur = () => saveHeader(id, el.textContent.trim());
+      el.onkeydown = (e) => { if(e.key==='Enter'){e.preventDefault();el.blur();} };
+    } else {
+      el.classList.remove('th-editable');
+      el.removeAttribute('contenteditable');
+    }
+  });
+}
+
+function saveHeader(id, val){
+  if(!val) return;
+  const h = ld(K.headers, DEF_HEADERS);
+  h[id] = val;
+  sv(K.headers, h);
+  // Sync paired headers (admin ↔ main)
+  const pairs = {wh1:'awh1',wh2:'awh2',wh3:'awh3',awh1:'wh1',awh2:'wh2',awh3:'wh3',
+                 kh1:'akh1',kh2:'akh2',kh3:'akh3',akh1:'kh1',akh2:'kh2',akh3:'kh3'};
+  if(pairs[id]){
+    h[pairs[id]] = val;
+    sv(K.headers, h);
+    const paired = document.getElementById(pairs[id]);
+    if(paired) paired.textContent = val;
+  }
+  showToast('✅ Header saved!','success');
+}
+
+// ══════════════════════
 //  BOOT
 // ══════════════════════
 loadSess();
@@ -907,4 +976,3 @@ if(CU){goMain();}else{show('signin');}
 </script>
 </body>
 </html>
-
