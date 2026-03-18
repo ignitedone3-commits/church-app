@@ -1,0 +1,910 @@
+
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Mount of Olives Ministry"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0a1f5c"/>
+<title>Mount of Olives Ministry</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --blue-deep:#0a1f5c; --blue-mid:#1a3a8f; --blue-bright:#2563eb;
+  --blue-light:#dbeafe; --blue-pale:#eff6ff; --gold:#f59e0b;
+  --gold-light:#fef3c7; --white:#ffffff; --text-dark:#0f172a;
+  --text-mid:#334155; --text-light:#64748b; --border:#bfdbfe;
+  --shadow:0 4px 24px rgba(10,31,92,0.13); --radius:18px;
+  --green:#16a34a; --red:#dc2626; --red-light:#fee2e2;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Lock body — no scrolling on the body itself */
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+  background: #0a1f5c;
+  color: var(--text-dark);
+}
+
+/* ════════════════════════════════
+   SCREEN SYSTEM
+   Every screen = fixed full-viewport layer
+   Only .active screen is visible
+════════════════════════════════ */
+.screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: linear-gradient(160deg, #0a1f5c 0%, #1e3a8a 40%, #1d4ed8 100%);
+  /* Hidden by default */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.2s ease;
+}
+.screen.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: all;
+  z-index: 100;
+}
+
+/* ════════ SIGN IN SCREEN ════════ */
+#screen-signin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+.signin-box {
+  background: white;
+  border-radius: 24px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.45);
+}
+.signin-logo { text-align: center; margin-bottom: 28px; }
+.signin-logo .cross { font-size: 3rem; display: block; filter: drop-shadow(0 0 12px rgba(245,158,11,0.6)); }
+.signin-logo h1 { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 800; color: var(--blue-deep); margin-top: 8px; }
+.signin-logo p { font-size: 0.72rem; color: var(--text-light); margin-top: 4px; letter-spacing: 0.1em; text-transform: uppercase; }
+.field-label { display: block; font-size: 0.74rem; font-weight: 800; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+.field-input { width: 100%; padding: 13px 16px; border: 2px solid var(--border); border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; outline: none; transition: border 0.2s; color: var(--text-dark); margin-bottom: 14px; }
+.field-input:focus { border-color: var(--blue-bright); }
+.btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--blue-bright), var(--blue-deep)); color: white; border: none; border-radius: 12px; font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; cursor: pointer; letter-spacing: 0.06em; transition: transform 0.15s, box-shadow 0.15s; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+.err-box { background: var(--red-light); color: var(--red); border-radius: 10px; padding: 10px 14px; font-size: 0.84rem; font-weight: 700; margin-top: 12px; display: none; text-align: center; }
+.info-note { margin-top: 16px; text-align: center; background: var(--blue-pale); border-radius: 10px; padding: 10px 14px; font-size: 0.77rem; color: var(--text-light); line-height: 1.6; }
+
+/* ════════ SETUP SCREEN ════════ */
+#screen-setup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+.setup-box { background: white; border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 420px; box-shadow: 0 24px 64px rgba(0,0,0,0.45); }
+.setup-badge { display: inline-block; background: var(--gold); color: var(--blue-deep); font-size: 0.7rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+.setup-box h2 { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--blue-deep); font-weight: 800; margin-bottom: 6px; }
+.setup-box .sub { font-size: 0.84rem; color: var(--text-light); margin-bottom: 22px; line-height: 1.5; }
+.pw-bar-wrap { height: 5px; background: #e2e8f0; border-radius: 5px; margin-top: 6px; margin-bottom: 14px; overflow: hidden; }
+.pw-bar { height: 100%; border-radius: 5px; transition: width 0.3s, background 0.3s; width: 0; }
+
+/* ════════ MAIN APP SCREEN ════════
+   Uses flexbox column so it fills
+   exactly the viewport height       */
+#screen-main {
+  display: flex;
+  flex-direction: column;
+}
+.app-header {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #0a1f5c 0%, #1e40af 100%);
+  padding: 18px 20px 14px;
+  text-align: center;
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.app-header .cross { font-size: 22px; display: block; margin-bottom: 2px; filter: drop-shadow(0 0 8px rgba(245,158,11,0.7)); }
+.app-header h1 { font-family: 'Cinzel', serif; font-size: clamp(0.95rem, 3.5vw, 1.45rem); font-weight: 800; color: white; letter-spacing: 0.04em; }
+.app-header p { font-size: 0.68rem; color: var(--gold); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
+.admin-bar {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,0.28); padding: 7px 14px;
+  font-size: 0.73rem; color: rgba(255,255,255,0.8);
+}
+.admin-bar strong { color: var(--gold); }
+.btn-bar { background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.25); color: white; padding: 4px 11px; border-radius: 20px; font-size: 0.71rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.btn-bar:hover { background: rgba(255,255,255,0.24); }
+.app-nav {
+  flex-shrink: 0;
+  display: flex;
+  background: linear-gradient(180deg, #0d2166, #091847);
+  border-bottom: 3px solid var(--gold);
+}
+.nav-btn {
+  flex: 1; padding: 12px 4px; border: none;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  background: transparent; color: rgba(255,255,255,0.5);
+  font-family: 'Cinzel', serif; font-size: clamp(0.44rem, 1.4vw, 0.68rem);
+  font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.22s; border-bottom: 4px solid transparent;
+  text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-btn:last-child { border-right: none; }
+.nav-btn .ni { font-size: 1rem; display: block; margin-bottom: 3px; }
+.nav-btn:hover { color: rgba(255,255,255,0.92); background: rgba(255,255,255,0.06); }
+.nav-btn.active { color: var(--gold); border-bottom: 4px solid var(--gold); background: linear-gradient(180deg,rgba(245,158,11,0.12),rgba(245,158,11,0.03)); font-weight: 800; }
+/* This flex:1 div is the ONLY scrollable area in the main screen */
+.app-body { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.content { padding: 16px 13px 60px; max-width: 720px; margin: 0 auto; }
+.tab-panel { display: none; animation: fadeIn 0.28s ease; }
+.tab-panel.active { display: block; }
+
+/* ════════ ADMIN PANEL SCREEN ════════ */
+#screen-admin { display: flex; flex-direction: column; }
+.admin-hdr {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #0a1f5c, #1e40af);
+  padding: 15px 18px; border-bottom: 3px solid var(--gold);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.admin-hdr h2 { font-family: 'Cinzel', serif; color: white; font-size: 1rem; font-weight: 700; }
+.admin-hdr p { color: rgba(255,255,255,0.55); font-size: 0.7rem; margin-top: 2px; }
+.admin-subnav { flex-shrink: 0; display: flex; background: #091847; border-bottom: 2px solid rgba(255,255,255,0.1); overflow-x: auto; scrollbar-width: none; }
+.admin-subnav::-webkit-scrollbar { display: none; }
+.atn { padding: 11px 18px; border: none; background: transparent; color: rgba(255,255,255,0.5); font-family: 'Nunito', sans-serif; font-size: 0.77rem; font-weight: 700; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
+.atn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.atn:hover { color: white; }
+.admin-body { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.admin-content { padding: 16px 13px 60px; max-width: 720px; margin: 0 auto; }
+.admin-panel { display: none; animation: fadeIn 0.28s ease; }
+.admin-panel.active { display: block; }
+
+/* ════════ SHARED COMPONENTS ════════ */
+@keyframes fadeIn { from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);} }
+
+.card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 15px; }
+.card-hdr { background: linear-gradient(135deg,var(--blue-deep),var(--blue-mid)); padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
+.card-hdr h2 { font-family: 'Cinzel', serif; font-size: 0.92rem; color: white; font-weight: 600; }
+.badge { margin-left: auto; background: var(--gold); color: var(--blue-deep); font-size: 0.66rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.card-body { padding: 16px; }
+.sec-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-light); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { background: var(--blue-pale); color: var(--blue-deep); font-weight: 800; font-size: 0.73rem; padding: 8px 9px; text-align: left; border-bottom: 2px solid var(--border); text-transform: uppercase; }
+.tbl td { padding: 9px; font-size: 0.85rem; border-bottom: 1px solid #f0f4ff; color: var(--text-mid); }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--blue-pale); }
+.pill { display: inline-block; background: var(--blue-light); color: var(--blue-deep); font-weight: 700; font-size: 0.74rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.ecell { outline: none; border-radius: 5px; padding: 3px 5px; transition: background 0.15s; }
+.ecell:focus { background: var(--blue-pale); box-shadow: 0 0 0 2px var(--blue-bright); }
+.btn-del { background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.95rem; padding: 3px 7px; border-radius: 6px; transition: background 0.15s; }
+.btn-del:hover { background: var(--red-light); }
+
+.add-row { display: flex; gap: 7px; margin-top: 13px; flex-wrap: wrap; align-items: center; padding: 11px; background: var(--blue-pale); border-radius: 11px; border: 1.5px dashed var(--border); }
+.add-row input { flex: 1; min-width: 75px; padding: 7px 11px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.83rem; outline: none; }
+.add-row input:focus { border-color: var(--blue-bright); }
+.btn-sm { padding: 8px 13px; background: linear-gradient(135deg,var(--blue-bright),var(--blue-mid)); color: white; border: none; border-radius: 8px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+.btn-sm:hover { opacity: 0.9; }
+
+.live-bar { display: flex; align-items: center; gap: 8px; background: var(--gold-light); border: 1.5px solid var(--gold); border-radius: 10px; padding: 8px 13px; margin-bottom: 13px; font-size: 0.78rem; font-weight: 700; color: #92400e; }
+.live-dot { width: 9px; height: 9px; background: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);} }
+
+.name-form { display: flex; gap: 9px; margin-bottom: 14px; flex-wrap: wrap; }
+.name-form input { flex: 1; min-width: 140px; padding: 9px 13px; border: 2px solid var(--border); border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 0.9rem; outline: none; transition: border 0.2s; }
+.name-form input:focus { border-color: var(--blue-bright); }
+.btn-add { padding: 9px 17px; background: linear-gradient(135deg,var(--blue-bright),var(--blue-mid)); color: white; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.86rem; cursor: pointer; white-space: nowrap; }
+.btn-add:hover { opacity: 0.9; }
+.names-list { list-style: none; }
+.name-item { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; margin-bottom: 6px; background: var(--blue-pale); border: 1.5px solid var(--border); animation: slideIn 0.28s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);} }
+.name-num { width: 27px; height: 27px; background: linear-gradient(135deg,var(--blue-bright),var(--blue-mid)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; flex-shrink: 0; }
+.name-txt { flex: 1; font-size: 0.98rem; font-weight: 700; color: var(--blue-deep); }
+.btn-del-n { background: none; border: none; cursor: pointer; color: #ef4444; font-size: 0.95rem; padding: 3px 6px; border-radius: 6px; opacity: 0.6; transition: background 0.15s,opacity 0.15s; }
+.btn-del-n:hover { background: var(--red-light); opacity: 1; }
+.empty { text-align: center; padding: 26px 18px; color: var(--text-light); font-size: 0.86rem; }
+.empty .eico { font-size: 2rem; display: block; margin-bottom: 7px; }
+.last-upd { text-align: right; font-size: 0.7rem; color: var(--text-light); margin-top: 7px; font-style: italic; }
+
+.user-card { background: white; border-radius: 13px; padding: 13px 15px; margin-bottom: 9px; display: flex; align-items: center; gap: 11px; box-shadow: 0 2px 12px rgba(10,31,92,0.1); }
+.user-av { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg,var(--blue-bright),var(--blue-deep)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.95rem; flex-shrink: 0; }
+.user-info { flex: 1; }
+.user-info strong { display: block; font-size: 0.88rem; color: var(--text-dark); }
+.user-info span { font-size: 0.72rem; color: var(--text-light); }
+.rpill { font-size: 0.64rem; font-weight: 800; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; }
+.r-super { background: var(--gold-light); color: #92400e; }
+.r-reg { background: var(--blue-light); color: var(--blue-deep); }
+.btn-dang { background: none; border: 1.5px solid #fca5a5; color: var(--red); padding: 4px 11px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.2s; }
+.btn-dang:hover { background: var(--red-light); }
+.perm-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.perm-row:last-child { border-bottom: none; }
+.toggle { position: relative; width: 42px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.tog-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; border-radius: 22px; cursor: pointer; transition: 0.3s; }
+.tog-slider::before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+.toggle input:checked + .tog-slider { background: var(--blue-bright); }
+.toggle input:checked + .tog-slider::before { transform: translateX(20px); }
+
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--blue-deep); color: white; padding: 11px 20px; border-radius: 30px; font-size: 0.83rem; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.3); transition: transform 0.3s ease; z-index: 99999; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 99998; padding: 20px; }
+.modal-bg.open { display: flex; }
+.modal { background: white; border-radius: 20px; padding: 26px; width: 100%; max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.modal h3 { font-family: 'Cinzel', serif; color: var(--blue-deep); font-size: 0.98rem; margin-bottom: 8px; }
+.modal p { font-size: 0.83rem; color: var(--text-light); margin-bottom: 18px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 9px; justify-content: flex-end; }
+.btn-cancel { padding: 9px 16px; background: var(--blue-pale); border: none; border-radius: 9px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.83rem; cursor: pointer; color: var(--text-mid); }
+.btn-ok { padding: 9px 16px; background: var(--red); color: white; border: none; border-radius: 9px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.83rem; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SCREEN 1 — SIGN IN
+══════════════════════════════════ -->
+<div id="screen-signin" class="screen">
+  <div class="signin-box">
+    <div class="signin-logo">
+      <span class="cross">✝</span>
+      <h1>Mount of Olives Ministry</h1>
+      <p>Huduma ya Kanisa • Church Service</p>
+    </div>
+    <label class="field-label">Username / Jina la Mtumiaji</label>
+    <input class="field-input" type="text" id="si-user" placeholder="Enter username..."
+      autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('si-pass').focus()"/>
+    <label class="field-label">Password / Nywila</label>
+    <input class="field-input" type="password" id="si-pass" placeholder="Enter password..."
+      autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()" style="margin-bottom:4px;"/>
+    <button class="btn-primary" onclick="doSignIn()">SIGN IN — INGIA</button>
+    <div class="err-box" id="si-err">❌ Username au password si sahihi. / Incorrect credentials.</div>
+    <div class="info-note">🔒 Sign in required to access all pages.<br>Ingia ili kuweza kuona kurasa zote.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 2 — FIRST-TIME PASSWORD SETUP
+══════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <div class="setup-box">
+    <span class="setup-badge">⭐ Super Admin — First Time Setup</span>
+    <h2>Welcome, <span id="setup-name"></span>!</h2>
+    <p class="sub">First time signing in. Create your password below.<br>Mara yako ya kwanza. Weka nywila yako.</p>
+    <label class="field-label">New Password / Nywila Mpya</label>
+    <input class="field-input" type="password" id="sp-pw1" placeholder="Create a password..."
+      oninput="checkPwStr()" autocomplete="new-password" style="margin-bottom:0;"/>
+    <div class="pw-bar-wrap"><div class="pw-bar" id="pw-bar"></div></div>
+    <label class="field-label">Confirm Password / Thibitisha</label>
+    <input class="field-input" type="password" id="sp-pw2" placeholder="Repeat password..."
+      autocomplete="new-password" style="margin-bottom:4px;"/>
+    <div class="err-box" id="sp-err"></div>
+    <button class="btn-primary" onclick="doSetupPw()">SET PASSWORD — WEKA NYWILA</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 3 — MAIN APP
+══════════════════════════════════ -->
+<div id="screen-main" class="screen">
+
+  <div class="app-header">
+    <span class="cross">✝</span>
+    <h1>Mount of Olives Ministry</h1>
+    <p>Huduma ya Kanisa • Church Service</p>
+  </div>
+
+  <div class="admin-bar">
+    <span>Signed in: <strong id="main-name"></strong></span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-bar" id="btn-ap" onclick="openAdmin()" style="display:none;">⚙️ Admin Panel</button>
+      <button class="btn-bar" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <nav class="app-nav">
+    <button class="nav-btn active" id="nt-walawi" onclick="switchTab('walawi')">
+      <span class="ni">📋</span>RATIBA YA WALAWI
+    </button>
+    <button class="nav-btn" id="nt-kawaida" onclick="switchTab('kawaida')">
+      <span class="ni">🗓️</span>RATIBA YA KAWAIDA
+    </button>
+    <button class="nav-btn" id="nt-ushuhuda" onclick="switchTab('ushuhuda')">
+      <span class="ni">🎤</span>MAJINA YA USHUHUDA
+    </button>
+  </nav>
+
+  <div class="app-body">
+    <div class="content">
+
+      <!-- TAB 1 -->
+      <div class="tab-panel active" id="panel-walawi">
+        <div class="card">
+          <div class="card-hdr"><span>📋</span><h2>Ratiba ya Walawi</h2><span class="badge">Ministers</span></div>
+          <div class="card-body">
+            <div class="sec-label">Ratiba ya Wiki / Weekly Schedule</div>
+            <table class="tbl">
+              <thead><tr>
+                <th>Wakati / Time</th><th>Jina / Name</th><th>Kazi / Role</th>
+                <th id="wth" style="display:none;width:36px;"></th>
+              </tr></thead>
+              <tbody id="w-tbody"></tbody>
+            </table>
+            <div id="w-addrow" style="display:none;">
+              <div class="add-row">
+                <input type="text" id="w-t" placeholder="Time" style="max-width:110px;"/>
+                <input type="text" id="w-n" placeholder="Jina / Name"/>
+                <input type="text" id="w-r" placeholder="Kazi / Role"/>
+                <button class="btn-sm" onclick="addWRow()">+ Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2 -->
+      <div class="tab-panel" id="panel-kawaida">
+        <div class="card">
+          <div class="card-hdr"><span>🗓️</span><h2>Ratiba ya Kawaida</h2><span class="badge">Program</span></div>
+          <div class="card-body">
+            <div class="sec-label">Mpango wa Ibada / Order of Service</div>
+            <table class="tbl">
+              <thead><tr>
+                <th>Wakati / Time</th><th>Shughuli / Activity</th><th>Kiongozi / Leader</th>
+                <th id="kth" style="display:none;width:36px;"></th>
+              </tr></thead>
+              <tbody id="k-tbody"></tbody>
+            </table>
+            <div id="k-addrow" style="display:none;">
+              <div class="add-row">
+                <input type="text" id="k-t" placeholder="Time" style="max-width:110px;"/>
+                <input type="text" id="k-a" placeholder="Shughuli / Activity"/>
+                <input type="text" id="k-l" placeholder="Kiongozi / Leader"/>
+                <button class="btn-sm" onclick="addKRow()">+ Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3 -->
+      <div class="tab-panel" id="panel-ushuhuda">
+        <div class="card">
+          <div class="card-hdr"><span>🎤</span><h2>Majina ya Ushuhuda</h2><span class="badge">Live</span></div>
+          <div class="card-body">
+            <div class="live-bar"><div class="live-dot"></div>Inasasishwa moja kwa moja — Live every 5 sec</div>
+            <div class="name-form" id="u-form" style="display:none;">
+              <input type="text" id="u-inp" placeholder="Andika jina / Enter name..." maxlength="60"
+                onkeydown="if(event.key==='Enter')addName()"/>
+              <button class="btn-add" onclick="addName()">+ Ongeza / Add</button>
+            </div>
+            <ul class="names-list" id="u-list"></ul>
+            <div class="empty" id="u-empty"><span class="eico">🎤</span>Hakuna majina bado.<br>No names yet.</div>
+            <div class="last-upd" id="u-upd"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 4 — ADMIN PANEL
+══════════════════════════════════ -->
+<div id="screen-admin" class="screen">
+
+  <div class="admin-hdr">
+    <div>
+      <h2>⚙️ Admin Panel</h2>
+      <p>Mount of Olives Ministry — Backend</p>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-bar" onclick="goBack()">← Back</button>
+      <button class="btn-bar" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-subnav">
+    <button class="atn active" id="atn-schedules" onclick="switchATab('schedules')">📋 Schedules</button>
+    <button class="atn" id="atn-testimony" onclick="switchATab('testimony')">🎤 Testimony</button>
+    <button class="atn" id="atn-users" onclick="switchATab('users')" style="display:none;">👥 Manage Admins</button>
+  </div>
+
+  <div class="admin-body">
+    <div class="admin-content">
+
+      <!-- ADMIN: SCHEDULES -->
+      <div class="admin-panel active" id="ap-schedules">
+        <div class="card">
+          <div class="card-hdr"><span>📋</span><h2>Ratiba ya Walawi</h2><span class="badge">Editable</span></div>
+          <div class="card-body">
+            <div class="sec-label">Click any cell to edit • Bonyeza kubadilisha</div>
+            <table class="tbl">
+              <thead><tr><th>Time</th><th>Name</th><th>Role</th><th style="width:40px;"></th></tr></thead>
+              <tbody id="aw-body"></tbody>
+            </table>
+            <div class="add-row" style="margin-top:13px;">
+              <input type="text" id="aw-t" placeholder="Time" style="max-width:105px;"/>
+              <input type="text" id="aw-n" placeholder="Name / Jina"/>
+              <input type="text" id="aw-r" placeholder="Role / Kazi"/>
+              <button class="btn-sm" onclick="adminAddW()">+ Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span>🗓️</span><h2>Ratiba ya Kawaida</h2><span class="badge">Editable</span></div>
+          <div class="card-body">
+            <div class="sec-label">Click any cell to edit • Bonyeza kubadilisha</div>
+            <table class="tbl">
+              <thead><tr><th>Time</th><th>Activity</th><th>Leader</th><th style="width:40px;"></th></tr></thead>
+              <tbody id="ak-body"></tbody>
+            </table>
+            <div class="add-row" style="margin-top:13px;">
+              <input type="text" id="ak-t" placeholder="Time" style="max-width:105px;"/>
+              <input type="text" id="ak-a" placeholder="Activity / Shughuli"/>
+              <input type="text" id="ak-l" placeholder="Leader / Kiongozi"/>
+              <button class="btn-sm" onclick="adminAddK()">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN: TESTIMONY -->
+      <div class="admin-panel" id="ap-testimony">
+        <div class="card">
+          <div class="card-hdr"><span>🎤</span><h2>Majina ya Ushuhuda</h2><span class="badge">Live Edit</span></div>
+          <div class="card-body">
+            <div class="live-bar"><div class="live-dot"></div>Changes appear on stage within 5 seconds</div>
+            <div class="name-form">
+              <input type="text" id="an-inp" placeholder="Andika jina / Enter name..." maxlength="60"
+                onkeydown="if(event.key==='Enter')adminAddName()"/>
+              <button class="btn-add" onclick="adminAddName()">+ Ongeza / Add</button>
+            </div>
+            <ul class="names-list" id="an-list"></ul>
+            <div class="empty" id="an-empty"><span class="eico">🎤</span>Hakuna majina bado.</div>
+            <div style="margin-top:13px;text-align:right;">
+              <button class="btn-dang" onclick="confirmClear()">🗑️ Clear All Names</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN: USERS -->
+      <div class="admin-panel" id="ap-users">
+        <div class="card">
+          <div class="card-hdr">
+            <span>👥</span><h2>Admin Accounts</h2>
+            <span class="badge" id="user-count">0 / 5 users</span>
+          </div>
+          <div class="card-body">
+            <div class="sec-label">Current Admins / Wasimamizi wa Sasa</div>
+            <div id="users-list"></div>
+          </div>
+        </div>
+
+        <!-- Limit reached message -->
+        <div id="limit-msg" style="display:none;background:var(--red-light);border:1.5px solid #fca5a5;border-radius:14px;padding:16px 18px;margin-bottom:15px;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:6px;">🔒</div>
+          <strong style="color:var(--red);font-size:0.9rem;">Maximum 5 users reached</strong><br>
+          <span style="font-size:0.8rem;color:var(--text-mid);">Remove a user before adding a new one.<br>Futa mtumiaji kabla ya kuongeza mwingine.</span>
+        </div>
+
+        <div class="card" id="add-admin-card">
+          <div class="card-hdr"><span>➕</span><h2>Add New User</h2></div>
+          <div class="card-body">
+            <label class="field-label">Username</label>
+            <input class="field-input" type="text" id="nu-u" placeholder="e.g. deacon"/>
+            <label class="field-label">Password</label>
+            <input class="field-input" type="password" id="nu-p" placeholder="Set a password"/>
+            <label class="field-label">Role</label>
+            <select id="nu-r" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;margin-bottom:14px;">
+              <option value="regular">Regular Admin</option>
+              <option value="super">Super Admin</option>
+            </select>
+            <div style="background:var(--blue-pale);border-radius:11px;padding:13px;margin-bottom:13px;">
+              <div class="sec-label" style="margin-bottom:9px;">Permissions / Ruhusa</div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="p-w" checked/><span class="tog-slider"></span></label></div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="p-k" checked/><span class="tog-slider"></span></label></div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="p-u" checked/><span class="tog-slider"></span></label></div>
+            </div>
+            <button class="btn-sm" style="width:100%;padding:12px;" onclick="addAdmin()">+ Add User</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3 id="m-title"></h3><p id="m-body"></p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-ok" onclick="runModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════
+//  DATA
+// ══════════════════════
+const K={admins:'mom_a4',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4'};
+
+const DW=[
+  {time:'7:00 AM',name:'Mzee Yohana',role:'Ufunguzi / Opening'},
+  {time:'7:30 AM',name:'Dkt. Amina',role:'Maombi / Prayer'},
+  {time:'8:00 AM',name:'Bro. Petro',role:'Ushauri / Counselling'},
+  {time:'9:00 AM',name:'Sis. Grace',role:'Uimbaji / Choir Lead'},
+  {time:'10:00 AM',name:'Mzee Daudi',role:'Somo / Bible Study'},
+  {time:'11:30 AM',name:'Pas. Marko',role:'Hotuba / Sermon'},
+  {time:'1:00 PM',name:'Sis. Ruth',role:'Ufungaji / Closing'},
+];
+const DK=[
+  {time:'7:00 AM',act:'Ibada ya Asubuhi / Morning Devotion',lead:'Timu ya Uimbaji'},
+  {time:'7:30 AM',act:'Maombi / Corporate Prayer',lead:'Kila Mtu / All'},
+  {time:'8:00 AM',act:'Wimbo wa Sifa / Praise & Worship',lead:'Bwana Choir'},
+  {time:'9:15 AM',act:'Matangazo / Announcements',lead:'Sekretari'},
+  {time:'9:30 AM',act:'Ushuhuda / Testimonies',lead:'Waumini / Members'},
+  {time:'10:00 AM',act:'Neno la Mungu / Word of God',lead:'Mchungaji'},
+  {time:'11:30 AM',act:'Sadaka / Offering',lead:'Mweka Hazina'},
+  {time:'12:00 PM',act:'Baraka / Benediction',lead:'Mchungaji'},
+];
+const DA=[
+  {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,permissions:{walawi:true,kawaida:true,ushuhuda:true}},
+  {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,permissions:{walawi:true,kawaida:true,ushuhuda:true}},
+  {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,permissions:{walawi:false,kawaida:false,ushuhuda:true}},
+];
+
+function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+if(!localStorage.getItem(K.admins))  sv(K.admins,  DA);
+if(!localStorage.getItem(K.walawi))  sv(K.walawi,  DW);
+if(!localStorage.getItem(K.kawaida)) sv(K.kawaida, DK);
+if(!localStorage.getItem(K.testimony))sv(K.testimony,[]);
+
+// ══════════════════════
+//  SESSION
+// ══════════════════════
+let CU=null;
+function loadSess(){const s=ld(K.session,null);if(s)CU=s;}
+function saveSess(u){sv(K.session,u);CU=u;}
+function clearSess(){localStorage.removeItem(K.session);CU=null;}
+
+// ══════════════════════
+//  SCREEN SYSTEM
+// ══════════════════════
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+// ══════════════════════
+//  SIGN IN
+// ══════════════════════
+function doSignIn(){
+  const user=document.getElementById('si-user').value.trim();
+  const pass=document.getElementById('si-pass').value;
+  const err=document.getElementById('si-err');
+  err.style.display='none';
+  const admins=ld(K.admins,[]);
+  const found=admins.find(a=>a.username.toLowerCase()===user.toLowerCase());
+  if(!found){err.style.display='block';return;}
+  if(found.firstLogin&&found.password===null){
+    document.getElementById('setup-name').textContent=found.displayName;
+    sessionStorage.setItem('su',found.username);
+    show('setup');return;
+  }
+  if(found.password!==pass){err.style.display='block';return;}
+  saveSess(found);
+  goMain();
+}
+
+function doSignOut(){
+  clearSess();
+  document.getElementById('si-user').value='';
+  document.getElementById('si-pass').value='';
+  show('signin');
+}
+
+// ══════════════════════
+//  FIRST-TIME SETUP
+// ══════════════════════
+function checkPwStr(){
+  const pw=document.getElementById('sp-pw1').value;
+  const bar=document.getElementById('pw-bar');
+  let s=0;
+  if(pw.length>=6)s++;if(pw.length>=10)s++;
+  if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+  bar.style.width=(s/5*100)+'%';
+  bar.style.background=s<=1?'#ef4444':s<=3?'#f59e0b':'#16a34a';
+}
+function doSetupPw(){
+  const pw1=document.getElementById('sp-pw1').value;
+  const pw2=document.getElementById('sp-pw2').value;
+  const err=document.getElementById('sp-err');
+  err.style.display='none';
+  if(pw1.length<6){err.textContent='❌ At least 6 characters needed';err.style.display='block';return;}
+  if(pw1!==pw2){err.textContent='❌ Passwords do not match / Hazilingani';err.style.display='block';return;}
+  const uname=sessionStorage.getItem('su');
+  const admins=ld(K.admins,[]);
+  const idx=admins.findIndex(a=>a.username.toLowerCase()===uname.toLowerCase());
+  if(idx<0)return;
+  admins[idx].password=pw1;admins[idx].firstLogin=false;
+  sv(K.admins,admins);sessionStorage.removeItem('su');
+  saveSess(admins[idx]);
+  showToast('✅ Password set! Welcome, '+admins[idx].displayName,'success');
+  goMain();
+}
+
+// ══════════════════════
+//  MAIN APP
+// ══════════════════════
+function goMain(){
+  if(!CU){show('signin');return;}
+  document.getElementById('main-name').textContent=CU.displayName+(CU.role==='super'?' ⭐':'');
+  document.getElementById('btn-ap').style.display='inline-block';
+  const sup=CU.role==='super';
+  const p=CU.permissions;
+  const cw=sup||p.walawi, ck=sup||p.kawaida, cu=sup||p.ushuhuda;
+  document.getElementById('wth').style.display=cw?'':'none';
+  document.getElementById('w-addrow').style.display=cw?'block':'none';
+  document.getElementById('kth').style.display=ck?'':'none';
+  document.getElementById('k-addrow').style.display=ck?'block':'none';
+  document.getElementById('u-form').style.display=cu?'flex':'none';
+  renderW();renderK();renderNames();
+  show('main');
+}
+
+function switchTab(n){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  document.getElementById('nt-'+n).classList.add('active');
+}
+
+// ── WALAWI ──
+function renderW(){
+  const data=ld(K.walawi,DW);
+  const can=CU&&(CU.role==='super'||CU.permissions.walawi);
+  document.getElementById('w-tbody').innerHTML=data.map((r,i)=>`
+    <tr>
+      <td><span class="pill">${esc(r.time)}</span></td>
+      <td><strong>${esc(r.name)}</strong></td>
+      <td style="color:var(--text-light);font-size:0.82rem;">${esc(r.role)}</td>
+      ${can?`<td><button class="btn-del" onclick="delWRow(${i})">✕</button></td>`:''}
+    </tr>`).join('');
+}
+function addWRow(){
+  const t=document.getElementById('w-t').value.trim(),n=document.getElementById('w-n').value.trim(),r=document.getElementById('w-r').value.trim();
+  if(!t||!n)return showToast('Fill Time & Name','error');
+  const d=ld(K.walawi,[]);d.push({time:t,name:n,role:r});sv(K.walawi,d);
+  document.getElementById('w-t').value='';document.getElementById('w-n').value='';document.getElementById('w-r').value='';
+  renderW();showToast('✅ Row added!','success');
+}
+function delWRow(i){const d=ld(K.walawi,[]);d.splice(i,1);sv(K.walawi,d);renderW();}
+
+// ── KAWAIDA ──
+function renderK(){
+  const data=ld(K.kawaida,DK);
+  const can=CU&&(CU.role==='super'||CU.permissions.kawaida);
+  document.getElementById('k-tbody').innerHTML=data.map((r,i)=>`
+    <tr>
+      <td><span class="pill">${esc(r.time)}</span></td>
+      <td><strong>${esc(r.act)}</strong></td>
+      <td style="color:var(--text-light);font-size:0.82rem;">${esc(r.lead)}</td>
+      ${can?`<td><button class="btn-del" onclick="delKRow(${i})">✕</button></td>`:''}
+    </tr>`).join('');
+}
+function addKRow(){
+  const t=document.getElementById('k-t').value.trim(),a=document.getElementById('k-a').value.trim(),l=document.getElementById('k-l').value.trim();
+  if(!t||!a)return showToast('Fill Time & Activity','error');
+  const d=ld(K.kawaida,[]);d.push({time:t,act:a,lead:l});sv(K.kawaida,d);
+  document.getElementById('k-t').value='';document.getElementById('k-a').value='';document.getElementById('k-l').value='';
+  renderK();showToast('✅ Row added!','success');
+}
+function delKRow(i){const d=ld(K.kawaida,[]);d.splice(i,1);sv(K.kawaida,d);renderK();}
+
+// ── TESTIMONY ──
+function getNms(){return ld(K.testimony,[]);}
+function saveNms(n){sv(K.testimony,n);localStorage.setItem(K.testimony+'_p',Date.now());}
+
+function renderNames(){
+  const names=getNms();
+  const canDel=CU&&(CU.role==='super'||CU.permissions.ushuhuda);
+  // main
+  const ml=document.getElementById('u-list'),me=document.getElementById('u-empty');
+  if(ml){
+    if(!names.length){ml.innerHTML='';if(me)me.style.display='block';}
+    else{
+      if(me)me.style.display='none';
+      ml.innerHTML=names.map((n,i)=>`<li class="name-item">
+        <div class="name-num">${i+1}</div><div class="name-txt">${esc(n)}</div>
+        ${canDel?`<button class="btn-del-n" onclick="delName(${i})">✕</button>`:''}</li>`).join('');
+    }
+  }
+  // admin
+  const al=document.getElementById('an-list'),ae=document.getElementById('an-empty');
+  if(al){
+    if(!names.length){al.innerHTML='';if(ae)ae.style.display='block';}
+    else{
+      if(ae)ae.style.display='none';
+      al.innerHTML=names.map((n,i)=>`<li class="name-item">
+        <div class="name-num">${i+1}</div><div class="name-txt">${esc(n)}</div>
+        <button class="btn-del-n" onclick="delName(${i})">✕</button></li>`).join('');
+    }
+  }
+  const u=document.getElementById('u-upd');
+  if(u)u.textContent='Imesasishwa: '+new Date().toLocaleTimeString();
+}
+function addName(){const i=document.getElementById('u-inp');const v=i.value.trim();if(!v)return;const n=getNms();n.push(v);saveNms(n);i.value='';renderNames();}
+function adminAddName(){const i=document.getElementById('an-inp');const v=i.value.trim();if(!v)return;const n=getNms();n.push(v);saveNms(n);i.value='';renderNames();showToast('✅ Name added!','success');}
+function delName(i){const n=getNms();n.splice(i,1);saveNms(n);renderNames();}
+function confirmClear(){showModal('Clear All Names','Remove ALL testimony names?',()=>{saveNms([]);renderNames();showToast('🗑️ Cleared','success');});}
+
+// ══════════════════════
+//  ADMIN PANEL
+// ══════════════════════
+function openAdmin(){
+  if(!CU)return;
+  const sup=CU.role==='super';
+  document.getElementById('atn-users').style.display=sup?'inline-block':'none';
+  renderAW();renderAK();renderNames();if(sup)renderUsers();
+  switchATab('schedules');
+  show('admin');
+}
+function goBack(){show('main');}
+function switchATab(n){
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.atn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ap-'+n).classList.add('active');
+  document.getElementById('atn-'+n).classList.add('active');
+}
+
+function renderAW(){
+  const d=ld(K.walawi,DW);
+  document.getElementById('aw-body').innerHTML=d.map((r,i)=>`<tr>
+    <td><span class="ecell" contenteditable="true" onblur="swc(${i},'time',this)">${esc(r.time)}</span></td>
+    <td><span class="ecell" contenteditable="true" onblur="swc(${i},'name',this)">${esc(r.name)}</span></td>
+    <td><span class="ecell" contenteditable="true" onblur="swc(${i},'role',this)">${esc(r.role)}</span></td>
+    <td><button class="btn-del" onclick="adW(${i})">✕</button></td></tr>`).join('');
+}
+function swc(i,f,el){const d=ld(K.walawi,[]);d[i][f]=el.innerText.trim();sv(K.walawi,d);renderW();showToast('✅ Saved!','success');}
+function adminAddW(){
+  const t=document.getElementById('aw-t').value.trim(),n=document.getElementById('aw-n').value.trim(),r=document.getElementById('aw-r').value.trim();
+  if(!t||!n)return showToast('Fill Time & Name','error');
+  const d=ld(K.walawi,[]);d.push({time:t,name:n,role:r});sv(K.walawi,d);
+  document.getElementById('aw-t').value='';document.getElementById('aw-n').value='';document.getElementById('aw-r').value='';
+  renderAW();renderW();showToast('✅ Added!','success');
+}
+function adW(i){const d=ld(K.walawi,[]);d.splice(i,1);sv(K.walawi,d);renderAW();renderW();}
+
+function renderAK(){
+  const d=ld(K.kawaida,DK);
+  document.getElementById('ak-body').innerHTML=d.map((r,i)=>`<tr>
+    <td><span class="ecell" contenteditable="true" onblur="skc(${i},'time',this)">${esc(r.time)}</span></td>
+    <td><span class="ecell" contenteditable="true" onblur="skc(${i},'act',this)">${esc(r.act)}</span></td>
+    <td><span class="ecell" contenteditable="true" onblur="skc(${i},'lead',this)">${esc(r.lead)}</span></td>
+    <td><button class="btn-del" onclick="adK(${i})">✕</button></td></tr>`).join('');
+}
+function skc(i,f,el){const d=ld(K.kawaida,[]);d[i][f]=el.innerText.trim();sv(K.kawaida,d);renderK();showToast('✅ Saved!','success');}
+function adminAddK(){
+  const t=document.getElementById('ak-t').value.trim(),a=document.getElementById('ak-a').value.trim(),l=document.getElementById('ak-l').value.trim();
+  if(!t||!a)return showToast('Fill Time & Activity','error');
+  const d=ld(K.kawaida,[]);d.push({time:t,act:a,lead:l});sv(K.kawaida,d);
+  document.getElementById('ak-t').value='';document.getElementById('ak-a').value='';document.getElementById('ak-l').value='';
+  renderAK();renderK();showToast('✅ Added!','success');
+}
+function adK(i){const d=ld(K.kawaida,[]);d.splice(i,1);sv(K.kawaida,d);renderAK();renderK();}
+
+const MAX_USERS = 5;
+
+function renderUsers(){
+  const a=ld(K.admins,[]);
+  const count=a.length;
+  const atLimit=count>=MAX_USERS;
+
+  // Update user count badge
+  const countEl=document.getElementById('user-count');
+  if(countEl){
+    countEl.textContent=`${count} / ${MAX_USERS} users`;
+    countEl.style.background=atLimit?'var(--red)':'var(--gold)';
+    countEl.style.color=atLimit?'white':'var(--blue-deep)';
+  }
+
+  // Show/hide add form based on limit
+  const addForm=document.getElementById('add-admin-card');
+  if(addForm){
+    addForm.style.display=atLimit?'none':'block';
+  }
+  const limitMsg=document.getElementById('limit-msg');
+  if(limitMsg){
+    limitMsg.style.display=atLimit?'block':'none';
+  }
+
+  document.getElementById('users-list').innerHTML=a.map((u,i)=>`
+    <div class="user-card">
+      <div class="user-av">${u.displayName.charAt(0).toUpperCase()}</div>
+      <div class="user-info">
+        <strong>${esc(u.displayName)} <span class="rpill ${u.role==='super'?'r-super':'r-reg'}">${u.role==='super'?'⭐ Super':'Regular'}</span></strong>
+        <span>@${esc(u.username)}${u.firstLogin?' · 🔑 Awaiting first login':''}</span>
+        ${u.role==='regular'?`<div style="margin-top:4px;font-size:0.71rem;color:var(--text-light);">Perms: ${[u.permissions.walawi?'Walawi':'',u.permissions.kawaida?'Kawaida':'',u.permissions.ushuhuda?'Ushuhuda':''].filter(Boolean).join(', ')||'None'}</div>`:''}
+      </div>
+      ${u.username!==CU.username?`<button class="btn-dang" onclick="remUser(${i})">✕ Remove</button>`:'<span style="font-size:0.7rem;color:var(--text-light);">(You)</span>'}
+    </div>`).join('');
+}
+function addAdmin(){
+  const u=document.getElementById('nu-u').value.trim(),p=document.getElementById('nu-p').value,r=document.getElementById('nu-r').value;
+  if(!u||!p)return showToast('Fill all fields','error');
+  const a=ld(K.admins,[]);
+  if(a.length>=MAX_USERS)return showToast('❌ Maximum 5 users reached!','error');
+  if(a.find(x=>x.username.toLowerCase()===u.toLowerCase()))return showToast('Username already exists!','error');
+  a.push({username:u,password:p,displayName:u,role:r,firstLogin:false,
+    permissions:{walawi:document.getElementById('p-w').checked,kawaida:document.getElementById('p-k').checked,ushuhuda:document.getElementById('p-u').checked}});
+  sv(K.admins,a);document.getElementById('nu-u').value='';document.getElementById('nu-p').value='';
+  renderUsers();showToast('✅ Admin added: '+u,'success');
+}
+function remUser(i){
+  showModal('Remove Admin','Are you sure?',()=>{
+    const a=ld(K.admins,[]);a.splice(i,1);sv(K.admins,a);renderUsers();showToast('Removed','success');
+  });
+}
+
+// ══════════════════════
+//  TOAST
+// ══════════════════════
+let _tt;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(type?' '+type:'')+' show';
+  clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══════════════════════
+//  MODAL
+// ══════════════════════
+let _ma=null;
+function showModal(title,body,cb){document.getElementById('m-title').textContent=title;document.getElementById('m-body').textContent=body;_ma=cb;document.getElementById('modal-bg').classList.add('open');}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');_ma=null;}
+function runModal(){if(_ma)_ma();closeModal();}
+
+// ══════════════════════
+//  LIVE SYNC
+// ══════════════════════
+window.addEventListener('storage',e=>{
+  if(e.key===K.testimony||e.key===K.testimony+'_p')renderNames();
+  if(e.key===K.walawi){renderW();renderAW();}
+  if(e.key===K.kawaida){renderK();renderAK();}
+});
+setInterval(renderNames,5000);
+
+// ══════════════════════
+//  BOOT
+// ══════════════════════
+loadSess();
+if(CU){goMain();}else{show('signin');}
+</script>
+</body>
+</html>
+
