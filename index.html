@@ -1066,6 +1066,7 @@ html, body {
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="p-w" checked/><span class="tog-slider"></span></label></div>
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="p-k" checked/><span class="tog-slider"></span></label></div>
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="p-u" checked/><span class="tog-slider"></span></label></div>
+              <div class="perm-row" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border);"><span style="font-size:0.85rem;font-weight:700;">📌 Send Notes to Service Leader</span><label class="toggle"><input type="checkbox" id="p-notes" checked/><span class="tog-slider"></span></label></div>
             </div>
 
             <!-- Access Control -->
@@ -1283,13 +1284,13 @@ const DK=[
 ];
 const DA=[
   {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,
-   permissions:{walawi:true,kawaida:true,ushuhuda:true},
+   permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
   {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,
-   permissions:{walawi:true,kawaida:true,ushuhuda:true},
+   permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
   {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,
-   permissions:{walawi:false,kawaida:false,ushuhuda:true},
+   permissions:{walawi:false,kawaida:false,ushuhuda:true,sendNote:true},
    access:{enabled:true,days:[0],startTime:'09:00',endTime:'13:00'}},
 ];
 function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
@@ -1765,7 +1766,8 @@ function addAdmin(){
     permissions:{
       walawi: r==='super'||document.getElementById('p-w').checked,
       kawaida: r==='super'||document.getElementById('p-k').checked,
-      ushuhuda: r==='super'||document.getElementById('p-u').checked
+      ushuhuda: r==='super'||document.getElementById('p-u').checked,
+      sendNote: r==='super'||r==='view'||document.getElementById('p-notes').checked
     },
     access:{
       enabled: document.getElementById('nu-enabled').checked,
@@ -1806,6 +1808,7 @@ function openEditUser(i){
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="eu-w" ${u.permissions.walawi?'checked':''}/><span class="tog-slider"></span></label></div>
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="eu-k" ${u.permissions.kawaida?'checked':''}/><span class="tog-slider"></span></label></div>
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="eu-u" ${u.permissions.ushuhuda?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row" style="margin-top:6px;padding-top:7px;border-top:1px solid var(--border);"><span style="font-size:0.82rem;font-weight:700;">📌 Send Notes to Service Leader</span><label class="toggle"><input type="checkbox" id="eu-notes" ${u.permissions.sendNote!==false?'checked':''}/><span class="tog-slider"></span></label></div>
       </div>
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:6px;">
         <div class="sec-label" style="margin-bottom:7px;color:#15803d;">🔐 Access Control</div>
@@ -1851,7 +1854,8 @@ function saveEditUser(){
   u.permissions={
     walawi: r==='super'||(r==='regular'&&document.getElementById('eu-w').checked),
     kawaida: r==='super'||(r==='regular'&&document.getElementById('eu-k').checked),
-    ushuhuda: r==='super'||(r==='regular'&&document.getElementById('eu-u').checked)
+    ushuhuda: r==='super'||(r==='regular'&&document.getElementById('eu-u').checked),
+    sendNote: r==='super'||document.getElementById('eu-notes').checked
   };
   u.access={
     enabled: document.getElementById('eu-enabled').checked,
@@ -2709,14 +2713,16 @@ if(CU){goMain();}else{show('signin');}
 // Notes stored in localStorage so all "users" on same device share them
 
 const STICKY_KEY = 'mom_sticky_notes';
-const NOTE_SENDERS = ['grace','erik','mizeituni'];
-const NOTE_RECEIVERS = ['grace','erik']; // super admins = service leaders
 
+// Who can SEND notes: any logged-in user with sendNote permission (or super admin)
 function isStickyUser(){
-  return CU && NOTE_SENDERS.includes(CU.username.toLowerCase());
+  if(!CU) return false;
+  if(CU.role === 'super') return true;
+  return CU.permissions && CU.permissions.sendNote !== false;
 }
+// Who RECEIVES notes: super admins
 function isServiceLeader(){
-  return CU && NOTE_RECEIVERS.includes(CU.username.toLowerCase());
+  return CU && CU.role === 'super';
 }
 
 function getStickyNotes(){ return ld(STICKY_KEY, []); }
@@ -2741,6 +2747,7 @@ function sendStickyNote(){
     id: 'note_' + Date.now(),
     text: text,
     sender: CU.displayName,
+    senderUser: CU.username,
     time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
     read: false
   };
@@ -2748,8 +2755,33 @@ function sendStickyNote(){
   saveStickyNotes(notes);
   closeStickyModal();
   showToast('📌 Note sent to service leader!', 'success');
+
+  // Show sent confirmation card to the sender (bottom-left area)
+  showSentConfirmation(note);
+
   // If current user is also a service leader, show incoming note immediately
   if(isServiceLeader()) renderIncomingNotes();
+}
+
+function showSentConfirmation(note){
+  // Show a brief "sent" sticky card for the sender so they can see it was posted
+  let board = document.getElementById('sent-notes-board');
+  if(!board){
+    board = document.createElement('div');
+    board.id = 'sent-notes-board';
+    board.style.cssText = 'position:fixed;bottom:85px;left:14px;z-index:8998;max-width:260px;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+    document.getElementById('screen-main').appendChild(board);
+  }
+  const card = document.createElement('div');
+  card.style.cssText = 'background:#fef08a;border-radius:4px 14px 14px 14px;padding:11px 14px 9px;box-shadow:3px 4px 14px rgba(0,0,0,0.2);position:relative;transform:rotate(1.5deg);animation:stickyDrop 0.4s cubic-bezier(.34,1.56,.64,1);pointer-events:all;';
+  card.innerHTML = `
+    <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#facc15,#fde047,#facc15);border-radius:4px 14px 0 0;"></div>
+    <div style="font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#92400e;margin-bottom:4px;">✅ Note Sent · ${note.time}</div>
+    <div style="font-size:0.88rem;color:#1c1917;line-height:1.45;">${note.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    <div style="font-size:0.62rem;color:#a16207;margin-top:5px;">Delivered to service leader</div>`;
+  board.appendChild(card);
+  // Auto-remove after 6 seconds
+  setTimeout(()=>{ card.style.opacity='0'; card.style.transition='opacity 0.4s'; setTimeout(()=>card.remove(), 400); }, 6000);
 }
 
 function renderIncomingNotes(){
