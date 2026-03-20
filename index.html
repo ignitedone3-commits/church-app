@@ -388,6 +388,7 @@ html, body {
 #incoming-notes-container {
   display: flex; flex-direction: column; gap: 10px;
   pointer-events: all;
+  max-height: 70vh; overflow-y: auto;
 }
 .incoming-note-card {
   background: #fef08a;
@@ -397,7 +398,7 @@ html, body {
   position: relative;
   animation: stickyDrop 0.4s cubic-bezier(.34,1.56,.64,1);
   transform: rotate(-1.5deg);
-  max-width: 340px;
+  max-width: 320px;
 }
 .incoming-note-card::before {
   content: '';
@@ -405,9 +406,7 @@ html, body {
   background: linear-gradient(90deg, #facc15, #fde047, #facc15);
   border-radius: 4px 16px 0 0;
 }
-.incoming-note-pin {
-  font-size: 1.3rem; margin-bottom: 4px;
-}
+.incoming-note-pin { font-size: 1.3rem; margin-bottom: 4px; }
 .incoming-note-from {
   font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
   letter-spacing: 0.08em; color: #92400e; margin-bottom: 6px;
@@ -423,8 +422,28 @@ html, body {
   box-shadow: 0 2px 8px rgba(22,163,74,0.3); transition: transform 0.15s;
 }
 .incoming-note-read-btn:hover { transform: translateY(-1px); }
-@keyframes noteLeave {
-  to { opacity: 0; transform: rotate(-1.5deg) scale(0.85) translateX(20px); }
+.incoming-note-read-btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+/* ── Minimized Notes Bar ── */
+#minimized-notes-bar {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  pointer-events: all; margin-top: 8px;
+}
+.minimized-note-pill {
+  background: linear-gradient(135deg, #fde047, #facc15);
+  color: #78350f; border: none; border-radius: 20px;
+  padding: 5px 12px 5px 8px; font-family: 'Nunito', sans-serif;
+  font-size: 0.72rem; font-weight: 800; cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.18);
+  display: flex; align-items: center; gap: 5px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.minimized-note-pill:hover { transform: translateY(-2px); box-shadow: 2px 4px 12px rgba(0,0,0,0.25); }
+.minimized-note-pill .pill-dot {
+  width: 20px; height: 20px; border-radius: 50%; background: #92400e;
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 900; flex-shrink: 0;
 }
 
 /* ── Read Notes Toggle Button ── */
@@ -473,9 +492,7 @@ html, body {
   font-size: 0.67rem; font-weight: 800; text-transform: uppercase;
   letter-spacing: 0.07em; color: #92400e; margin-bottom: 4px;
 }
-.read-note-text {
-  font-size: 0.9rem; color: #1c1917; line-height: 1.45;
-}
+.read-note-text { font-size: 0.9rem; color: #1c1917; line-height: 1.45; }
 </style>
 </head><body>
 
@@ -608,7 +625,8 @@ html, body {
   <!-- Incoming Notes Area (only shown to service leaders: grace/erik) -->
   <div id="incoming-notes-area" style="display:none;">
     <div id="incoming-notes-container"></div>
-    <button class="read-notes-toggle-btn" onclick="toggleReadNotesPanel()" title="View read notes">
+    <div id="minimized-notes-bar"></div>
+    <button class="read-notes-toggle-btn" onclick="toggleReadNotesPanel()" title="View acknowledged notes">
       <span>📋</span>
       <span id="read-notes-badge" class="read-notes-badge">0</span>
     </button>
@@ -1067,6 +1085,7 @@ html, body {
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="p-k" checked/><span class="tog-slider"></span></label></div>
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="p-u" checked/><span class="tog-slider"></span></label></div>
               <div class="perm-row" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border);"><span style="font-size:0.85rem;font-weight:700;">📌 Send Notes to Service Leader</span><label class="toggle"><input type="checkbox" id="p-notes" checked/><span class="tog-slider"></span></label></div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">📥 Receive Notes (Service Leader)</span><label class="toggle"><input type="checkbox" id="p-receive"/><span class="tog-slider"></span></label></div>
             </div>
 
             <!-- Access Control -->
@@ -1229,7 +1248,7 @@ html, body {
   </div>
 </div>
 <script>
-const K={admins:'mom_a4',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4',headers:'mom_h4',
+const K={admins:'mom_a5',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4',headers:'mom_h4',
   draftW:'mom_dw4',draftK:'mom_dk4',draftT:'mom_dt4',draftStatus:'mom_ds4',settings:'mom_cfg4'};
 const DEF_HEADERS = {
   wh1:'Wakati / Time', wh2:'Jina / Name',    wh3:'Kazi / Role',
@@ -1284,14 +1303,17 @@ const DK=[
 ];
 const DA=[
   {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,
-   permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true},
+   permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true,receiveNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
   {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,
-   permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true},
+   permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true,receiveNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
   {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,
-   permissions:{walawi:false,kawaida:false,ushuhuda:true,sendNote:true},
+   permissions:{walawi:false,kawaida:false,ushuhuda:true,sendNote:true,receiveNote:false},
    access:{enabled:true,days:[0],startTime:'09:00',endTime:'13:00'}},
+  {username:'Msimamizi',password:null,displayName:'Msimamizi',role:'view',firstLogin:true,
+   permissions:{walawi:false,kawaida:false,ushuhuda:false,sendNote:false,receiveNote:true},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
 ];
 function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
@@ -1767,7 +1789,8 @@ function addAdmin(){
       walawi: r==='super'||document.getElementById('p-w').checked,
       kawaida: r==='super'||document.getElementById('p-k').checked,
       ushuhuda: r==='super'||document.getElementById('p-u').checked,
-      sendNote: r==='super'||r==='view'||document.getElementById('p-notes').checked
+      sendNote: r==='super'||r==='view'||document.getElementById('p-notes').checked,
+      receiveNote: r==='super'||document.getElementById('p-receive').checked
     },
     access:{
       enabled: document.getElementById('nu-enabled').checked,
@@ -1809,6 +1832,7 @@ function openEditUser(i){
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="eu-k" ${u.permissions.kawaida?'checked':''}/><span class="tog-slider"></span></label></div>
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="eu-u" ${u.permissions.ushuhuda?'checked':''}/><span class="tog-slider"></span></label></div>
         <div class="perm-row" style="margin-top:6px;padding-top:7px;border-top:1px solid var(--border);"><span style="font-size:0.82rem;font-weight:700;">📌 Send Notes to Service Leader</span><label class="toggle"><input type="checkbox" id="eu-notes" ${u.permissions.sendNote!==false?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">📥 Receive Notes (Service Leader)</span><label class="toggle"><input type="checkbox" id="eu-receive" ${u.permissions.receiveNote?'checked':''}/><span class="tog-slider"></span></label></div>
       </div>
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:6px;">
         <div class="sec-label" style="margin-bottom:7px;color:#15803d;">🔐 Access Control</div>
@@ -1855,7 +1879,8 @@ function saveEditUser(){
     walawi: r==='super'||(r==='regular'&&document.getElementById('eu-w').checked),
     kawaida: r==='super'||(r==='regular'&&document.getElementById('eu-k').checked),
     ushuhuda: r==='super'||(r==='regular'&&document.getElementById('eu-u').checked),
-    sendNote: r==='super'||document.getElementById('eu-notes').checked
+    sendNote: r==='super'||document.getElementById('eu-notes').checked,
+    receiveNote: r==='super'||document.getElementById('eu-receive').checked
   };
   u.access={
     enabled: document.getElementById('eu-enabled').checked,
@@ -2720,9 +2745,11 @@ function isStickyUser(){
   if(CU.role === 'super') return true;
   return CU.permissions && CU.permissions.sendNote !== false;
 }
-// Who RECEIVES notes: super admins
+// Who RECEIVES notes: super admins OR users with receiveNote permission
 function isServiceLeader(){
-  return CU && CU.role === 'super';
+  if(!CU) return false;
+  if(CU.role === 'super') return true;
+  return CU.permissions && CU.permissions.receiveNote === true;
 }
 
 function getStickyNotes(){ return ld(STICKY_KEY, []); }
@@ -2785,14 +2812,19 @@ function showSentConfirmation(note){
 }
 
 function renderIncomingNotes(){
-  // Only service leaders see incoming popups
   if(!isServiceLeader()) return;
   const notes = getStickyNotes();
   const unread = notes.filter(n => !n.read);
+  const minimized = notes.filter(n => n.minimized && !n.read);
+  const visible = notes.filter(n => !n.read && !n.minimized);
   const container = document.getElementById('incoming-notes-container');
+  const bar = document.getElementById('minimized-notes-bar');
   if(!container) return;
-  container.innerHTML = '';
-  unread.forEach(note => {
+
+  // Render full visible unread notes (only replace cards not already in DOM)
+  const existingIds = new Set([...container.querySelectorAll('.incoming-note-card')].map(c=>c.dataset.id));
+  visible.forEach(note => {
+    if(existingIds.has(note.id)) return; // already rendered
     const card = document.createElement('div');
     card.className = 'incoming-note-card';
     card.dataset.id = note.id;
@@ -2800,34 +2832,84 @@ function renderIncomingNotes(){
       <div class="incoming-note-pin">📌</div>
       <div class="incoming-note-from">From: <strong>${esc(note.sender)}</strong> · ${esc(note.time)}</div>
       <div class="incoming-note-text">${esc(note.text)}</div>
-      <button class="incoming-note-read-btn" onclick="markNoteRead('${note.id}')">✓ Acknowledge</button>`;
+      <div style="display:flex;gap:7px;margin-top:8px;">
+        <button class="incoming-note-read-btn" style="flex:1;" onclick="markNoteRead('${note.id}')">✓ Acknowledge</button>
+        <button style="padding:8px 12px;background:#fde047;color:#78350f;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;" onclick="minimizeNote('${note.id}')">− Min</button>
+      </div>`;
     container.appendChild(card);
   });
+  // Remove cards that no longer belong (acknowledged or minimized)
+  [...container.querySelectorAll('.incoming-note-card')].forEach(card => {
+    const note = notes.find(n => n.id === card.dataset.id);
+    if(!note || note.read || note.minimized) card.remove();
+  });
+
+  // Render minimized pills bar
+  if(bar){
+    bar.innerHTML = minimized.map(n => `
+      <button class="minimized-note-pill" onclick="restoreNote('${n.id}')" title="${esc(n.text)}">
+        <span class="pill-dot">${esc(n.sender).charAt(0)}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;">📌 ${esc(n.sender)}</span>
+      </button>`).join('');
+  }
+}
+
+function minimizeNote(noteId){
+  const card = document.querySelector(`.incoming-note-card[data-id="${noteId}"]`);
+  if(card){
+    card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'rotate(-1.5deg) scale(0.7) translateY(20px)';
+    setTimeout(()=>{
+      const notes = getStickyNotes();
+      const idx = notes.findIndex(n => n.id === noteId);
+      if(idx >= 0){ notes[idx].minimized = true; saveStickyNotes(notes); }
+      renderIncomingNotes();
+      renderReadNotes();
+    }, 260);
+  }
+}
+
+function restoreNote(noteId){
+  const notes = getStickyNotes();
+  const idx = notes.findIndex(n => n.id === noteId);
+  if(idx >= 0){ notes[idx].minimized = false; saveStickyNotes(notes); }
+  renderIncomingNotes();
 }
 
 function markNoteRead(noteId){
-  const notes = getStickyNotes();
-  const idx = notes.findIndex(n => n.id === noteId);
-  if(idx >= 0){ notes[idx].read = true; saveStickyNotes(notes); }
-  renderIncomingNotes();
-  renderReadNotes();
-  // Animate removal
   const card = document.querySelector(`.incoming-note-card[data-id="${noteId}"]`);
-  if(card){ card.style.animation = 'noteLeave 0.3s ease forwards'; setTimeout(()=>{ renderIncomingNotes(); renderReadNotes(); }, 320); }
+  const doMark = () => {
+    const notes = getStickyNotes();
+    const idx = notes.findIndex(n => n.id === noteId);
+    if(idx >= 0){ notes[idx].read = true; notes[idx].minimized = false; saveStickyNotes(notes); }
+    renderIncomingNotes();
+    renderReadNotes();
+  };
+  if(card){
+    const btn = card.querySelector('.incoming-note-read-btn');
+    if(btn){ btn.disabled = true; btn.textContent = '✓ Acknowledged'; }
+    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'rotate(-1.5deg) scale(0.85) translateX(20px)';
+    setTimeout(doMark, 320);
+  } else {
+    doMark();
+  }
 }
 
 function renderReadNotes(){
   if(!isServiceLeader()) return;
   const notes = getStickyNotes();
   const readNotes = notes.filter(n => n.read).reverse();
-  const panel = document.getElementById('read-notes-panel');
   const list = document.getElementById('read-notes-list');
   const badge = document.getElementById('read-notes-badge');
-  if(!list || !badge) return;
   if(badge) badge.textContent = readNotes.length;
-  if(panel && panel.style.display !== 'none'){
-    list.innerHTML = readNotes.length === 0 ? '<div style="text-align:center;color:#a16207;padding:16px;font-size:0.82rem;">No read notes yet</div>' :
-      readNotes.map(n => `
+  // Always refresh the list (whether panel is open or not)
+  if(list){
+    list.innerHTML = readNotes.length === 0
+      ? '<div style="text-align:center;color:#a16207;padding:16px;font-size:0.82rem;">No acknowledged notes yet</div>'
+      : readNotes.map(n => `
         <div class="read-note-item">
           <div class="read-note-from">From: <strong>${esc(n.sender)}</strong> · ${esc(n.time)}</div>
           <div class="read-note-text">${esc(n.text)}</div>
