@@ -47,6 +47,9 @@ html, body {
   height: 34px; width: 34px; object-fit: contain;
   display: inline-block; vertical-align: middle; margin-bottom: 3px;
   filter: drop-shadow(0 0 6px rgba(245,158,11,0.5));
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+  overflow: visible;
 }
 .signin-logo h1 { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 800; color: var(--blue-deep); margin-top: 8px; }
 .signin-logo p { font-size: 0.72rem; color: var(--text-light); margin-top: 4px; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -65,8 +68,7 @@ html, body {
 .pw-bar-wrap { height: 5px; background: #e2e8f0; border-radius: 5px; margin-top: 6px; margin-bottom: 14px; overflow: hidden; }
 .pw-bar { height: 100%; border-radius: 5px; transition: width 0.3s, background 0.3s; width: 0; }
 #screen-main { display: flex; flex-direction: column; }
-.app-header { flex-shrink: 0; background: linear-gradient(135deg, #0a1f5c 0%, #1e40af 100%); padding: 10px 20px 8px; text-align: center; border-bottom: 3px solid var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.3s ease, opacity 0.3s ease; }
-.app-header.header-hidden { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+.app-header { flex-shrink: 0; background: linear-gradient(135deg, #0a1f5c 0%, #1e40af 100%); padding: 10px 20px 8px; text-align: center; border-bottom: 3px solid var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.3s ease, opacity 0.3s ease; overflow: visible; position: relative; }
 .app-header .cross { display: none; }
 .app-header h1 { font-family: 'Cinzel', serif; font-size: clamp(0.85rem, 3vw, 1.25rem); font-weight: 800; color: white; letter-spacing: 0.04em; margin-top: 4px; }
 .app-header p { font-size: 0.65rem; color: #ef4444; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
@@ -823,6 +825,22 @@ html, body {
               </div>
             </div>
 
+            <!-- Logo Size Control -->
+            <div style="background:var(--blue-pale);border-radius:12px;padding:14px 16px;margin-top:12px;border:1.5px solid var(--border);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <span style="font-size:0.75rem;font-weight:800;color:var(--blue-deep);text-transform:uppercase;letter-spacing:0.07em;">🔲 Header Logo Size</span>
+                <span id="logo-size-val" style="font-size:0.85rem;font-weight:800;color:var(--blue-bright);">34px</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button onclick="adjustLogoSize(-4)" style="width:32px;height:32px;border-radius:8px;border:2px solid var(--blue-bright);background:white;color:var(--blue-bright);font-size:1.1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
+                <input type="range" id="logo-size-slider" min="20" max="80" value="34" step="2"
+                  style="flex:1;accent-color:var(--blue-bright);"
+                  oninput="applyLogoSize(parseInt(this.value))"/>
+                <button onclick="adjustLogoSize(4)" style="width:32px;height:32px;border-radius:8px;border:2px solid var(--blue-bright);background:white;color:var(--blue-bright);font-size:1.1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
+              </div>
+              <button onclick="resetLogoSize()" style="margin-top:10px;width:100%;padding:7px;background:var(--red-light);color:var(--red);border:1.5px solid #fca5a5;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;">↺ Reset Size</button>
+            </div>
+
             <hr style="border:none;border-top:1.5px solid var(--border);margin:18px 0;"/>
 
             <!-- Background Section -->
@@ -1017,36 +1035,86 @@ html, body {
 
       <div class="admin-panel" id="ap-users">
         <div class="card">
-          <div class="card-hdr"><span>&#128101;</span><h2>Admin Accounts</h2><span class="badge" id="user-count">0 / 5 users</span></div>
+          <div class="card-hdr"><span>👥</span><h2>Admin Accounts</h2><span class="badge" id="user-count">0 / 5 users</span></div>
           <div class="card-body">
-            <div class="sec-label">Current Admins / Wasimamizi wa Sasa</div>
+            <div class="sec-label">Current Users / Watumiaji wa Sasa</div>
             <div id="users-list"></div>
           </div>
         </div>
         <div id="limit-msg" style="display:none;background:var(--red-light);border:1.5px solid #fca5a5;border-radius:14px;padding:16px 18px;margin-bottom:15px;text-align:center;">
-          <div style="font-size:1.5rem;margin-bottom:6px;">&#128274;</div>
+          <div style="font-size:1.5rem;margin-bottom:6px;">🔒</div>
           <strong style="color:var(--red);font-size:0.9rem;">Maximum 5 users reached</strong><br>
-          <span style="font-size:0.8rem;color:var(--text-mid);">Remove a user before adding a new one.<br>Futa mtumiaji kabla ya kuongeza mwingine.</span>
+          <span style="font-size:0.8rem;color:var(--text-mid);">Remove a user before adding a new one.</span>
         </div>
         <div class="card" id="add-admin-card">
-          <div class="card-hdr"><span>&#10133;</span><h2>Add New User</h2></div>
+          <div class="card-hdr"><span>➕</span><h2>Add New User</h2></div>
           <div class="card-body">
             <label class="field-label">Username</label>
             <input class="field-input" type="text" id="nu-u" placeholder="e.g. deacon"/>
+            <label class="field-label">Display Name</label>
+            <input class="field-input" type="text" id="nu-dn" placeholder="e.g. Deacon James"/>
             <label class="field-label">Password</label>
             <input class="field-input" type="password" id="nu-p" placeholder="Set a password"/>
             <label class="field-label">Role</label>
-            <select id="nu-r" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;margin-bottom:14px;">
-              <option value="regular">Regular Admin</option>
-              <option value="super">Super Admin</option>
+            <select id="nu-r" onchange="toggleNewUserPerms()" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;margin-bottom:14px;">
+              <option value="view">👁️ View Only</option>
+              <option value="regular" selected>✏️ Regular</option>
+              <option value="super">⭐ Super Admin</option>
             </select>
-            <div style="background:var(--blue-pale);border-radius:11px;padding:13px;margin-bottom:13px;">
+
+            <!-- Permissions (hidden for super/view) -->
+            <div id="nu-perms-wrap" style="background:var(--blue-pale);border-radius:11px;padding:13px;margin-bottom:13px;">
               <div class="sec-label" style="margin-bottom:9px;">Permissions / Ruhusa</div>
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="p-w" checked/><span class="tog-slider"></span></label></div>
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="p-k" checked/><span class="tog-slider"></span></label></div>
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="p-u" checked/><span class="tog-slider"></span></label></div>
             </div>
+
+            <!-- Access Control -->
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:11px;padding:13px;margin-bottom:13px;">
+              <div class="sec-label" style="margin-bottom:9px;color:#15803d;">🔐 Login Access Control</div>
+              <div class="perm-row" style="margin-bottom:8px;">
+                <span style="font-size:0.85rem;font-weight:700;">Allow Login</span>
+                <label class="toggle"><input type="checkbox" id="nu-enabled" checked/><span class="tog-slider"></span></label>
+              </div>
+              <div class="sec-label" style="margin-bottom:6px;margin-top:10px;">📅 Allowed Days</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;" id="nu-days">
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="0" checked style="accent-color:var(--blue-bright);"/> Sun</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="1" checked style="accent-color:var(--blue-bright);"/> Mon</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="2" checked style="accent-color:var(--blue-bright);"/> Tue</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="3" checked style="accent-color:var(--blue-bright);"/> Wed</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="4" checked style="accent-color:var(--blue-bright);"/> Thu</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="5" checked style="accent-color:var(--blue-bright);"/> Fri</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="6" checked style="accent-color:var(--blue-bright);"/> Sat</label>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div>
+                  <div class="sec-label" style="margin-bottom:4px;">⏰ Start Time</div>
+                  <input type="time" id="nu-start" value="00:00" style="width:100%;padding:8px 10px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;"/>
+                </div>
+                <div>
+                  <div class="sec-label" style="margin-bottom:4px;">⏰ End Time</div>
+                  <input type="time" id="nu-end" value="23:59" style="width:100%;padding:8px 10px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;"/>
+                </div>
+              </div>
+            </div>
+
             <button class="btn-sm" style="width:100%;padding:12px;" onclick="addAdmin()">+ Add User</button>
+          </div>
+        </div>
+
+        <!-- Edit User Modal -->
+        <div id="edit-user-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99998;align-items:center;justify-content:center;padding:16px;">
+          <div style="background:white;border-radius:20px;padding:22px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <h3 style="font-family:'Cinzel',serif;color:var(--blue-deep);font-size:0.95rem;">✏️ Edit User</h3>
+              <button onclick="closeEditUser()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-light);">✕</button>
+            </div>
+            <div id="edit-user-body"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+              <button onclick="closeEditUser()" style="flex:1;padding:10px;background:var(--blue-pale);border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.83rem;cursor:pointer;color:var(--text-mid);">Cancel</button>
+              <button onclick="saveEditUser()" style="flex:2;padding:10px;background:linear-gradient(135deg,var(--blue-bright),var(--blue-deep));color:white;border:none;border-radius:9px;font-family:'Cinzel',serif;font-weight:700;font-size:0.83rem;cursor:pointer;">💾 Save Changes</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1216,9 +1284,15 @@ const DK=[
   {time:'',act:'SALA YA BABA (WATU WOTE)',sub:'',lead:'',fontSize:16},
 ];
 const DA=[
-  {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,permissions:{walawi:true,kawaida:true,ushuhuda:true}},
-  {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,permissions:{walawi:true,kawaida:true,ushuhuda:true}},
-  {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,permissions:{walawi:false,kawaida:false,ushuhuda:true}},
+  {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,
+   permissions:{walawi:true,kawaida:true,ushuhuda:true},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
+  {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,
+   permissions:{walawi:true,kawaida:true,ushuhuda:true},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
+  {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,
+   permissions:{walawi:false,kawaida:false,ushuhuda:true},
+   access:{enabled:true,days:[0],startTime:'09:00',endTime:'13:00'}},
 ];
 function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
@@ -1247,13 +1321,35 @@ function doSignIn(){
   err.style.display='none';
   const admins=ld(K.admins,[]);
   const found=admins.find(a=>a.username.toLowerCase()===user.toLowerCase());
-  if(!found){err.style.display='block';return;}
+  if(!found){err.innerHTML='❌ Username au password si sahihi.';err.style.display='block';return;}
+
+  // ── Access control check ──
+  const ac = found.access || {enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'};
+  if(!ac.enabled){
+    err.innerHTML='🔒 Access disabled for this account. Contact admin.';err.style.display='block';return;
+  }
+  const now = new Date();
+  const todayDay = now.getDay(); // 0=Sun,6=Sat
+  const allowedDays = ac.days || [0,1,2,3,4,5,6];
+  if(!allowedDays.includes(todayDay)){
+    const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const allowed = allowedDays.map(d=>dayNames[d]).join(', ');
+    err.innerHTML='📅 Login not allowed today.<br><small>Allowed days: '+allowed+'</small>';err.style.display='block';return;
+  }
+  const nowMins = now.getHours()*60 + now.getMinutes();
+  const [sh,sm] = (ac.startTime||'00:00').split(':').map(Number);
+  const [eh,em] = (ac.endTime||'23:59').split(':').map(Number);
+  const startMins = sh*60+sm, endMins = eh*60+em;
+  if(nowMins < startMins || nowMins > endMins){
+    err.innerHTML='⏰ Login not allowed at this time.<br><small>Window: '+(ac.startTime||'00:00')+' – '+(ac.endTime||'23:59')+'</small>';err.style.display='block';return;
+  }
+
   if(found.firstLogin&&found.password===null){
     document.getElementById('setup-name').textContent=found.displayName;
     sessionStorage.setItem('su',found.username);
     show('setup');return;
   }
-  if(found.password!==pass){err.style.display='block';return;}
+  if(found.password!==pass){err.innerHTML='❌ Username au password si sahihi.';err.style.display='block';return;}
   saveSess(found); goMain();
 }
 function doSignOut(){
@@ -1295,17 +1391,21 @@ function goMain(){
   const uname = CU.username.toLowerCase();
   if(uname === 'grace') displayLabel = 'Admin.G';
   else if(uname === 'erik') displayLabel = 'Admin.E';
-  document.getElementById('main-name').innerHTML = displayLabel + (CU.role==='super'?' &#11088;':'');
-  document.getElementById('btn-ap').style.display='inline-block';
-  document.getElementById('btn-draft').style.display='inline-block';
-  const sup=CU.role==='super';
-  const p=CU.permissions;
-  const cw=sup||p.walawi, ck=sup||p.kawaida, cu=sup||p.ushuhuda;
-  document.getElementById('wth').style.display=cw?'':'none';
-  document.getElementById('w-addrow').style.display=cw?'block':'none';
-  document.getElementById('kth').style.display=ck?'':'none';
-  document.getElementById('k-addrow').style.display=ck?'block':'none';
-  document.getElementById('u-form').style.display=cu?'flex':'none';
+  const roleLabel = CU.role==='super'?' ⭐':CU.role==='view'?' 👁️':'';
+  document.getElementById('main-name').innerHTML = displayLabel + roleLabel;
+  const sup = CU.role==='super';
+  const isView = CU.role==='view';
+  const p = CU.permissions || {};
+  // Super admin gets draft + admin panel; view-only gets neither
+  document.getElementById('btn-ap').style.display = sup ? 'inline-block' : 'none';
+  document.getElementById('btn-draft').style.display = (!isView && sup) ? 'inline-block' : 'none';
+  const cw = sup || p.walawi, ck = sup || p.kawaida, cu = sup || p.ushuhuda;
+  // View-only never gets edit controls
+  document.getElementById('wth').style.display = (cw && !isView) ? '' : 'none';
+  document.getElementById('w-addrow').style.display = (cw && !isView) ? 'block' : 'none';
+  document.getElementById('kth').style.display = (ck && !isView) ? '' : 'none';
+  document.getElementById('k-addrow').style.display = (ck && !isView) ? 'block' : 'none';
+  document.getElementById('u-form').style.display = (cu && !isView) ? 'flex' : 'none';
   renderW();renderK();renderNames();
   loadHeaders();
   renderNavBar();
@@ -1594,6 +1694,13 @@ function adminAddK(){
 }
 function adK(i){const d=ld(K.kawaida,[]);d.splice(i,1);sv(K.kawaida,d);renderAK();renderK();}
 const MAX_USERS=5;
+const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const ROLE_LABELS={super:'⭐ Super Admin',regular:'✏️ Regular',view:'👁️ View Only'};
+
+function getAccess(u){
+  return u.access || {enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'};
+}
+
 function renderUsers(){
   const a=ld(K.admins,[]); const count=a.length; const atLimit=count>=MAX_USERS;
   const countEl=document.getElementById('user-count');
@@ -1604,75 +1711,161 @@ function renderUsers(){
   if(limitMsg) limitMsg.style.display=atLimit?'block':'none';
   document.getElementById('users-list').innerHTML=a.map((u,i)=>{
     const isSelf = u.username===CU.username;
-    const isSuper = u.role==='super';
-    const permsText = [u.permissions.walawi?'Walawi':'',u.permissions.kawaida?'Kawaida':'',u.permissions.ushuhuda?'Ushuhuda':''].filter(Boolean).join(', ')||'None';
-    return `<div class="user-card" style="flex-wrap:wrap;gap:8px;">
+    const ac = getAccess(u);
+    const daysStr = ac.days.map(d=>DAY_NAMES[d]).join(', ') || '—';
+    const roleLabel = ROLE_LABELS[u.role] || u.role;
+    const roleColor = u.role==='super'?'#92400e':u.role==='view'?'#1e40af':'#065f46';
+    const roleBg = u.role==='super'?'#fef3c7':u.role==='view'?'#dbeafe':'#d1fae5';
+    const accessStatus = ac.enabled
+      ? `<span style="color:#15803d;font-size:0.7rem;font-weight:700;">✅ Login On</span>`
+      : `<span style="color:#dc2626;font-size:0.7rem;font-weight:700;">🔒 Login Off</span>`;
+    return `<div class="user-card" style="flex-wrap:wrap;gap:8px;margin-bottom:10px;">
       <div class="user-av">${u.displayName.charAt(0).toUpperCase()}</div>
       <div class="user-info" style="flex:1;min-width:140px;">
-        <strong>${esc(u.displayName)} <span class="rpill ${isSuper?'r-super':'r-reg'}">${isSuper?'&#11088; Super':'Regular'}</span></strong>
-        <span>@${esc(u.username)}${u.firstLogin?' &#183; &#128273; Awaiting first login':''}</span>
-        ${!isSuper?`<div style="margin-top:4px;font-size:0.71rem;color:var(--text-light);">Perms: ${permsText}</div>`:'<div style="margin-top:4px;font-size:0.71rem;color:var(--text-light);">Full access to everything</div>'}
+        <strong style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${esc(u.displayName)}
+          <span style="font-size:0.65rem;font-weight:800;padding:2px 8px;border-radius:20px;background:${roleBg};color:${roleColor};">${roleLabel}</span>
+        </strong>
+        <span style="font-size:0.72rem;color:var(--text-light);">@${esc(u.username)}${u.firstLogin?' · 🔑 Awaiting setup':''}</span>
+        <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+          ${accessStatus}
+          <span style="font-size:0.68rem;color:var(--text-light);">📅 ${daysStr}</span>
+          <span style="font-size:0.68rem;color:var(--text-light);">⏰ ${ac.startTime||'00:00'}–${ac.endTime||'23:59'}</span>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
+      <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;">
         ${isSelf
           ? '<span style="font-size:0.7rem;color:var(--text-light);">(You)</span>'
-          : `<div style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${!isSuper
-                ? `<button style="padding:4px 10px;border:1.5px solid #a78bfa;background:#ede9fe;color:#5b21b6;border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="promoteUser(${i})" title="Grant Super Admin">&#11088; Promote</button>`
-                : `<button style="padding:4px 10px;border:1.5px solid var(--border);background:var(--blue-pale);color:var(--text-mid);border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="demoteUser(${i})" title="Remove Super Admin">&#8595; Demote</button>`
-              }
-              <button class="btn-dang" onclick="remUser(${i})">&#10005; Remove</button>
+          : `<div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <button style="padding:4px 10px;border:1.5px solid var(--blue-bright);background:var(--blue-pale);color:var(--blue-deep);border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="openEditUser(${i})">✏️ Edit</button>
+              <button class="btn-dang" onclick="remUser(${i})">✕ Remove</button>
             </div>`
         }
       </div>
     </div>`;
   }).join('');
 }
+
+function toggleNewUserPerms(){
+  const r = document.getElementById('nu-r').value;
+  const pw = document.getElementById('nu-perms-wrap');
+  if(pw) pw.style.display = (r==='regular') ? 'block' : 'none';
+}
+
 function addAdmin(){
-  const u=document.getElementById('nu-u').value.trim(),p=document.getElementById('nu-p').value,r=document.getElementById('nu-r').value;
-  if(!u||!p)return showToast('Fill all fields','error');
+  const u=document.getElementById('nu-u').value.trim();
+  const dn=document.getElementById('nu-dn').value.trim()||u;
+  const p=document.getElementById('nu-p').value;
+  const r=document.getElementById('nu-r').value;
+  if(!u||!p)return showToast('Fill username & password','error');
   const a=ld(K.admins,[]);
-  if(a.length>=MAX_USERS)return showToast('&#10060; Maximum 5 users reached!','error');
+  if(a.length>=MAX_USERS)return showToast('❌ Maximum 5 users reached!','error');
   if(a.find(x=>x.username.toLowerCase()===u.toLowerCase()))return showToast('Username already exists!','error');
-  a.push({username:u,password:p,displayName:u,role:r,firstLogin:false,
-    permissions:{walawi:document.getElementById('p-w').checked,kawaida:document.getElementById('p-k').checked,ushuhuda:document.getElementById('p-u').checked}});
-  sv(K.admins,a);document.getElementById('nu-u').value='';document.getElementById('nu-p').value='';
-  renderUsers();showToast('&#9989; Admin added: '+u,'success');
+  const days=[...document.querySelectorAll('#nu-days input:checked')].map(c=>parseInt(c.value));
+  a.push({
+    username:u, password:p, displayName:dn, role:r, firstLogin:false,
+    permissions:{
+      walawi: r==='super'||document.getElementById('p-w').checked,
+      kawaida: r==='super'||document.getElementById('p-k').checked,
+      ushuhuda: r==='super'||document.getElementById('p-u').checked
+    },
+    access:{
+      enabled: document.getElementById('nu-enabled').checked,
+      days: days.length?days:[0,1,2,3,4,5,6],
+      startTime: document.getElementById('nu-start').value||'00:00',
+      endTime: document.getElementById('nu-end').value||'23:59'
+    }
+  });
+  sv(K.admins,a);
+  document.getElementById('nu-u').value='';
+  document.getElementById('nu-dn').value='';
+  document.getElementById('nu-p').value='';
+  renderUsers(); showToast('✅ User added: '+dn,'success');
 }
-function remUser(i){showModal('Remove Admin','Are you sure?',()=>{const a=ld(K.admins,[]);a.splice(i,1);sv(K.admins,a);renderUsers();showToast('Removed','success');});}
-function promoteUser(i){
+
+function remUser(i){showModal('Remove User','Are you sure you want to remove this user?',()=>{const a=ld(K.admins,[]);a.splice(i,1);sv(K.admins,a);renderUsers();showToast('Removed','success');});}
+
+let _editIdx = null;
+function openEditUser(i){
   const a=ld(K.admins,[]);
-  if(!a[i])return;
-  showModal('Promote to Super Admin',
-    'Grant "'+a[i].displayName+'" full Super Admin access? They will be able to manage all settings.',
-    ()=>{
-      a[i].role='super';
-      a[i].permissions={walawi:true,kawaida:true,ushuhuda:true};
-      sv(K.admins,a);
-      // If this user is currently logged in, update their session
-      if(CU && CU.username===a[i].username){ saveSess(a[i]); }
-      renderUsers();
-      showToast('&#11088; '+a[i].displayName+' promoted to Super Admin!','success');
-    });
+  const u=a[i]; if(!u) return;
+  _editIdx=i;
+  const ac=getAccess(u);
+  const isSuper=u.role==='super';
+  const isView=u.role==='view';
+  document.getElementById('edit-user-body').innerHTML=`
+    <div style="margin-bottom:10px;">
+      <div class="field-label">Display Name</div>
+      <input class="field-input" id="eu-dn" value="${esc(u.displayName)}" style="margin-bottom:8px;"/>
+      <div class="field-label">Role</div>
+      <select id="eu-r" onchange="toggleEditPerms()" style="width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;margin-bottom:10px;">
+        <option value="view"${u.role==='view'?' selected':''}>👁️ View Only</option>
+        <option value="regular"${u.role==='regular'?' selected':''}>✏️ Regular</option>
+        <option value="super"${u.role==='super'?' selected':''}>⭐ Super Admin</option>
+      </select>
+      <div id="eu-perms-wrap" style="background:var(--blue-pale);border-radius:10px;padding:11px;margin-bottom:10px;${isSuper||isView?'display:none;':''}">
+        <div class="sec-label" style="margin-bottom:7px;">Permissions</div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="eu-w" ${u.permissions.walawi?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="eu-k" ${u.permissions.kawaida?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="eu-u" ${u.permissions.ushuhuda?'checked':''}/><span class="tog-slider"></span></label></div>
+      </div>
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:6px;">
+        <div class="sec-label" style="margin-bottom:7px;color:#15803d;">🔐 Access Control</div>
+        <div class="perm-row" style="margin-bottom:8px;">
+          <span style="font-size:0.82rem;font-weight:700;">Allow Login</span>
+          <label class="toggle"><input type="checkbox" id="eu-enabled" ${ac.enabled?'checked':''}/><span class="tog-slider"></span></label>
+        </div>
+        <div class="sec-label" style="margin-bottom:5px;margin-top:8px;">📅 Allowed Days</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="eu-days">
+          ${[0,1,2,3,4,5,6].map(d=>`<label style="display:flex;align-items:center;gap:3px;font-size:0.76rem;font-weight:700;cursor:pointer;"><input type="checkbox" value="${d}" ${ac.days.includes(d)?'checked':''} style="accent-color:var(--blue-bright);"/> ${DAY_NAMES[d]}</label>`).join('')}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <div class="sec-label" style="margin-bottom:3px;">⏰ Start</div>
+            <input type="time" id="eu-start" value="${ac.startTime||'00:00'}" style="width:100%;padding:7px 9px;border:2px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;outline:none;"/>
+          </div>
+          <div>
+            <div class="sec-label" style="margin-bottom:3px;">⏰ End</div>
+            <input type="time" id="eu-end" value="${ac.endTime||'23:59'}" style="width:100%;padding:7px 9px;border:2px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;outline:none;"/>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('edit-user-modal').style.display='flex';
 }
-function demoteUser(i){
+
+function toggleEditPerms(){
+  const r=document.getElementById('eu-r').value;
+  const pw=document.getElementById('eu-perms-wrap');
+  if(pw) pw.style.display=(r==='regular')?'block':'none';
+}
+
+function closeEditUser(){ document.getElementById('edit-user-modal').style.display='none'; _editIdx=null; }
+
+function saveEditUser(){
+  if(_editIdx===null) return;
   const a=ld(K.admins,[]);
-  if(!a[i])return;
-  // Count remaining super admins
-  const superCount=a.filter(u=>u.role==='super').length;
-  if(superCount<=1){
-    showToast('&#10060; Cannot demote — at least one Super Admin must remain','error');
-    return;
-  }
-  showModal('Remove Super Admin Access',
-    'Demote "'+a[i].displayName+'" to Regular Admin? They will lose Super Admin privileges.',
-    ()=>{
-      a[i].role='regular';
-      a[i].permissions={walawi:true,kawaida:true,ushuhuda:true};
-      sv(K.admins,a);
-      renderUsers();
-      showToast('&#8595; '+a[i].displayName+' demoted to Regular Admin','success');
-    });
+  const u=a[_editIdx]; if(!u) return;
+  const r=document.getElementById('eu-r').value;
+  const days=[...document.querySelectorAll('#eu-days input:checked')].map(c=>parseInt(c.value));
+  u.displayName=document.getElementById('eu-dn').value.trim()||u.displayName;
+  u.role=r;
+  u.permissions={
+    walawi: r==='super'||(r==='regular'&&document.getElementById('eu-w').checked),
+    kawaida: r==='super'||(r==='regular'&&document.getElementById('eu-k').checked),
+    ushuhuda: r==='super'||(r==='regular'&&document.getElementById('eu-u').checked)
+  };
+  u.access={
+    enabled: document.getElementById('eu-enabled').checked,
+    days: days.length?days:[0,1,2,3,4,5,6],
+    startTime: document.getElementById('eu-start').value||'00:00',
+    endTime: document.getElementById('eu-end').value||'23:59'
+  };
+  sv(K.admins,a);
+  // Update session if editing self
+  if(CU && CU.username===u.username){ saveSess(u); }
+  closeEditUser(); renderUsers();
+  showToast('✅ User updated: '+u.displayName,'success');
 }
 let _tt;
 function showToast(msg,type=''){
@@ -2020,6 +2213,8 @@ function renderBrandingPanel(){
 // ══════════════════════════════════════
 const K_LOGO = 'mom_custom_logo';
 const K_BG   = 'mom_custom_bg';
+const K_LOGO_SIZE = 'mom_logo_size';
+const DEFAULT_LOGO_SIZE = 34;
 
 // ── Defaults ──
 const DEFAULT_LOGO_SRC = document.querySelector('.logo-img-lg, .logo-img-sm') ?
@@ -2036,10 +2231,41 @@ function applyBrandingOnLoad(){
   if(savedLogo){
     applyLogoToPage(savedLogo);
   }
+  const savedSize = localStorage.getItem(K_LOGO_SIZE);
+  if(savedSize){ applyLogoSize(parseInt(savedSize), false); }
   const savedBg = localStorage.getItem(K_BG);
   if(savedBg){
     applyBgToPage(JSON.parse(savedBg));
   }
+}
+
+function applyLogoSize(size, save){
+  size = Math.min(80, Math.max(20, size));
+  // Use transform:scale so the logo grows visually without pushing the header layout
+  const scale = size / 34; // 34 is the base size
+  document.querySelectorAll('.logo-img-sm').forEach(img => {
+    img.style.transform = 'scale(' + scale + ')';
+  });
+  // Update slider & label if panel is open
+  const slider = document.getElementById('logo-size-slider');
+  const valEl  = document.getElementById('logo-size-val');
+  if(slider) slider.value = size;
+  if(valEl)  valEl.textContent = size + 'px';
+  // Update preview size in branding panel
+  const preview = document.getElementById('brand-logo-preview');
+  if(preview){ preview.style.width = Math.min(size * 2, 120) + 'px'; preview.style.height = Math.min(size * 2, 120) + 'px'; }
+  if(save !== false) localStorage.setItem(K_LOGO_SIZE, size);
+}
+
+function adjustLogoSize(delta){
+  const current = parseInt(localStorage.getItem(K_LOGO_SIZE) || DEFAULT_LOGO_SIZE);
+  applyLogoSize(current + delta);
+}
+
+function resetLogoSize(){
+  applyLogoSize(DEFAULT_LOGO_SIZE);
+  localStorage.removeItem(K_LOGO_SIZE);
+  showToast('↺ Logo size reset', 'success');
 }
 
 function applyLogoToPage(src){
@@ -2069,6 +2295,9 @@ function renderBrandingPanel(){
     const savedLogo = localStorage.getItem(K_LOGO);
     preview.src = savedLogo || getDefaultLogoSrc();
   }
+  // Sync logo size slider
+  const savedSize = parseInt(localStorage.getItem(K_LOGO_SIZE) || DEFAULT_LOGO_SIZE);
+  applyLogoSize(savedSize, false);
   // Show current bg status
   const savedBg = localStorage.getItem(K_BG);
   const statusEl = document.getElementById('brand-current-bg');
@@ -2475,25 +2704,6 @@ loadSess();
 applyBrandingOnLoad();
 applyTypographyOnLoad();
 if(CU){goMain();}else{show('signin');}
-
-// ── Hide header on scroll up, show on scroll down ──
-(function(){
-  let lastY = 0;
-  const appBody = document.getElementById ? null : null;
-  function getBody(){ return document.querySelector('#screen-main .app-body'); }
-  function getHeader(){ return document.querySelector('#screen-main .app-header'); }
-  document.addEventListener('scroll', handleScroll, true);
-  function handleScroll(e){
-    const body = e.target;
-    if(!body || !body.classList || !body.classList.contains('app-body')) return;
-    const hdr = getHeader();
-    if(!hdr) return;
-    const y = body.scrollTop;
-    if(y > lastY && y > 40){ hdr.classList.add('header-hidden'); }
-    else { hdr.classList.remove('header-hidden'); }
-    lastY = y;
-  }
-})();
 
 // ── Sticky Notes System ──
 // Note senders: grace, erik, mizeituni
