@@ -59,13 +59,6 @@ html, body {
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
 .err-box { background: var(--red-light); color: var(--red); border-radius: 10px; padding: 10px 14px; font-size: 0.84rem; font-weight: 700; margin-top: 12px; display: none; text-align: center; }
 .info-note { margin-top: 16px; text-align: center; background: var(--blue-pale); border-radius: 10px; padding: 10px 14px; font-size: 0.77rem; color: var(--text-light); line-height: 1.6; }
-#screen-setup { display: flex; align-items: center; justify-content: center; padding: 24px 16px; overflow-y: auto; }
-.setup-box { background: white; border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 420px; box-shadow: 0 24px 64px rgba(0,0,0,0.45); }
-.setup-badge { display: inline-block; background: var(--gold); color: var(--blue-deep); font-size: 0.7rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
-.setup-box h2 { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--blue-deep); font-weight: 800; margin-bottom: 6px; }
-.setup-box .sub { font-size: 0.84rem; color: var(--text-light); margin-bottom: 22px; line-height: 1.5; }
-.pw-bar-wrap { height: 5px; background: #e2e8f0; border-radius: 5px; margin-top: 6px; margin-bottom: 14px; overflow: hidden; }
-.pw-bar { height: 100%; border-radius: 5px; transition: width 0.3s, background 0.3s; width: 0; }
 #screen-main { display: flex; flex-direction: column; }
 .app-header { flex-shrink: 0; background: linear-gradient(135deg, #0a1f5c 0%, #1e40af 100%); padding: 10px 20px 8px; text-align: center; border-bottom: 3px solid var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.3s ease, opacity 0.3s ease; overflow: visible; position: relative; }
 .app-header .cross { display: none; }
@@ -643,25 +636,13 @@ html, body {
     <button class="btn-primary" onclick="doSignIn()">SIGN IN — INGIA</button>
     <div class="err-box" id="si-err">❌ Username au password si sahihi. / Incorrect credentials.</div>
     <div class="info-note">🔒 Sign in required to access all pages.<br>Ingia ili kuweza kuona kurasa zote.</div>
+    <div style="margin-top:10px;text-align:center;">
+      <button onclick="hardResetApp()" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:0.65rem;cursor:pointer;padding:6px;">Having trouble? Reset app</button>
+    </div>
   </div>
 </div>
 
-<div id="screen-setup" class="screen">
-  <div class="setup-box">
-    <span class="setup-badge">⭐ Super Admin — First Time Setup</span>
-    <h2>Welcome, <span id="setup-name"></span>!</h2>
-    <p class="sub">First time signing in. Create your password below.<br>Mara yako ya kwanza. Weka nywila yako.</p>
-    <label class="field-label">New Password / Nywila Mpya</label>
-    <input class="field-input" type="password" id="sp-pw1" placeholder="Create a password..."
-      oninput="checkPwStr()" autocomplete="new-password" style="margin-bottom:0;"/>
-    <div class="pw-bar-wrap"><div class="pw-bar" id="pw-bar"></div></div>
-    <label class="field-label">Confirm Password / Thibitisha</label>
-    <input class="field-input" type="password" id="sp-pw2" placeholder="Repeat password..."
-      autocomplete="new-password" style="margin-bottom:4px;"/>
-    <div class="err-box" id="sp-err"></div>
-    <button class="btn-primary" onclick="doSetupPw()">SET PASSWORD — WEKA NYWILA</button>
-  </div>
-</div>
+
 
 <div id="screen-main" class="screen">
   <div class="app-header">
@@ -674,24 +655,28 @@ html, body {
     <div style="display:flex;gap:6px;">
       <button class="btn-bar" id="btn-home" onclick="goWindowHome()" style="display:none;">🏠 Home</button>
       <button class="btn-bar" id="btn-draft" onclick="openDraft()" style="display:none;">✏️ Draft</button>
+      <button class="btn-bar" id="btn-chpw" onclick="openChangePwModal()" style="display:none;">🔑 Password</button>
       <button class="btn-bar" id="btn-ap" onclick="openAdmin()" style="display:none;">⚙️ Admin Panel</button>
       <button class="btn-bar" onclick="doSignOut()">Sign Out</button>
     </div>
   </div>
   <nav class="app-nav" id="app-nav-bar"></nav>
 
-  <!-- Window Switcher: Schedules | Departments -->
+  <!-- Window Switcher: dynamically rendered -->
   <div class="window-switcher" id="window-switcher" style="display:none;">
     <button class="win-btn" id="win-btn-schedules" onclick="switchWindow('schedules')">📅 Schedules</button>
     <button class="win-btn" id="win-btn-departments" onclick="switchWindow('departments')">🏛️ Departments</button>
+    <button class="win-btn" id="win-btn-wasimamizi" onclick="switchWindow('wasimamizi')">👔 Wasimamizi</button>
+    <button class="win-btn" id="win-btn-church-calendar" onclick="switchWindow('church-calendar')">📆 Church Calendar</button>
+    <span id="win-btn-custom-slot"></span>
   </div>
 
-  <!-- Landing: shown when user has both windows but none selected yet -->
+  <!-- Landing: shown when user has multiple windows -->
   <div id="win-landing" class="win-landing" style="display:none;">
     <div style="font-size:2.4rem;">⛪</div>
     <div class="win-landing-title">Choose a Window</div>
     <div class="win-landing-sub">Select where you'd like to go</div>
-    <div class="win-landing-btns">
+    <div class="win-landing-btns" id="win-landing-btns">
       <button class="win-landing-btn" id="wlb-schedules" onclick="switchWindow('schedules')" style="display:none;">
         <span class="wlb-icon">📅</span>
         <span class="wlb-label">SCHEDULES</span>
@@ -700,6 +685,15 @@ html, body {
         <span class="wlb-icon">🏛️</span>
         <span class="wlb-label">DEPARTMENTS</span>
       </button>
+      <button class="win-landing-btn" id="wlb-wasimamizi" onclick="switchWindow('wasimamizi')" style="display:none;">
+        <span class="wlb-icon">👔</span>
+        <span class="wlb-label">WASIMAMIZI</span>
+      </button>
+      <button class="win-landing-btn" id="wlb-church-calendar" onclick="switchWindow('church-calendar')" style="display:none;">
+        <span class="wlb-icon">📆</span>
+        <span class="wlb-label">CHURCH CALENDAR</span>
+      </button>
+      <span id="wlb-custom-slot"></span>
     </div>
   </div>
 
@@ -796,6 +790,45 @@ html, body {
     </div>
   </div><!-- end win-panel-departments -->
 
+  <!-- Wasimamizi Window -->
+  <div class="win-panel" id="win-panel-wasimamizi">
+    <div class="app-body">
+      <div class="content">
+        <div class="card">
+          <div class="card-hdr"><span>👔</span><h2>Wasimamizi</h2><span class="badge">Leaders</span></div>
+          <div class="card-body">
+            <div class="empty" style="padding:30px 0;">
+              <span class="eico">👔</span>
+              <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:6px;"><strong>Wasimamizi Window</strong></p>
+              <p style="color:var(--text-light);font-size:0.82rem;">Content for this window will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end win-panel-wasimamizi -->
+
+  <!-- Church Calendar Window -->
+  <div class="win-panel" id="win-panel-church-calendar">
+    <div class="app-body">
+      <div class="content">
+        <div class="card">
+          <div class="card-hdr"><span>📆</span><h2>Church Calendar</h2><span class="badge">Events</span></div>
+          <div class="card-body">
+            <div class="empty" style="padding:30px 0;">
+              <span class="eico">📆</span>
+              <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:6px;"><strong>Church Calendar</strong></p>
+              <p style="color:var(--text-light);font-size:0.82rem;">Content for this window will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end win-panel-church-calendar -->
+
+  <!-- Dynamic Custom Windows (rendered by JS) -->
+  <div id="custom-win-panels"></div>
+
   <!-- Sticky Note FAB (only shown to grace/erik/mizeituni) -->
   <button class="sticky-note-fab" id="sticky-note-fab" onclick="openStickyModal()" title="Send note to service leader" style="display:none;">📝</button>
 
@@ -868,6 +901,30 @@ html, body {
 
 
 
+  <!-- Edit Window Modal -->
+  <div id="edit-win-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99997;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:18px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.25);">
+      <div style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:white;">✏️ Edit Window</div>
+        <button onclick="closeEditWindowModal()" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.1rem;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:18px;">
+        <div style="font-size:0.65rem;color:#64748b;margin-bottom:10px;" id="ewm-id-label"></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input id="ewm-icon" type="text" maxlength="2"
+            style="width:50px;padding:10px 4px;border:2px solid var(--border);border-radius:9px;font-size:1.2rem;text-align:center;outline:none;flex-shrink:0;"/>
+          <input id="ewm-name" type="text" placeholder="Window name..." maxlength="30"
+            style="flex:1;padding:10px 12px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;"
+            onkeydown="if(event.key==='Enter')saveEditWindow()"/>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="closeEditWindowModal()" style="flex:1;padding:11px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Cancel</button>
+          <button onclick="saveEditWindow()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">✅ Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Headcount Reset Modal -->
   <div id="hc-reset-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:flex-end;justify-content:center;padding:0;">
     <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:22px 18px 36px;box-shadow:0 -8px 40px rgba(0,0,0,0.22);max-height:90vh;overflow-y:auto;">
@@ -919,37 +976,25 @@ html, body {
     </div>
   </div>
 
-  <!-- Monthly Report Reminder Modal -->
-  <div id="hc-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99998;align-items:center;justify-content:center;padding:16px;">
-    <div style="background:white;border-radius:20px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-      <!-- Header -->
-      <div style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:20px 20px 16px;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:6px;">📊</div>
-        <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:800;color:white;">Monthly Report Ready</div>
-        <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);margin-top:4px;" id="hcr-report-period"></div>
+  <!-- Change Own Password Modal -->
+  <div id="chpw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:20px;width:100%;max-width:380px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:18px 20px;text-align:center;">
+        <div style="font-size:1.6rem;margin-bottom:4px;">🔑</div>
+        <div style="font-family:'Cinzel',serif;font-size:0.95rem;font-weight:800;color:white;">Change Password</div>
+        <div id="chpw-username" style="font-size:0.72rem;color:rgba(255,255,255,0.6);margin-top:3px;"></div>
       </div>
-      <!-- Report preview -->
-      <div style="padding:16px 18px;max-height:55vh;overflow-y:auto;">
-        <div style="background:#f0f9ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:14px;margin-bottom:14px;">
-          <div style="font-family:'Cinzel',serif;font-size:0.72rem;font-weight:800;color:#1e40af;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">📋 Report Summary</div>
-          <div id="hcr-report-preview"></div>
-        </div>
-        <div id="hcr-email-section" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:14px;">
-          <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;color:#64748b;margin-bottom:6px;">📧 Report destination</div>
-          <div id="hcr-email-display" style="font-size:0.82rem;font-weight:700;color:#0a1f5c;"></div>
-        </div>
-        <div style="font-size:0.75rem;color:#64748b;line-height:1.5;margin-bottom:4px;">
-          This report summarises attendance data for the month. Press <strong>Submit Report</strong> to notify the Super Admin, or <strong>Remind Me Later</strong> to be reminded next time you open the app.
-        </div>
-      </div>
-      <!-- Buttons -->
-      <div style="padding:14px 18px 20px;display:flex;flex-direction:column;gap:8px;">
-        <button onclick="submitMonthlyReport()" style="width:100%;padding:15px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;cursor:pointer;min-height:52px;letter-spacing:0.04em;">
-          📤 Submit Report
-        </button>
+      <div style="padding:20px 18px;">
+        <label class="field-label">Current Password</label>
+        <input class="field-input" type="password" id="chpw-current" placeholder="Enter current password..." autocomplete="current-password"/>
+        <label class="field-label">New Password</label>
+        <input class="field-input" type="password" id="chpw-new" placeholder="New password (min 6 chars)..." autocomplete="new-password"/>
+        <label class="field-label">Confirm New Password</label>
+        <input class="field-input" type="password" id="chpw-confirm" placeholder="Repeat new password..." autocomplete="new-password" style="margin-bottom:4px;" onkeydown="if(event.key==='Enter')saveChangePw()"/>
+        <div id="chpw-err" style="font-size:0.75rem;color:#dc2626;margin-bottom:12px;display:none;"></div>
         <div style="display:flex;gap:8px;">
-          <button onclick="remindMeLater()" style="flex:1;padding:12px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;cursor:pointer;">⏰ Remind Me Later</button>
-          <button onclick="dismissReport()" style="flex:1;padding:12px;background:white;color:#94a3b8;border:2px solid #e2e8f0;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">✕ Dismiss</button>
+          <button onclick="closeChangePwModal()" style="flex:1;padding:12px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:12px;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:800;cursor:pointer;">Cancel</button>
+          <button onclick="saveChangePw()" style="flex:2;padding:12px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:800;cursor:pointer;">✅ Update Password</button>
         </div>
       </div>
     </div>
@@ -987,6 +1032,7 @@ html, body {
     <button class="atn" id="atn-users" onclick="switchATab('users')" style="display:none;">&#128101; Manage Admins</button>
     <button class="atn" id="atn-activity" onclick="switchATab('activity');renderActivityLog()" style="display:none;">📊 Activity Log</button>
     <button class="atn" id="atn-reports" onclick="switchATab('reports');renderReportsPanel()" style="display:none;">📤 Reports</button>
+    <button class="atn" id="atn-windows" onclick="switchATab('windows');renderWindowManager()" style="display:none;">🪟 Windows</button>
   </div>
   <div class="admin-body">
     <div class="admin-content">
@@ -1425,8 +1471,7 @@ html, body {
             <!-- Window Access -->
             <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:11px;padding:13px;margin-bottom:13px;">
               <div class="sec-label" style="margin-bottom:9px;color:#1e40af;">🪟 Window Access</div>
-              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">📅 Schedules Window</span><label class="toggle"><input type="checkbox" id="nu-win-schedules" checked/><span class="tog-slider"></span></label></div>
-              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">🏛️ Departments Window</span><label class="toggle"><input type="checkbox" id="nu-win-departments"/><span class="tog-slider"></span></label></div>
+              <div id="nu-win-rows"></div>
             </div>
             <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:11px;padding:13px;margin-bottom:13px;">
               <div class="sec-label" style="margin-bottom:9px;color:#15803d;">🔐 Login Access Control</div>
@@ -1569,7 +1614,35 @@ html, body {
             </div>
           </div>
         </div>
+      
+      <!-- Windows Manager Panel -->
+      <div class="admin-panel" id="ap-windows">
+        <div class="card">
+          <div class="card-hdr"><span>🪟</span><h2>Window Manager</h2><span class="badge">Navigation</span></div>
+          <div class="card-body">
+            <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:14px;line-height:1.5;">
+              Manage the navigation windows users can access. Built-in windows can be renamed. Add custom windows for new sections.
+            </p>
+            <div id="win-mgr-list" style="margin-bottom:16px;"></div>
+            <!-- Add new window -->
+            <div style="background:#f0f9ff;border:2px solid #bfdbfe;border-radius:12px;padding:13px;">
+              <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#1e40af;margin-bottom:10px;">➕ Add New Window</div>
+              <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <input id="wm-new-icon" type="text" value="🗂️" maxlength="2"
+                  style="width:50px;padding:9px 4px;border:2px solid #bfdbfe;border-radius:9px;font-size:1.1rem;text-align:center;outline:none;flex-shrink:0;"/>
+                <input id="wm-new-name" type="text" placeholder="Window name..." maxlength="30"
+                  style="flex:1;padding:9px 11px;border:2px solid #bfdbfe;border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;"
+                  onkeydown="if(event.key==='Enter')addCustomWindow()"/>
+              </div>
+              <button onclick="addCustomWindow()"
+                style="width:100%;padding:11px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:800;cursor:pointer;">
+                + Add Window
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+</div>
     </div>
   </div>
 </div>
@@ -1741,23 +1814,24 @@ const DK=[
   {time:'',act:'SALA YA BABA (WATU WOTE)',sub:'',lead:'',fontSize:16},
 ];
 const DA=[
-  {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,
+  {username:'grace',password:'Grace2026',displayName:'Grace',role:'super',
    permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true,receiveNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
    windows:['schedules','departments'],departments:['ushers','financial','event','intercessors','elders']},
-  {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,
+  {username:'erik',password:'Erik2026',displayName:'Erik',role:'super',
    permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true,receiveNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
    windows:['schedules','departments'],departments:['ushers','financial','event','intercessors','elders']},
-  {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,
+  {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',
    permissions:{walawi:false,kawaida:false,ushuhuda:true,sendNote:true,receiveNote:false},
-   access:{enabled:true,days:[0],startTime:'09:00',endTime:'13:00'},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
    windows:['schedules'],departments:[]},
-  {username:'Msimamizi',password:null,displayName:'Msimamizi',role:'view',firstLogin:true,
+  {username:'Msimamizi',password:null,displayName:'Msimamizi',role:'view',
    permissions:{walawi:false,kawaida:false,ushuhuda:false,sendNote:false,receiveNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
    windows:['schedules'],departments:[]},
 ];
+
 function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -1771,7 +1845,17 @@ if(localStorage.getItem('mom_data_ver') !== DATA_VERSION){
 if(!localStorage.getItem(K.admins)) sv(K.admins,DA);
 if(!localStorage.getItem(K.testimony)) sv(K.testimony,[]);
 let CU=null;
-function loadSess(){const s=ld(K.session,null);if(s)CU=s;}
+function loadSess(){
+  try {
+    const s = ld(K.session, null);
+    if(s && s.username) {
+      // Validate — look up user in current admin list to get fresh data
+      const admins = ld(K.admins, []);
+      const fresh = admins.find(a => a.username === s.username);
+      CU = fresh || s;
+    }
+  } catch(e) { CU = null; }
+}
 function saveSess(u){sv(K.session,u);CU=u;}
 function clearSess(){localStorage.removeItem(K.session);CU=null;}
 function show(id){
@@ -1802,9 +1886,17 @@ function doSignIn(){
     uAttempts.count=0; uAttempts.locked=false;
   }
 
-  // Locked out
+  // Locked out — but super admins can use their default password to bypass
   if(uAttempts.locked){
-    err.innerHTML='🔒 Account temporarily locked after 3 failed attempts.<br><small>Contact your Super Admin to unlock.</small>';
+    if(found.role==='super' && found.defaultPassword && pass===found.defaultPassword){
+      // Default password bypass — unlock and sign in
+      uAttempts.count=0; uAttempts.locked=false;
+      allAttempts[found.username]=uAttempts;
+      sv(K.failedAttempts,allAttempts);
+      logActivity({type:'login',username:found.username,displayName:found.displayName,ts,detail:'Signed in using default password after lockout'});
+      saveSess(found); goMain(); return;
+    }
+    err.innerHTML='🔒 Account temporarily locked after 3 failed attempts.<br><small>Contact your Super Admin to unlock, or use your default password.</small>';
     err.style.display='block';
     logActivity({type:'locked',username:found.username,displayName:found.displayName,ts,detail:'Attempted login while account is locked'});
     return;
@@ -1839,15 +1931,22 @@ function doSignIn(){
     return;
   }
 
-  // First login setup
-  if(found.firstLogin&&found.password===null){
-    document.getElementById('setup-name').textContent=found.displayName;
-    sessionStorage.setItem('su',found.username);
-    show('setup');return;
+  // No password set — must be set by Super Admin
+  if(found.password===null||found.password===undefined){
+    err.innerHTML='🔒 No password set for this account.<br><small>Please contact your Super Admin to set a password.</small>';
+    err.style.display='block'; return;
   }
 
-  // Wrong password
+  // Wrong password — but super admins can always use their default password
   if(found.password!==pass){
+    // Super admin default password bypass (works even when not locked)
+    if(found.role==='super' && found.defaultPassword && pass===found.defaultPassword){
+      // Clear any failed attempts and sign in
+      allAttempts[found.username]={count:0,lastTs:null,locked:false};
+      sv(K.failedAttempts,allAttempts);
+      logActivity({type:'login',username:found.username,displayName:found.displayName,ts,detail:'Signed in using default password'});
+      saveSess(found); goMain(); return;
+    }
     uAttempts.count++;
     uAttempts.lastTs = Date.now();
     const remaining = 3 - uAttempts.count;
@@ -1991,32 +2090,7 @@ function doSignOut(){
   document.getElementById('si-pass').value='';
   show('signin');
 }
-function checkPwStr(){
-  const pw=document.getElementById('sp-pw1').value;
-  const bar=document.getElementById('pw-bar');
-  let s=0;
-  if(pw.length>=6)s++;if(pw.length>=10)s++;
-  if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
-  bar.style.width=(s/5*100)+'%';
-  bar.style.background=s<=1?'#ef4444':s<=3?'#f59e0b':'#16a34a';
-}
-function doSetupPw(){
-  const pw1=document.getElementById('sp-pw1').value;
-  const pw2=document.getElementById('sp-pw2').value;
-  const err=document.getElementById('sp-err');
-  err.style.display='none';
-  if(pw1.length<6){err.textContent='&#10060; At least 6 characters needed';err.style.display='block';return;}
-  if(pw1!==pw2){err.textContent='&#10060; Passwords do not match / Hazilingani';err.style.display='block';return;}
-  const uname=sessionStorage.getItem('su');
-  const admins=ld(K.admins,[]);
-  const idx=admins.findIndex(a=>a.username.toLowerCase()===uname.toLowerCase());
-  if(idx<0)return;
-  admins[idx].password=pw1;admins[idx].firstLogin=false;
-  sv(K.admins,admins);sessionStorage.removeItem('su');
-  saveSess(admins[idx]);
-  showToast('&#9989; Password set! Welcome, '+admins[idx].displayName,'success');
-  goMain();
-}
+
 function goMain(){
   if(!CU){show('signin');return;}
   let displayLabel = CU.displayName;
@@ -2029,6 +2103,7 @@ function goMain(){
   const isView = CU.role==='view';
   const p = CU.permissions || {};
   document.getElementById('btn-ap').style.display = sup ? 'inline-block' : 'none';
+  document.getElementById('btn-chpw').style.display = sup ? 'inline-block' : 'none';
   document.getElementById('btn-draft').style.display = (!isView && sup) ? 'inline-block' : 'none';
   const cw = sup || p.walawi, ck = sup || p.kawaida, cu = sup || p.ushuhuda;
   document.getElementById('wth').style.display = (cw && !isView) ? '' : 'none';
@@ -2039,37 +2114,41 @@ function goMain(){
 
   // ── Window access setup ──
   const userWindows = CU.windows || ['schedules'];
-  const hasBoth = userWindows.includes('schedules') && userWindows.includes('departments');
+  const allWinDefs  = getWindowDefs(); // built-ins + custom
   const switcher = document.getElementById('window-switcher');
   const landing  = document.getElementById('win-landing');
-  // Hide all windows and switcher — user must click landing to open one
+
+  // Hide all windows and switcher
   document.querySelectorAll('.win-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.win-btn').forEach(b => b.classList.remove('active'));
-  if(switcher) switcher.style.display = 'none'; // always hidden until a window is chosen
-  // Hide window buttons for inaccessible windows
-  const sb = document.getElementById('win-btn-schedules');
-  const db = document.getElementById('win-btn-departments');
-  if(sb) sb.style.display = userWindows.includes('schedules') ? '' : 'none';
-  if(db) db.style.display = userWindows.includes('departments') ? '' : 'none';
-  // Landing big buttons
-  const wlbs = document.getElementById('wlb-schedules');
-  const wlbd = document.getElementById('wlb-departments');
-  if(wlbs) wlbs.style.display = userWindows.includes('schedules') ? 'flex' : 'none';
-  if(wlbd) wlbd.style.display = userWindows.includes('departments') ? 'flex' : 'none';
-  if(hasBoth){
-    // Show landing prompt — nav and switcher stay hidden until window is chosen
+  if(switcher) switcher.style.display = 'none';
+
+  // Render dynamic custom window switcher buttons + landing buttons
+  renderCustomWinButtons(userWindows);
+
+  // Show/hide built-in + custom window buttons based on user access
+  allWinDefs.forEach(w=>{
+    const hasAccess = sup || userWindows.includes(w.id);
+    const swBtn = document.getElementById('win-btn-'+w.id);
+    if(swBtn) swBtn.style.display = hasAccess ? '' : 'none';
+    const lbBtn = document.getElementById('wlb-'+w.id);
+    if(lbBtn) lbBtn.style.display = hasAccess ? 'flex' : 'none';
+  });
+
+  const accessibleWins = allWinDefs.filter(w=> sup || userWindows.includes(w.id));
+  const hasMultiple = accessibleWins.length > 1;
+
+  if(hasMultiple){
     if(landing) landing.style.display = 'flex';
     const nav = document.getElementById('app-nav-bar');
     if(nav) nav.style.display = 'none';
-    // Show Home button so they can return to landing any time
     const homeBtn = document.getElementById('btn-home');
     if(homeBtn) homeBtn.style.display = 'inline-block';
   } else {
-    // Only one window — open it directly, no choice needed
     if(landing) landing.style.display = 'none';
     const homeBtn = document.getElementById('btn-home');
     if(homeBtn) homeBtn.style.display = 'none';
-    const onlyWin = userWindows[0] || 'schedules';
+    const onlyWin = accessibleWins[0]?.id || 'schedules';
     switchWindow(onlyWin);
   }
 
@@ -2305,6 +2384,7 @@ function openAdmin(){
   document.getElementById('atn-menus').style.display=sup?'inline-block':'none';
   document.getElementById('atn-activity').style.display=sup?'inline-block':'none';
   document.getElementById('atn-reports').style.display=(sup||canViewReports())?'inline-block':'none';
+  document.getElementById('atn-windows').style.display=sup?'inline-block':'none';
   // Hide config sections from non-super viewers
   const isReportViewer = !sup && canViewReports();
   renderAW();renderAK();renderNames();if(sup)renderUsers();
@@ -2494,7 +2574,7 @@ function renderUsers(){
           ${esc(u.displayName)}
           <span style="font-size:0.65rem;font-weight:800;padding:2px 8px;border-radius:20px;background:${roleBg};color:${roleColor};">${roleLabel}</span>
         </strong>
-        <span style="font-size:0.72rem;color:var(--text-light);">@${esc(u.username)}${u.firstLogin?' · 🔑 Awaiting setup':''}</span>
+        <span style="font-size:0.72rem;color:var(--text-light);">@${esc(u.username)}${!u.password?' · 🔑 No password set':''}</span>
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
           ${accessStatus}${failCount}
           <span style="font-size:0.68rem;color:var(--text-light);">📅 ${daysStr}</span>
@@ -2503,7 +2583,10 @@ function renderUsers(){
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;">
         ${isSelf
-          ? '<span style="font-size:0.7rem;color:var(--text-light);">(You)</span>'
+          ? `<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
+              <span style="font-size:0.68rem;color:var(--text-light);background:#f1f5f9;padding:2px 8px;border-radius:20px;font-weight:700;">👤 You</span>
+              <button style="padding:4px 10px;border:1.5px solid var(--blue-bright);background:var(--blue-pale);color:var(--blue-deep);border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="openEditUser(${i})">✏️ Edit</button>
+            </div>`
           : `<div style="display:flex;gap:5px;flex-wrap:wrap;">
               ${isLocked ? `<button style="padding:4px 10px;border:1.5px solid #dc2626;background:#fee2e2;color:#dc2626;border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="unlockUser('${esc(u.username)}')">🔓 Unlock</button>` : ''}
               <button style="padding:4px 10px;border:1.5px solid var(--blue-bright);background:var(--blue-pale);color:var(--blue-deep);border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="openEditUser(${i})">✏️ Edit</button>
@@ -2531,11 +2614,9 @@ function addAdmin(){
   if(a.length>=MAX_USERS)return showToast('❌ Maximum 500 users reached!','error');
   if(a.find(x=>x.username.toLowerCase()===u.toLowerCase()))return showToast('Username already exists!','error');
   const days=[...document.querySelectorAll('#nu-days input:checked')].map(c=>parseInt(c.value));
-  const wins=[];
-  if(document.getElementById('nu-win-schedules')?.checked) wins.push('schedules');
-  if(document.getElementById('nu-win-departments')?.checked) wins.push('departments');
+  const wins = getWindowDefs().filter(w=>document.getElementById('nu-win-'+w.id)?.checked).map(w=>w.id);
   a.push({
-    username:u, password:p, displayName:dn, role:r, firstLogin:false,
+    username:u, password:p, displayName:dn, role:r,
     permissions:{
       walawi: r==='super'||document.getElementById('p-w').checked,
       kawaida: r==='super'||document.getElementById('p-k').checked,
@@ -2596,8 +2677,7 @@ function openEditUser(i){
       <!-- Window Access -->
       <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:11px;margin-bottom:10px;">
         <div class="sec-label" style="margin-bottom:8px;color:#1e40af;">🪟 Window Access</div>
-        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">📅 Schedules Window</span><label class="toggle"><input type="checkbox" id="eu-win-schedules" ${uWindows.includes('schedules')?'checked':''}/><span class="tog-slider"></span></label></div>
-        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">🏛️ Departments Window</span><label class="toggle"><input type="checkbox" id="eu-win-departments" ${uWindows.includes('departments')?'checked':''}/><span class="tog-slider"></span></label></div>
+        ${getWindowDefs().map(w=>`<div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">${w.icon} ${w.name}</span><label class="toggle"><input type="checkbox" id="eu-win-${w.id}" ${uWindows.includes(w.id)?'checked':''}/><span class="tog-slider"></span></label></div>`).join('')}
       </div>
 
       <!-- Department Access -->
@@ -2605,6 +2685,29 @@ function openEditUser(i){
         <div class="sec-label" style="margin-bottom:8px;color:#15803d;">🏛️ Department Access</div>
         ${DEPT_DEFS.map(d=>`<div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">${d.icon} ${d.name}</span><label class="toggle"><input type="checkbox" id="eu-dept-${d.id}" ${uDepts.includes(d.id)?'checked':''}/><span class="tog-slider"></span></label></div>`).join('')}
       </div>
+
+      <!-- Set Password (Super Admin only) -->
+      <div style="background:#fef3c7;border:1.5px solid #fde68a;border-radius:10px;padding:11px;margin-bottom:10px;">
+        <div class="sec-label" style="margin-bottom:7px;color:#92400e;">🔑 Set Password</div>
+        <div style="font-size:0.75rem;color:#78350f;margin-bottom:9px;line-height:1.4;">
+          ${u.password?'✅ Password is set. Enter a new one to change it.':'⚠️ No password set — user cannot log in until you set one.'}
+        </div>
+        <input class="field-input" type="password" id="eu-pw1" placeholder="New password..." autocomplete="new-password" style="margin-bottom:7px;"/>
+        <input class="field-input" type="password" id="eu-pw2" placeholder="Confirm password..." autocomplete="new-password" style="margin-bottom:0;"/>
+        <div id="eu-pw-err" style="font-size:0.72rem;color:#dc2626;margin-top:4px;display:none;"></div>
+      </div>
+
+      <!-- Default Password — super admin only -->
+      ${u.role==='super'?`
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:10px;">
+        <div class="sec-label" style="margin-bottom:6px;color:#15803d;">🛡️ Default Password (Super Admin)</div>
+        <div style="font-size:0.75rem;color:#166534;margin-bottom:9px;line-height:1.4;">
+          A fallback password the Super Admin can use to sign in after 3 failed attempts or if they forget their password. Keep this secret and secure.
+        </div>
+        <div style="font-size:0.72rem;font-weight:800;color:#15803d;margin-bottom:5px;">${u.defaultPassword?'✅ Default password is set':'⚠️ No default password set yet'}</div>
+        <input class="field-input" type="password" id="eu-defpw" placeholder="Set or change default password..." autocomplete="new-password" style="margin-bottom:0;"/>
+        <div style="font-size:0.68rem;color:#64748b;margin-top:4px;">Leave blank to keep existing default password.</div>
+      </div>`:''}
 
       <!-- Access Control -->
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:6px;">
@@ -2647,9 +2750,7 @@ function saveEditUser(){
   const r=document.getElementById('eu-r').value;
   const days=[...document.querySelectorAll('#eu-days input:checked')].map(c=>parseInt(c.value));
   // Windows & departments
-  const wins=[];
-  if(document.getElementById('eu-win-schedules')?.checked) wins.push('schedules');
-  if(document.getElementById('eu-win-departments')?.checked) wins.push('departments');
+  const wins = getWindowDefs().filter(w=>document.getElementById('eu-win-'+w.id)?.checked).map(w=>w.id);
   u.displayName=document.getElementById('eu-dn').value.trim()||u.displayName;
   u.role=r;
   u.permissions={
@@ -2667,6 +2768,25 @@ function saveEditUser(){
   };
   u.windows = wins.length ? wins : ['schedules'];
   u.departments = DEPT_DEFS.filter(d=>document.getElementById('eu-dept-'+d.id)?.checked).map(d=>d.id);
+
+  // Handle password update
+  const pw1 = document.getElementById('eu-pw1')?.value||'';
+  const pw2 = document.getElementById('eu-pw2')?.value||'';
+  const pwErr = document.getElementById('eu-pw-err');
+  if(pw1 || pw2){
+    if(pw1.length < 6){ if(pwErr){pwErr.textContent='Password must be at least 6 characters'; pwErr.style.display='block';} return; }
+    if(pw1 !== pw2){ if(pwErr){pwErr.textContent='Passwords do not match'; pwErr.style.display='block';} return; }
+    u.password = pw1;
+    if(pwErr) pwErr.style.display='none';
+  }
+
+  // Handle default password (super admin only)
+  const defPw = document.getElementById('eu-defpw')?.value||'';
+  if(defPw){
+    if(defPw.length < 6){ showToast('Default password must be at least 6 characters','error'); return; }
+    u.defaultPassword = defPw;
+  }
+
   sv(K.admins,a);
   if(CU && CU.username===u.username){ saveSess(u); }
   closeEditUser(); renderUsers();
@@ -2893,8 +3013,10 @@ function applyTypographyOnLoad(){
 }
 
 function applyTypoToPage(t){
+  const headingEls = document.querySelectorAll(
+    '.app-header h1, .card-hdr h2, .admin-hdr h2, .draft-hdr h2, .nav-btn, .cinzel, [class*="Cinzel"]'
+  );
   // Apply heading font to Cinzel elements (app header h1, card headers, nav)
-  const headingEls = document.querySelectorAll('.app-header h1, .card-hdr h2, .nav-btn, .admin-hdr h2, .draft-hdr h2, .signin-logo h1, .setup-box h2');
   headingEls.forEach(el=>{
     el.style.fontFamily = `'${t.headingFont}', serif`;
     el.style.color = el.closest('.app-header') || el.closest('.card-hdr') || el.closest('.admin-hdr') || el.closest('.draft-hdr') ? t.headingColor : '';
@@ -3620,6 +3742,7 @@ const DEPT_DEFS_DEFAULT = [
   {id:'elders',     name:'Elders',       icon:'📖', color:'#ffe4e6', border:'#fda4af', builtin:true},
 ];
 const K_CUSTOM_DEPTS = 'mom_custom_depts_v1';
+const K_WINDOWS = 'mom_windows_v1';
 
 function getDeptDefs(){
   const custom = ld(K_CUSTOM_DEPTS,[]);
@@ -3643,27 +3766,29 @@ function goWindowHome(){
 }
 
 function switchWindow(winId, silent){
-  // Hide landing screen
   const landing = document.getElementById('win-landing');
   if(landing) landing.style.display = 'none';
-  // Show the top switcher bar now that a window is active
+
+  // Show switcher if user has access to more than one window
   const switcher = document.getElementById('window-switcher');
   if(switcher){
+    const allDefs = getWindowDefs();
     const userWindows = (CU && CU.windows) || ['schedules'];
-    if(userWindows.includes('schedules') && userWindows.includes('departments')){
-      switcher.style.display = 'flex';
-    }
+    const sup = CU && CU.role === 'super';
+    const accessible = allDefs.filter(w=> sup || userWindows.includes(w.id));
+    switcher.style.display = accessible.length > 1 ? 'flex' : 'none';
   }
-  // Show nav bar only when Schedules window is active, hide for Departments
+
+  // Show nav only for Schedules
   const nav = document.getElementById('app-nav-bar');
   if(nav) nav.style.display = (winId === 'schedules') ? 'flex' : 'none';
 
   document.querySelectorAll('.win-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.win-btn').forEach(b=>b.classList.remove('active'));
   const panel = document.getElementById('win-panel-'+winId);
-  const btn = document.getElementById('win-btn-'+winId);
+  const btn   = document.getElementById('win-btn-'+winId);
   if(panel) panel.classList.add('active');
-  if(btn) btn.classList.add('active');
+  if(btn)   btn.classList.add('active');
   if(winId === 'departments'){ renderDeptGrid(); setTimeout(checkMonthlyReportReminder, 800); }
 }
 
@@ -4539,83 +4664,31 @@ const MONTH_NAMES_RPT = ['','January','February','March','April','May','June','J
 function checkMonthlyReportReminder(){
   if(!CU) return;
   const cfg = getReportConfig();
-  if(!cfg.leadUsername || CU.username !== cfg.leadUsername) return; // only for usher lead
-  const now   = new Date();
-  const day   = now.getDate();
-  const total = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-  const daysLeft = total - day;
-  if(daysLeft > 3) return; // only in last 3 days of month
+  if(!cfg.leadUsername || CU.username !== cfg.leadUsername) return;
 
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const dismissed = cfg.dismissedMonths || [];
+  const now  = new Date();
+  const day  = now.getDate();
+
+  // Only trigger from day 5 onwards (5 days after month end)
+  if(day < 5) return;
+
+  // Target = previous month
+  const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevYM   = `${prevDate.getFullYear()}-${String(prevDate.getMonth()+1).padStart(2,'0')}`;
+
+  // Skip if already submitted
   const log = getReportLog();
-  const alreadySubmitted = log.some(r=>r.month===thisMonth);
-  if(alreadySubmitted) return;
-  if(dismissed.includes(thisMonth)) return;
+  if(log.some(r=>r.month===prevYM)) return;
 
-  // Show the reminder
-  showMonthlyReportModal(thisMonth);
+  // Auto-send silently — no popup
+  autoSubmitMonthlyReport(prevYM);
 }
 
-function showMonthlyReportModal(ym){
+function autoSubmitMonthlyReport(ym){
   const [y,m] = ym.split('-');
   const label = MONTH_NAMES_RPT[parseInt(m)]+' '+y;
   const cfg   = getReportConfig();
 
-  // Build report data
-  const hcData = getHeadcountData();
-  const history = (hcData._history||[]).filter(h=>h.date?.startsWith(ym));
-  const dayDefs = [{id:'sunday',label:'Sunday',icon:'☀️'},{id:'saturday',label:'Saturday',icon:'🌤️'},{id:'friday',label:'Friday',icon:'🌙'}];
-
-  const totalPeople   = history.reduce((s,h)=>s+(h.total||0),0);
-  const totalAdults   = history.reduce((s,h)=>s+(h.adults||0),0);
-  const totalChildren = history.reduce((s,h)=>s+(h.children||0),0);
-  const sessions      = history.length;
-
-  const periodEl  = document.getElementById('hcr-report-period');
-  const previewEl = document.getElementById('hcr-report-preview');
-  const emailEl   = document.getElementById('hcr-email-display');
-
-  if(periodEl)  periodEl.textContent = label;
-  if(emailEl)   emailEl.textContent  = cfg.churchEmail || '(No email configured — Super Admin will receive in-app)';
-
-  if(previewEl) previewEl.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-      ${[
-        {icon:'👥',label:'Total Attendance',val:totalPeople,bg:'#dbeafe',c:'#1e40af'},
-        {icon:'📅',label:'Sessions',val:sessions,bg:'#d1fae5',c:'#065f46'},
-        {icon:'👨‍👩',label:'Adults',val:totalAdults,bg:'#ede9fe',c:'#5b21b6'},
-        {icon:'👦👧',label:'Children',val:totalChildren,bg:'#fef3c7',c:'#92400e'},
-      ].map(s=>`<div style="background:${s.bg};border-radius:9px;padding:9px;text-align:center;">
-        <div style="font-size:1rem;">${s.icon}</div>
-        <div style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:800;color:${s.c};">${s.val}</div>
-        <div style="font-size:0.58rem;font-weight:800;text-transform:uppercase;color:${s.c};opacity:0.75;">${s.label}</div>
-      </div>`).join('')}
-    </div>
-    ${dayDefs.map(d=>{
-      const recs = history.filter(h=>h.dayId===d.id);
-      const tot  = recs.reduce((s,h)=>s+(h.total||0),0);
-      return tot>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e2e8f0;font-size:0.78rem;">
-        <span>${d.icon} ${d.label} (${recs.length} session${recs.length!==1?'s':''})</span>
-        <strong style="color:#1e40af;">${tot} people</strong>
-      </div>`:'';
-    }).join('')}
-    ${!sessions?'<div style="text-align:center;color:#64748b;padding:10px;font-size:0.8rem;">No attendance data recorded for '+label+'.</div>':''}
-  `;
-
-  // Store current month for submit
-  document.getElementById('hc-report-modal').dataset.month = ym;
-  document.getElementById('hc-report-modal').dataset.label = label;
-  document.getElementById('hc-report-modal').style.display = 'flex';
-}
-
-function submitMonthlyReport(){
-  const modal = document.getElementById('hc-report-modal');
-  const ym    = modal.dataset.month;
-  const label = modal.dataset.label;
-  const cfg   = getReportConfig();
-
-  // Build full report text
   const hcData  = getHeadcountData();
   const history = (hcData._history||[]).filter(h=>h.date?.startsWith(ym));
   const totalP  = history.reduce((s,h)=>s+(h.total||0),0);
@@ -4628,36 +4701,30 @@ function submitMonthlyReport(){
     id: Date.now(),
     month: ym,
     label,
-    submittedBy: CU.displayName,
+    submittedBy: CU.displayName+' (auto)',
     submittedAt: new Date().toLocaleString(),
     destination: cfg.churchEmail||'In-app only',
-    summary: { total:totalP, adults:totalA, children:totalC, male:totM, female:totF, sessions:history.length },
+    summary:{ total:totalP, adults:totalA, children:totalC, male:totM, female:totF, sessions:history.length },
     records: history,
-    status: cfg.churchEmail ? 'sent' : 'logged'
+    status: cfg.churchEmail ? 'sent' : 'logged',
+    auto: true
   };
 
-  // Save to report log
+  // Save to log
   const log = getReportLog();
   log.unshift(report);
   if(log.length>50) log.length=50;
   saveReportLog(log);
 
-  // Mark this month as submitted
-  const cfg2 = getReportConfig();
-  if(!cfg2.dismissedMonths) cfg2.dismissedMonths=[];
-  cfg2.dismissedMonths = cfg2.dismissedMonths.filter(m=>m!==ym);
-  saveReportConfig(cfg2);
+  logActivity({type:'login', username:CU.username, displayName:CU.displayName,
+    ts:new Date().toLocaleString(), detail:`Auto-report generated for ${label}`});
 
-  // Log to activity log
-  logActivity({type:'login',username:CU.username,displayName:CU.displayName,
-    ts:new Date().toLocaleString(),detail:`Monthly report submitted for ${label}`});
-
-  // If email configured, open mailto (best available on mobile)
+  // Open mailto if email configured
   if(cfg.churchEmail){
     const subject = encodeURIComponent(`Mount of Olives Ministry — Attendance Report: ${label}`);
     const body = encodeURIComponent(
       `MOUNT OF OLIVES MINISTRY\nAttendance Report: ${label}\n\n`+
-      `Submitted by: ${CU.displayName}\nDate: ${new Date().toLocaleString()}\n\n`+
+      `Generated automatically by: ${CU.displayName}\nDate: ${new Date().toLocaleString()}\n\n`+
       `━━━ SUMMARY ━━━\n`+
       `Total Attendance : ${totalP}\n`+
       `Adults           : ${totalA}\n`+
@@ -4669,33 +4736,17 @@ function submitMonthlyReport(){
       ['sunday','saturday','friday'].map(dayId=>{
         const recs = history.filter(h=>h.dayId===dayId);
         const tot  = recs.reduce((s,h)=>s+(h.total||0),0);
-        const dayLabel = recs[0]?.dayLabel||dayId;
-        return recs.length?`${dayLabel}: ${tot} total (${recs.length} sessions)`:null;
+        const dl   = recs[0]?.dayLabel||dayId;
+        return recs.length?`${dl}: ${tot} total (${recs.length} sessions)`:null;
       }).filter(Boolean).join('\n')+
       `\n\n━━━ RECORDS ━━━\n`+
-      history.map(h=>`${h.dayLabel} ${h.date}: Adults ${h.adults}, Children ${h.children}, Total ${h.total} — by ${h.enteredBy}`).join('\n')+
+      history.map(h=>`${h.dayLabel} ${h.date}: Adults ${h.adults||0}, Children ${h.children||0}, Total ${h.total} — by ${h.enteredBy}`).join('\n')+
       `\n\nGenerated automatically by Mount of Olives Ministry App.`
     );
     window.open(`mailto:${cfg.churchEmail}?subject=${subject}&body=${body}`, '_blank');
   }
 
-  modal.style.display='none';
-  showToast('✅ Report submitted for '+label, 'success');
-}
-
-function remindMeLater(){
-  document.getElementById('hc-report-modal').style.display='none';
-  showToast('⏰ You will be reminded next time','success');
-}
-
-function dismissReport(){
-  const modal = document.getElementById('hc-report-modal');
-  const ym    = modal.dataset.month;
-  const cfg   = getReportConfig();
-  if(!cfg.dismissedMonths) cfg.dismissedMonths=[];
-  if(ym && !cfg.dismissedMonths.includes(ym)) cfg.dismissedMonths.push(ym);
-  saveReportConfig(cfg);
-  modal.style.display='none';
+  showToast(`📤 Auto-report sent for ${label}`, 'success');
 }
 
 // ── Reports Admin Panel ──
@@ -4813,7 +4864,7 @@ function renderReportsPanel(){
         <div style="background:white;border:1.5px solid var(--border);border-left:4px solid var(--blue-bright);border-radius:10px;padding:11px 13px;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:5px;">
             <strong style="font-size:0.82rem;color:var(--blue-deep);">📊 ${esc(r.label)}</strong>
-            <span style="font-size:0.68rem;background:${r.status==='sent'?'#d1fae5':'#dbeafe'};color:${r.status==='sent'?'#065f46':'#1e40af'};padding:2px 8px;border-radius:20px;font-weight:800;">${r.status==='sent'?'✅ Sent':'📋 Logged'}</span>
+            <span style="font-size:0.68rem;background:${r.status==='sent'?'#d1fae5':'#dbeafe'};color:${r.status==='sent'?'#065f46':'#1e40af'};padding:2px 8px;border-radius:20px;font-weight:800;">${r.status==='sent'?'✅ Sent':'📋 Logged'}${r.auto?' 🤖 Auto':''}</span>
           </div>
           <div style="font-size:0.72rem;color:var(--text-light);display:flex;flex-wrap:wrap;gap:8px;">
             <span>👤 ${esc(r.submittedBy)}</span>
@@ -4915,10 +4966,259 @@ function deleteDept(deptId){
 }
 
 
+// ═══════════════════════════════════════════════════════════════
+// ── WINDOW MANAGER ──
+// ═══════════════════════════════════════════════════════════════
+
+const WIN_DEFS_DEFAULT = [
+  {id:'schedules',       name:'Schedules',       icon:'📅', builtin:true},
+  {id:'departments',     name:'Departments',     icon:'🏛️', builtin:true},
+  {id:'wasimamizi',      name:'Wasimamizi',      icon:'👔', builtin:true},
+  {id:'church-calendar', name:'Church Calendar', icon:'📆', builtin:true},
+];
+
+function getWindowDefs(){
+  const custom = ld(K_WINDOWS, []);
+  // Merge: start with defaults, apply any saved overrides for built-ins
+  const saved = ld('mom_win_overrides_v1', {});
+  const base = WIN_DEFS_DEFAULT.map(w=>({
+    ...w,
+    name: saved[w.id]?.name || w.name,
+    icon: saved[w.id]?.icon || w.icon,
+  }));
+  return [...base, ...custom];
+}
+
+function saveWinOverride(id, name, icon){
+  const saved = ld('mom_win_overrides_v1', {});
+  saved[id] = {name, icon};
+  sv('mom_win_overrides_v1', saved);
+}
+
+function renderCustomWinButtons(userWindows){
+  // Render custom window buttons into switcher + landing slots
+  const custom = ld(K_WINDOWS, []);
+  const sup = CU && CU.role === 'super';
+  const slot = document.getElementById('win-btn-custom-slot');
+  const lSlot = document.getElementById('wlb-custom-slot');
+  if(slot) slot.innerHTML = custom.map(w=>`
+    <button class="win-btn" id="win-btn-${w.id}" onclick="switchWindow('${w.id}')"
+      style="${(sup||userWindows.includes(w.id))?'':'display:none;'}">
+      ${w.icon} ${w.name}
+    </button>`).join('');
+  if(lSlot) lSlot.innerHTML = custom.map(w=>`
+    <button class="win-landing-btn" id="wlb-${w.id}" onclick="switchWindow('${w.id}')"
+      style="display:${(sup||userWindows.includes(w.id))?'flex':'none'};">
+      <span class="wlb-icon">${w.icon}</span>
+      <span class="wlb-label">${w.name.toUpperCase()}</span>
+    </button>`).join('');
+
+  // Render custom win panels if not already present
+  const panelContainer = document.getElementById('custom-win-panels');
+  if(panelContainer){
+    panelContainer.innerHTML = custom.map(w=>`
+      <div class="win-panel" id="win-panel-${w.id}">
+        <div class="app-body"><div class="content">
+          <div class="card">
+            <div class="card-hdr"><span>${w.icon}</span><h2>${esc(w.name)}</h2><span class="badge">Window</span></div>
+            <div class="card-body">
+              <div class="empty" style="padding:30px 0;">
+                <span class="eico">${w.icon}</span>
+                <p style="color:var(--text-light);font-size:0.86rem;"><strong>${esc(w.name)}</strong></p>
+                <p style="color:var(--text-light);font-size:0.82rem;">Content coming soon.</p>
+              </div>
+            </div>
+          </div>
+        </div></div>
+      </div>`).join('');
+  }
+}
+
+function renderWindowManager(){
+  const list = document.getElementById('win-mgr-list');
+  if(!list) return;
+  const defs = getWindowDefs();
+  list.innerHTML = defs.map((w,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+      <span style="font-size:1.3rem;">${w.icon}</span>
+      <div style="flex:1;">
+        <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:var(--blue-deep);">${esc(w.name)}</div>
+        <div style="font-size:0.65rem;color:var(--text-light);">ID: ${w.id} ${w.builtin?'· Built-in':''}</div>
+      </div>
+      <button onclick="openEditWindowModal('${w.id}')"
+        style="padding:5px 12px;background:var(--blue-pale);color:var(--blue-bright);border:1.5px solid var(--blue-bright);border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">
+        ✏️ Edit
+      </button>
+      ${!w.builtin?`<button onclick="deleteCustomWindow('${w.id}')"
+        style="padding:5px 10px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">
+        ✕
+      </button>`:''}
+    </div>`).join('');
+
+  // Also refresh nu-win-rows in Add User form
+  const nuRows = document.getElementById('nu-win-rows');
+  if(nuRows) nuRows.innerHTML = getWindowDefs().map(w=>
+    `<div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">${w.icon} ${w.name}</span><label class="toggle"><input type="checkbox" id="nu-win-${w.id}" ${w.id==='schedules'?'checked':''}/><span class="tog-slider"></span></label></div>`
+  ).join('');
+}
+
+let _editWinId = null;
+
+function openEditWindowModal(winId){
+  const defs = getWindowDefs();
+  const w = defs.find(x=>x.id===winId);
+  if(!w) return;
+  _editWinId = winId;
+  const overlay = document.getElementById('edit-win-modal');
+  if(!overlay) return;
+  document.getElementById('ewm-icon').value = w.icon;
+  document.getElementById('ewm-name').value = w.name;
+  document.getElementById('ewm-id-label').textContent = 'ID: ' + w.id + (w.builtin?' (built-in)':'');
+  overlay.style.display = 'flex';
+  setTimeout(()=>document.getElementById('ewm-name')?.focus(),100);
+}
+
+function closeEditWindowModal(){
+  const el = document.getElementById('edit-win-modal');
+  if(el) el.style.display='none';
+  _editWinId = null;
+}
+
+function saveEditWindow(){
+  if(!_editWinId) return;
+  const icon = document.getElementById('ewm-icon')?.value.trim()||'🗂️';
+  const name = document.getElementById('ewm-name')?.value.trim()||'';
+  if(!name){ showToast('Enter a window name','error'); return; }
+
+  const defs = getWindowDefs();
+  const w = defs.find(x=>x.id===_editWinId);
+  if(!w) return;
+
+  if(w.builtin){
+    saveWinOverride(_editWinId, name, icon);
+  } else {
+    const custom = ld(K_WINDOWS,[]);
+    const idx = custom.findIndex(x=>x.id===_editWinId);
+    if(idx>=0){ custom[idx].name=name; custom[idx].icon=icon; sv(K_WINDOWS,custom); }
+  }
+
+  // Update live UI
+  const swBtn = document.getElementById('win-btn-'+_editWinId);
+  if(swBtn) swBtn.textContent = icon+' '+name;
+  const lbBtn = document.getElementById('wlb-'+_editWinId);
+  if(lbBtn){ lbBtn.querySelector('.wlb-icon').textContent=icon; lbBtn.querySelector('.wlb-label').textContent=name.toUpperCase(); }
+
+  closeEditWindowModal();
+  renderWindowManager();
+  showToast('✅ Window updated','success');
+}
+
+function addCustomWindow(){
+  const icon = document.getElementById('wm-new-icon')?.value.trim()||'🗂️';
+  const name = document.getElementById('wm-new-name')?.value.trim()||'';
+  if(!name){ showToast('Enter a window name','error'); return; }
+  const all = getWindowDefs();
+  if(all.find(w=>w.name.toLowerCase()===name.toLowerCase())){ showToast('A window with this name already exists','error'); return; }
+
+  const id = 'win_'+Date.now();
+  const custom = ld(K_WINDOWS,[]);
+  custom.push({id, name, icon, builtin:false});
+  sv(K_WINDOWS, custom);
+
+  document.getElementById('wm-new-name').value='';
+  document.getElementById('wm-new-icon').value='🗂️';
+
+  // Re-render buttons + panels
+  const userWindows = (CU&&CU.windows)||['schedules'];
+  renderCustomWinButtons(userWindows);
+  renderWindowManager();
+  showToast(`✅ "${name}" window added`,'success');
+}
+
+function deleteCustomWindow(winId){
+  const w = getWindowDefs().find(x=>x.id===winId);
+  if(!w||w.builtin){ showToast('Built-in windows cannot be deleted','error'); return; }
+  showModal('Delete Window',`Delete the "${w.name}" window?`,()=>{
+    const custom = ld(K_WINDOWS,[]).filter(x=>x.id!==winId);
+    sv(K_WINDOWS, custom);
+    const panel = document.getElementById('win-panel-'+winId);
+    if(panel) panel.remove();
+    const swBtn = document.getElementById('win-btn-'+winId);
+    if(swBtn) swBtn.remove();
+    const lbBtn = document.getElementById('wlb-'+winId);
+    if(lbBtn) lbBtn.remove();
+    renderWindowManager();
+    showToast('🗑️ Window deleted','success');
+  });
+}
+
+// ── Change Own Password ──
+function openChangePwModal(){
+  if(!CU) return;
+  document.getElementById('chpw-username').textContent = CU.displayName + ' (@' + CU.username + ')';
+  ['chpw-current','chpw-new','chpw-confirm'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  const err = document.getElementById('chpw-err');
+  if(err){ err.textContent=''; err.style.display='none'; }
+  document.getElementById('chpw-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('chpw-current')?.focus(),100);
+}
+
+function closeChangePwModal(){
+  document.getElementById('chpw-modal').style.display='none';
+}
+
+function saveChangePw(){
+  if(!CU) return;
+  const current = document.getElementById('chpw-current')?.value||'';
+  const newPw   = document.getElementById('chpw-new')?.value||'';
+  const confirm = document.getElementById('chpw-confirm')?.value||'';
+  const err = document.getElementById('chpw-err');
+  const showErr = (msg)=>{ if(err){err.textContent=msg;err.style.display='block';} };
+
+  // Validate current password
+  const admins = ld(K.admins,[]);
+  const idx = admins.findIndex(a=>a.username===CU.username);
+  if(idx<0){ showErr('User not found.'); return; }
+  if(admins[idx].password && admins[idx].password !== current){
+    showErr('❌ Current password is incorrect.'); return;
+  }
+  if(newPw.length < 6){ showErr('❌ New password must be at least 6 characters.'); return; }
+  if(newPw !== confirm){ showErr('❌ Passwords do not match.'); return; }
+
+  // Save
+  admins[idx].password = newPw;
+  sv(K.admins, admins);
+  // Update session
+  CU = admins[idx];
+  saveSess(CU);
+  closeChangePwModal();
+  showToast('✅ Password updated successfully','success');
+}
+
+function hardResetApp(){
+  if(!confirm('This will clear your session and reload the app. Continue?')) return;
+  try { localStorage.removeItem(K.session); } catch(e){}
+  try { sessionStorage.clear(); } catch(e){}
+  CU = null;
+  location.reload();
+}
+
 loadSess();
-applyBrandingOnLoad();
-applyTypographyOnLoad();
-if(CU){goMain();}else{show('signin');}
+try { applyBrandingOnLoad(); } catch(e){ console.warn('branding error', e); }
+try { applyTypographyOnLoad(); } catch(e){ console.warn('typography error', e); }
+try {
+  if(CU){ goMain(); } else { show('signin'); }
+} catch(e) {
+  console.error('App init error:', e);
+  CU = null;
+  try { show('signin'); } catch(e2){
+    // Last resort — force signin visible directly
+    const s = document.getElementById('screen-signin');
+    if(s){ s.style.visibility='visible'; s.style.opacity='1'; s.style.pointerEvents='all'; s.style.zIndex='100'; }
+  }
+}
 
 // ── Sticky Notes System ──
 // Note senders: grace, erik, mizeituni
