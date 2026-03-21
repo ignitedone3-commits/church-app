@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -1934,18 +1932,21 @@ function sv(k,v){
 function _lsGet(k){try{return localStorage.getItem(k);}catch(e){return _memStore[k]!==undefined?JSON.stringify(_memStore[k]):null;}}
 function _lsDel(k){try{localStorage.removeItem(k);}catch(e){} delete _memStore[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-const DATA_VERSION = 'v2025-03-19b';
+const DATA_VERSION = 'v2026-03-21';
 try {
   if(_lsGet('mom_data_ver') !== DATA_VERSION){
+    // Version changed — re-seed schedules AND force fresh admin list with correct passwords
     sv(K.walawi,DW); sv(K.kawaida,DK);
     sv(K.draftW,DW); sv(K.draftK,DK);
     sv(K.draftStatus,'clean');
-    localStorage.setItem('mom_data_ver',DATA_VERSION);
+    sv(K.admins, DA);          // Force fresh admin list with correct passwords
+    sv(K.session, null);       // Clear any stale session
+    try { localStorage.setItem('mom_data_ver', DATA_VERSION); } catch(e){}
   }
 } catch(e) {
-  // localStorage blocked — seed memory store with defaults
   sv(K.walawi,DW); sv(K.kawaida,DK);
   sv(K.draftW,DW); sv(K.draftK,DK);
+  sv(K.admins, DA);
 }
 if(!ld(K.admins,null)) sv(K.admins,DA);
 if(!ld(K.testimony,null)) sv(K.testimony,[]);
@@ -1954,9 +1955,12 @@ function loadSess(){
   try {
     const s = ld(K.session, null);
     if(s && s.username) {
-      const admins = ld(K.admins, []);
+      const admins = ld(K.admins, DA);
       const fresh = admins.find(a => a.username === s.username);
-      CU = fresh || s;
+      const user = fresh || s;
+      // Reject sessions with no password (stale from old version)
+      if(!user.password) { CU = null; return; }
+      CU = user;
     }
   } catch(e) { CU = null; }
 }
@@ -2037,10 +2041,17 @@ function doSignIn(){
     return;
   }
 
-  // No password set — must be set by Super Admin
+  // No password set — check if DA has a default for this user
   if(found.password===null||found.password===undefined){
-    err.innerHTML='🔒 No password set for this account.<br><small>Please contact your Super Admin to set a password.</small>';
-    err.style.display='block'; return;
+    const daUser = DA.find(a=>a.username.toLowerCase()===found.username.toLowerCase());
+    if(daUser && daUser.password && pass===daUser.password){
+      // Restore DA password onto this user and sign in
+      found.password = daUser.password;
+      sv(K.admins, admins);
+    } else {
+      err.innerHTML='🔒 No password set for this account.<br><small>Please contact your Super Admin to set a password.</small>';
+      err.style.display='block'; return;
+    }
   }
 
   // Wrong password — but super admins can always use their default password
