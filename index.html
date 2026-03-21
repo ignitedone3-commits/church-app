@@ -672,6 +672,7 @@ html, body {
   <div class="admin-bar">
     <span>Signed in: <strong id="main-name"></strong></span>
     <div style="display:flex;gap:6px;">
+      <button class="btn-bar" id="btn-home" onclick="goWindowHome()" style="display:none;">🏠 Home</button>
       <button class="btn-bar" id="btn-draft" onclick="openDraft()" style="display:none;">✏️ Draft</button>
       <button class="btn-bar" id="btn-ap" onclick="openAdmin()" style="display:none;">⚙️ Admin Panel</button>
       <button class="btn-bar" onclick="doSignOut()">Sign Out</button>
@@ -2060,9 +2061,14 @@ function goMain(){
     if(landing) landing.style.display = 'flex';
     const nav = document.getElementById('app-nav-bar');
     if(nav) nav.style.display = 'none';
+    // Show Home button so they can return to landing any time
+    const homeBtn = document.getElementById('btn-home');
+    if(homeBtn) homeBtn.style.display = 'inline-block';
   } else {
     // Only one window — open it directly, no choice needed
     if(landing) landing.style.display = 'none';
+    const homeBtn = document.getElementById('btn-home');
+    if(homeBtn) homeBtn.style.display = 'none';
     const onlyWin = userWindows[0] || 'schedules';
     switchWindow(onlyWin);
   }
@@ -3621,6 +3627,20 @@ function getDeptDefs(){
 }
 // Alias so all existing code using DEPT_DEFS still works
 Object.defineProperty(window,'DEPT_DEFS',{get:getDeptDefs});
+
+function goWindowHome(){
+  // Hide all windows and switcher, show landing again
+  document.querySelectorAll('.win-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.win-btn').forEach(b => b.classList.remove('active'));
+  const switcher = document.getElementById('window-switcher');
+  if(switcher) switcher.style.display = 'none';
+  const nav = document.getElementById('app-nav-bar');
+  if(nav) nav.style.display = 'none';
+  const landing = document.getElementById('win-landing');
+  if(landing) landing.style.display = 'flex';
+  // If user was in departments, reset back to grid view
+  showDeptGrid();
+}
 
 function switchWindow(winId, silent){
   // Hide landing screen
