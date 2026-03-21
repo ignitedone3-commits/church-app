@@ -89,8 +89,8 @@ html, body {
 .atn:hover { color: white; }
 .admin-body { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 .admin-content { padding: 16px 13px 60px; max-width: 720px; margin: 0 auto; }
-.admin-panel { display: none; animation: fadeIn 0.28s ease; }
-.admin-panel.active { display: block; }
+.admin-panel { display: none; }
+.admin-panel.active { display: block; animation: fadeIn 0.28s ease; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);} }
 .card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 15px; }
 .card-hdr { background: linear-gradient(135deg,var(--blue-deep),var(--blue-mid)); padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
@@ -793,15 +793,59 @@ html, body {
   <!-- Wasimamizi Window -->
   <div class="win-panel" id="win-panel-wasimamizi">
     <div class="app-body">
-      <div class="content">
+      <div class="content" id="wasimamizi-main-view">
         <div class="card">
           <div class="card-hdr"><span>👔</span><h2>Wasimamizi</h2><span class="badge">Leaders</span></div>
           <div class="card-body">
-            <div class="empty" style="padding:30px 0;">
-              <span class="eico">👔</span>
-              <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:6px;"><strong>Wasimamizi Window</strong></p>
-              <p style="color:var(--text-light);font-size:0.82rem;">Content for this window will appear here.</p>
+            <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:12px;">Select a schedule to view or manage.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <!-- Sunday Leaders -->
+              <button onclick="openWasimSchedule('sunday')" style="
+                display:flex;align-items:center;justify-content:center;gap:10px;
+                width:100%;padding:18px 20px;
+                background:linear-gradient(135deg,#b45309,#78350f);
+                color:white;border:none;border-radius:14px;
+                font-family:'Cinzel',serif;font-size:0.92rem;font-weight:800;
+                cursor:pointer;letter-spacing:0.05em;
+                box-shadow:0 4px 16px rgba(120,53,15,0.3);
+                transition:transform 0.15s,box-shadow 0.15s;">
+                <span style="font-size:1.6rem;">☀️</span>
+                <div style="text-align:left;">
+                  <div>Wasimamizi wa Jumapili</div>
+                  <div style="font-size:0.68rem;font-weight:400;opacity:0.8;font-family:'Nunito',sans-serif;margin-top:2px;">Sunday Leaders Schedule</div>
+                </div>
+              </button>
+              <!-- Saturday Leaders -->
+              <button onclick="openWasimSchedule('saturday')" style="
+                display:flex;align-items:center;justify-content:center;gap:10px;
+                width:100%;padding:18px 20px;
+                background:linear-gradient(135deg,#1d4ed8,#0a1f5c);
+                color:white;border:none;border-radius:14px;
+                font-family:'Cinzel',serif;font-size:0.92rem;font-weight:800;
+                cursor:pointer;letter-spacing:0.05em;
+                box-shadow:0 4px 16px rgba(10,31,92,0.3);
+                transition:transform 0.15s,box-shadow 0.15s;">
+                <span style="font-size:1.6rem;">🌤️</span>
+                <div style="text-align:left;">
+                  <div>Wasimamizi wa Jumamosi</div>
+                  <div style="font-size:0.68rem;font-weight:400;opacity:0.8;font-family:'Nunito',sans-serif;margin-top:2px;">Saturday Leaders Schedule</div>
+                </div>
+              </button>
             </div>
+          </div>
+        </div>
+      </div>
+      <!-- Schedule detail view (hidden by default) -->
+      <div id="wasimamizi-sched-view" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <button id="wasim-back-btn" onclick="closeWasimSchedule()" style="
+          background:rgba(255,255,255,0.12);border:none;color:white;
+          padding:10px 16px;font-family:'Nunito',sans-serif;font-size:0.8rem;
+          font-weight:700;cursor:pointer;text-align:left;flex-shrink:0;">
+          ← Back to Wasimamizi
+        </button>
+        <div class="app-body" style="flex:1;overflow-y:auto;">
+          <div class="content">
+            <div id="wasim-sched-body"></div>
           </div>
         </div>
       </div>
@@ -900,6 +944,36 @@ html, body {
   </div>
 
 
+
+  <!-- Wasimamizi Schedule Edit Modal -->
+  <div id="wasim-sched-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99998;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;">
+    <div style="background:white;border-radius:18px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);margin:auto;">
+      <div id="wasim-edit-hdr" style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:white;" id="wasim-edit-title">✏️ Edit Schedule</div>
+        <button onclick="closeWasimSchedEdit()" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.2rem;cursor:pointer;">✕</button>
+      </div>
+      <div id="wasim-sched-edit-body" style="padding:18px;max-height:75vh;overflow-y:auto;"></div>
+      <div style="padding:14px 18px;border-top:1px solid #e2e8f0;display:flex;gap:8px;background:white;">
+        <button onclick="closeWasimSchedEdit()" style="flex:1;padding:11px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Cancel</button>
+        <button onclick="saveWasimSchedEdit()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">✅ Save Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Usher Schedule Edit Modal -->
+  <div id="usher-sched-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99998;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;">
+    <div style="background:white;border-radius:18px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);margin:auto;">
+      <div style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:white;">✏️ Edit Usher Schedule</div>
+        <button onclick="closeUsherSchedEdit()" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.2rem;cursor:pointer;line-height:1;">✕</button>
+      </div>
+      <div id="usher-sched-edit-body" style="padding:18px;max-height:75vh;overflow-y:auto;"></div>
+      <div style="padding:14px 18px;border-top:1px solid #e2e8f0;display:flex;gap:8px;background:white;">
+        <button onclick="closeUsherSchedEdit()" style="flex:1;padding:11px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Cancel</button>
+        <button onclick="saveUsherSchedEdit()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">✅ Save Schedule</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Edit Window Modal -->
   <div id="edit-win-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99997;align-items:center;justify-content:center;padding:20px;">
@@ -1032,7 +1106,7 @@ html, body {
     <button class="atn" id="atn-users" onclick="switchATab('users')" style="display:none;">&#128101; Manage Admins</button>
     <button class="atn" id="atn-activity" onclick="switchATab('activity');renderActivityLog()" style="display:none;">📊 Activity Log</button>
     <button class="atn" id="atn-reports" onclick="switchATab('reports');renderReportsPanel()" style="display:none;">📤 Reports</button>
-    <button class="atn" id="atn-windows" onclick="switchATab('windows');renderWindowManager()" style="display:none;">🪟 Windows</button>
+    <button class="atn" id="atn-winmgr" onclick="switchATab('winmgr');setTimeout(renderWindowManager,50)" style="display:none;">🪟 Windows</button>
   </div>
   <div class="admin-body">
     <div class="admin-content">
@@ -1616,16 +1690,39 @@ html, body {
         </div>
       
       <!-- Windows Manager Panel -->
-      <div class="admin-panel" id="ap-windows">
+      <div class="admin-panel" id="ap-winmgr">
         <div class="card">
           <div class="card-hdr"><span>🪟</span><h2>Window Manager</h2><span class="badge">Navigation</span></div>
           <div class="card-body">
             <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:14px;line-height:1.5;">
-              Manage the navigation windows users can access. Built-in windows can be renamed. Add custom windows for new sections.
+              Manage navigation windows. Edit icon and name of any window. Add custom windows below.
             </p>
-            <div id="win-mgr-list" style="margin-bottom:16px;"></div>
+            <!-- Static window list - always visible -->
+            <div id="win-mgr-list">
+              <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+                <span style="font-size:1.3rem;">📅</span>
+                <div style="flex:1;"><div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:#0a1f5c;" id="wml-name-schedules">Schedules</div><div style="font-size:0.65rem;color:#64748b;">ID: schedules · Built-in</div></div>
+                <button onclick="openEditWindowModal('schedules')" style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+                <span style="font-size:1.3rem;">🏛️</span>
+                <div style="flex:1;"><div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:#0a1f5c;" id="wml-name-departments">Departments</div><div style="font-size:0.65rem;color:#64748b;">ID: departments · Built-in</div></div>
+                <button onclick="openEditWindowModal('departments')" style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+                <span style="font-size:1.3rem;">👔</span>
+                <div style="flex:1;"><div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:#0a1f5c;" id="wml-name-wasimamizi">Wasimamizi</div><div style="font-size:0.65rem;color:#64748b;">ID: wasimamizi · Built-in</div></div>
+                <button onclick="openEditWindowModal('wasimamizi')" style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+                <span style="font-size:1.3rem;">📆</span>
+                <div style="flex:1;"><div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:#0a1f5c;" id="wml-name-church-calendar">Church Calendar</div><div style="font-size:0.65rem;color:#64748b;">ID: church-calendar · Built-in</div></div>
+                <button onclick="openEditWindowModal('church-calendar')" style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>
+              </div>
+              <div id="win-mgr-custom"></div>
+            </div>
             <!-- Add new window -->
-            <div style="background:#f0f9ff;border:2px solid #bfdbfe;border-radius:12px;padding:13px;">
+            <div style="background:#f0f9ff;border:2px solid #bfdbfe;border-radius:12px;padding:13px;margin-top:4px;">
               <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#1e40af;margin-bottom:10px;">➕ Add New Window</div>
               <div style="display:flex;gap:8px;margin-bottom:8px;">
                 <input id="wm-new-icon" type="text" value="🗂️" maxlength="2"
@@ -1639,10 +1736,27 @@ html, body {
                 + Add Window
               </button>
             </div>
+
+            <!-- Wasimamizi Schedule Edit Access -->
+            <div style="background:#fef3c7;border:1.5px solid #fde68a;border-radius:12px;padding:13px;margin-top:14px;">
+              <div class="sec-label" style="margin-bottom:6px;color:#92400e;">👔 Wasimamizi Schedule — Edit Access</div>
+              <p style="font-size:0.76rem;color:#78350f;margin-bottom:12px;line-height:1.5;">
+                Grant a non-super user the ability to see the Wasimamizi window and edit both Sunday and Saturday schedules. Super Admins always have full access.
+              </p>
+              <!-- Currently granted users -->
+              <div id="wasim-editors-list" style="margin-bottom:10px;"></div>
+              <!-- Grant new user -->
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select id="wasim-grant-user" style="flex:1;padding:9px 11px;border:2px solid #fde68a;border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.84rem;outline:none;background:white;">
+                  <option value="">— Select user to grant access —</option>
+                </select>
+                <button onclick="grantWasimEditor()" style="padding:10px 16px;background:#b45309;color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;white-space:nowrap;">+ Grant</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-</div>
+      </div>
     </div>
   </div>
 </div>
@@ -1832,24 +1946,41 @@ const DA=[
    windows:['schedules'],departments:[]},
 ];
 
-function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
-function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+// Storage: tries localStorage first, falls back to in-memory (for Edge file:// tracking prevention)
+const _memStore = {};
+let _lsOK = false;
+try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); _lsOK = true; } catch(e) {}
+function ld(k,d){
+  if(_lsOK){ try{ const v=localStorage.getItem(k); if(v!==null) return JSON.parse(v); }catch(e){} }
+  return k in _memStore ? _memStore[k] : d;
+}
+function sv(k,v){
+  if(_lsOK){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+  _memStore[k]=v;
+}
+function _lsGet(k){try{return _lsGet(k);}catch(e){return _memStore[k]!==undefined?JSON.stringify(_memStore[k]):null;}}
+function _lsDel(k){try{_lsDel(k);}catch(e){} delete _memStore[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 const DATA_VERSION = 'v2025-03-19b';
-if(localStorage.getItem('mom_data_ver') !== DATA_VERSION){
+try {
+  if(_lsGet('mom_data_ver') !== DATA_VERSION){
+    sv(K.walawi,DW); sv(K.kawaida,DK);
+    sv(K.draftW,DW); sv(K.draftK,DK);
+    sv(K.draftStatus,'clean');
+    localStorage.setItem('mom_data_ver',DATA_VERSION);
+  }
+} catch(e) {
+  // localStorage blocked — seed memory store with defaults
   sv(K.walawi,DW); sv(K.kawaida,DK);
   sv(K.draftW,DW); sv(K.draftK,DK);
-  sv(K.draftStatus,'clean');
-  localStorage.setItem('mom_data_ver',DATA_VERSION);
 }
-if(!localStorage.getItem(K.admins)) sv(K.admins,DA);
-if(!localStorage.getItem(K.testimony)) sv(K.testimony,[]);
+if(!ld(K.admins,null)) sv(K.admins,DA);
+if(!ld(K.testimony,null)) sv(K.testimony,[]);
 let CU=null;
 function loadSess(){
   try {
     const s = ld(K.session, null);
     if(s && s.username) {
-      // Validate — look up user in current admin list to get fresh data
       const admins = ld(K.admins, []);
       const fresh = admins.find(a => a.username === s.username);
       CU = fresh || s;
@@ -1857,7 +1988,7 @@ function loadSess(){
   } catch(e) { CU = null; }
 }
 function saveSess(u){sv(K.session,u);CU=u;}
-function clearSess(){localStorage.removeItem(K.session);CU=null;}
+function clearSess(){try{localStorage.removeItem(K.session);}catch(e){} delete _memStore[K.session]; CU=null;}
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
@@ -1867,7 +1998,9 @@ function doSignIn(){
   const pass=document.getElementById('si-pass').value;
   const err=document.getElementById('si-err');
   err.style.display='none';
-  const admins=ld(K.admins,[]);
+  const admins = ld(K.admins, DA.length ? DA : []);
+  // If storage was blocked, ensure defaults are in memStore
+  if(!admins.length){ sv(K.admins, DA); }
   const now = new Date();
   const ts = now.toLocaleString();
 
@@ -2128,14 +2261,14 @@ function goMain(){
 
   // Show/hide built-in + custom window buttons based on user access
   allWinDefs.forEach(w=>{
-    const hasAccess = sup || userWindows.includes(w.id);
+    const hasAccess = sup || canViewWindow(w.id);
     const swBtn = document.getElementById('win-btn-'+w.id);
     if(swBtn) swBtn.style.display = hasAccess ? '' : 'none';
     const lbBtn = document.getElementById('wlb-'+w.id);
     if(lbBtn) lbBtn.style.display = hasAccess ? 'flex' : 'none';
   });
 
-  const accessibleWins = allWinDefs.filter(w=> sup || userWindows.includes(w.id));
+  const accessibleWins = allWinDefs.filter(w=> sup || canViewWindow(w.id));
   const hasMultiple = accessibleWins.length > 1;
 
   if(hasMultiple){
@@ -2157,6 +2290,8 @@ function goMain(){
   renderNavBar();
   show('main');
   setTimeout(function(){ if(window._stickyNoteInit) window._stickyNoteInit(); }, 150);
+  // Auto-submit monthly report silently on login (day 5+ of month, previous month not yet submitted)
+  setTimeout(checkMonthlyReportReminder, 1200);
 }
 function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -2229,7 +2364,7 @@ function addKRow(){
 }
 function delKRow(i){const d=ld(K.kawaida,[]);d.splice(i,1);sv(K.kawaida,d);renderK();}
 function getNms(){return ld(K.testimony,[]);}
-function saveNms(n){sv(K.testimony,n);localStorage.setItem(K.testimony+'_p',Date.now());}
+function saveNms(n){sv(K.testimony,n);try{localStorage.setItem(K.testimony+'_p',Date.now());_memStore[K.testimony+'_p']=Date.now();}catch(e){_memStore[K.testimony+'_p']=Date.now();}}
 function renderNames(){
   const names=getNms();
   const canDel=CU&&(CU.role==='super'||CU.permissions.ushuhuda);
@@ -2384,7 +2519,7 @@ function openAdmin(){
   document.getElementById('atn-menus').style.display=sup?'inline-block':'none';
   document.getElementById('atn-activity').style.display=sup?'inline-block':'none';
   document.getElementById('atn-reports').style.display=(sup||canViewReports())?'inline-block':'none';
-  document.getElementById('atn-windows').style.display=sup?'inline-block':'none';
+  document.getElementById('atn-winmgr').style.display=sup?'inline-block':'none';
   // Hide config sections from non-super viewers
   const isReportViewer = !sup && canViewReports();
   renderAW();renderAK();renderNames();if(sup)renderUsers();
@@ -2393,10 +2528,15 @@ function openAdmin(){
 }
 function goBack(){show('main');}
 function switchATab(n){
-  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p=>{
+    p.classList.remove('active');
+    p.style.display='none';
+  });
   document.querySelectorAll('.atn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('ap-'+n).classList.add('active');
-  document.getElementById('atn-'+n).classList.add('active');
+  const panel = document.getElementById('ap-'+n);
+  const btn   = document.getElementById('atn-'+n);
+  if(panel){ panel.classList.add('active'); panel.style.display='block'; }
+  if(btn)  btn.classList.add('active');
 }
 let _dragSrc=null;
 function _isSuperAdmin(){return CU&&CU.role==='super';}
@@ -2614,7 +2754,14 @@ function addAdmin(){
   if(a.length>=MAX_USERS)return showToast('❌ Maximum 500 users reached!','error');
   if(a.find(x=>x.username.toLowerCase()===u.toLowerCase()))return showToast('Username already exists!','error');
   const days=[...document.querySelectorAll('#nu-days input:checked')].map(c=>parseInt(c.value));
-  const wins = getWindowDefs().filter(w=>document.getElementById('nu-win-'+w.id)?.checked).map(w=>w.id);
+  const nuWindowPerms = {};
+  const wins = [];
+  getWindowDefs().forEach(w=>{
+    const sel = document.querySelector(`input[name="nu-wperm-${w.id}"]:checked`);
+    const perm = sel ? sel.value : 'none';
+    nuWindowPerms[w.id] = perm;
+    if(perm !== 'none') wins.push(w.id);
+  });
   a.push({
     username:u, password:p, displayName:dn, role:r,
     permissions:{
@@ -2631,6 +2778,7 @@ function addAdmin(){
       endTime: document.getElementById('nu-end').value||'23:59'
     },
     windows: wins.length ? wins : ['schedules'],
+    windowPerms: nuWindowPerms,
     departments: []
   });
   sv(K.admins,a);
@@ -2677,7 +2825,18 @@ function openEditUser(i){
       <!-- Window Access -->
       <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:11px;margin-bottom:10px;">
         <div class="sec-label" style="margin-bottom:8px;color:#1e40af;">🪟 Window Access</div>
-        ${getWindowDefs().map(w=>`<div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">${w.icon} ${w.name}</span><label class="toggle"><input type="checkbox" id="eu-win-${w.id}" ${uWindows.includes(w.id)?'checked':''}/><span class="tog-slider"></span></label></div>`).join('')}
+        <div style="font-size:0.7rem;color:#64748b;margin-bottom:8px;">Set each window to None (no access), View (read-only), or Edit (full edit).</div>
+        ${getWindowDefs().map(w=>{
+          const perm = (u.windowPerms||{})[w.id] || (uWindows.includes(w.id)?'view':'none');
+          return `<div class="perm-row" style="margin-bottom:6px;">
+            <span style="font-size:0.82rem;font-weight:700;">${w.icon} ${w.name}</span>
+            <div style="display:flex;gap:4px;">
+              <label style="cursor:pointer;"><input type="radio" name="wperm-${w.id}" value="none"  ${perm==='none'?'checked':''} style="accent-color:#dc2626;"/> <span style="font-size:0.7rem;color:#dc2626;font-weight:700;">None</span></label>
+              <label style="cursor:pointer;margin-left:8px;"><input type="radio" name="wperm-${w.id}" value="view"  ${perm==='view'?'checked':''} style="accent-color:#0284c7;"/> <span style="font-size:0.7rem;color:#0284c7;font-weight:700;">View</span></label>
+              <label style="cursor:pointer;margin-left:8px;"><input type="radio" name="wperm-${w.id}" value="edit"  ${perm==='edit'?'checked':''} style="accent-color:#15803d;"/> <span style="font-size:0.7rem;color:#15803d;font-weight:700;">Edit</span></label>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
 
       <!-- Department Access -->
@@ -2749,8 +2908,15 @@ function saveEditUser(){
   const u=a[_editIdx]; if(!u) return;
   const r=document.getElementById('eu-r').value;
   const days=[...document.querySelectorAll('#eu-days input:checked')].map(c=>parseInt(c.value));
-  // Windows & departments
-  const wins = getWindowDefs().filter(w=>document.getElementById('eu-win-'+w.id)?.checked).map(w=>w.id);
+  // Windows & departments — collect 3-way permission per window
+  const windowPerms = {};
+  const wins = [];
+  getWindowDefs().forEach(w=>{
+    const sel = document.querySelector(`input[name="wperm-${w.id}"]:checked`);
+    const perm = sel ? sel.value : 'none';
+    windowPerms[w.id] = perm;
+    if(perm !== 'none') wins.push(w.id);
+  });
   u.displayName=document.getElementById('eu-dn').value.trim()||u.displayName;
   u.role=r;
   u.permissions={
@@ -2767,6 +2933,7 @@ function saveEditUser(){
     endTime:   document.getElementById('eu-end')?.value||'23:59'
   };
   u.windows = wins.length ? wins : ['schedules'];
+  u.windowPerms = windowPerms;
   u.departments = DEPT_DEFS.filter(d=>document.getElementById('eu-dept-'+d.id)?.checked).map(d=>d.id);
 
   // Handle password update
@@ -2809,10 +2976,10 @@ window.addEventListener('storage',e=>{
 });
 setInterval(renderNames,5000);
 function initDrafts(){
-  if(!localStorage.getItem(K.draftW)) sv(K.draftW,ld(K.walawi,DW));
-  if(!localStorage.getItem(K.draftK)) sv(K.draftK,ld(K.kawaida,DK));
-  if(!localStorage.getItem(K.draftT)) sv(K.draftT,ld(K.testimony,[]));
-  if(!localStorage.getItem(K.draftStatus)) sv(K.draftStatus,'clean');
+  if(!ld(K.draftW,null)) sv(K.draftW,ld(K.walawi,DW));
+  if(!ld(K.draftK,null)) sv(K.draftK,ld(K.kawaida,DK));
+  if(!ld(K.draftT,null)) sv(K.draftT,ld(K.testimony,[]));
+  if(!ld(K.draftStatus,null)) sv(K.draftStatus,'clean');
 }
 function markDraftDirty(){sv(K.draftStatus,'pending');updateDraftStatusBar();}
 function updateDraftStatusBar(){
@@ -3100,7 +3267,7 @@ function applyTypography(){
 }
 
 function resetTypography(){
-  localStorage.removeItem(K_TYPO);
+  _lsDel(K_TYPO);
   applyTypoToPage(DEF_TYPO);
   // Reset controls
   _typoFontType='Cinzel'; _typoWeight='normal'; _typoStyle='normal';
@@ -3154,13 +3321,13 @@ function getDefaultLogoSrc(){
 
 // ── Apply saved branding on load ──
 function applyBrandingOnLoad(){
-  const savedLogo = localStorage.getItem(K_LOGO);
+  const savedLogo = _lsGet(K_LOGO);
   if(savedLogo){
     applyLogoToPage(savedLogo);
   }
-  const savedSize = localStorage.getItem(K_LOGO_SIZE);
+  const savedSize = _lsGet(K_LOGO_SIZE);
   if(savedSize){ applyLogoSize(parseInt(savedSize), false); }
-  const savedBg = localStorage.getItem(K_BG);
+  const savedBg = _lsGet(K_BG);
   if(savedBg){
     applyBgToPage(JSON.parse(savedBg));
   }
@@ -3181,17 +3348,17 @@ function applyLogoSize(size, save){
   // Update preview size in branding panel
   const preview = document.getElementById('brand-logo-preview');
   if(preview){ preview.style.width = Math.min(size * 2, 120) + 'px'; preview.style.height = Math.min(size * 2, 120) + 'px'; }
-  if(save !== false) localStorage.setItem(K_LOGO_SIZE, size);
+  if(save !== false) try{localStorage.setItem(K_LOGO_SIZE,size);_memStore[K_LOGO_SIZE]=size;}catch(e){_memStore[K_LOGO_SIZE]=size;}
 }
 
 function adjustLogoSize(delta){
-  const current = parseInt(localStorage.getItem(K_LOGO_SIZE) || DEFAULT_LOGO_SIZE);
+  const current = parseInt(_lsGet(K_LOGO_SIZE) || DEFAULT_LOGO_SIZE);
   applyLogoSize(current + delta);
 }
 
 function resetLogoSize(){
   applyLogoSize(DEFAULT_LOGO_SIZE);
-  localStorage.removeItem(K_LOGO_SIZE);
+  _lsDel(K_LOGO_SIZE);
   showToast('↺ Logo size reset', 'success');
 }
 
@@ -3219,14 +3386,14 @@ function renderBrandingPanel(){
   // Show current logo
   const preview = document.getElementById('brand-logo-preview');
   if(preview){
-    const savedLogo = localStorage.getItem(K_LOGO);
+    const savedLogo = _lsGet(K_LOGO);
     preview.src = savedLogo || getDefaultLogoSrc();
   }
   // Sync logo size slider
-  const savedSize = parseInt(localStorage.getItem(K_LOGO_SIZE) || DEFAULT_LOGO_SIZE);
+  const savedSize = parseInt(_lsGet(K_LOGO_SIZE) || DEFAULT_LOGO_SIZE);
   applyLogoSize(savedSize, false);
   // Show current bg status
-  const savedBg = localStorage.getItem(K_BG);
+  const savedBg = _lsGet(K_BG);
   const statusEl = document.getElementById('brand-current-bg');
   const statusTxt = document.getElementById('brand-current-bg-text');
   if(savedBg && statusEl && statusTxt){
@@ -3269,7 +3436,7 @@ function handleLogoUpload(event){
   const reader = new FileReader();
   reader.onload = function(e){
     const src = e.target.result;
-    localStorage.setItem(K_LOGO, src);
+    try{localStorage.setItem(K_LOGO,src);_memStore[K_LOGO]=src;}catch(e){_memStore[K_LOGO]=src;}
     applyLogoToPage(src);
     const preview = document.getElementById('brand-logo-preview');
     if(preview) preview.src = src;
@@ -3279,7 +3446,7 @@ function handleLogoUpload(event){
 }
 
 function resetLogo(){
-  localStorage.removeItem(K_LOGO);
+  _lsDel(K_LOGO);
   // Re-apply original embedded logo
   const el = document.querySelector('.logo-img-lg');
   if(el){
@@ -3419,14 +3586,14 @@ function applyBackground(){
       }
     };
   }
-  localStorage.setItem(K_BG, JSON.stringify(bgConfig));
+  try{localStorage.setItem(K_BG,JSON.stringify(bgConfig));_memStore[K_BG]=JSON.stringify(bgConfig);}catch(e){_memStore[K_BG]=JSON.stringify(bgConfig);}
   applyBgToPage(bgConfig);
   renderBrandingPanel();
   showToast('&#9989; Background applied!','success');
 }
 
 function resetBackground(){
-  localStorage.removeItem(K_BG);
+  _lsDel(K_BG);
   const def = 'linear-gradient(160deg, #0a1f5c 0%, #1e3a8a 40%, #1d4ed8 100%)';
   document.querySelectorAll('.screen').forEach(s => { s.style.background = def; });
   renderBrandingPanel();
@@ -3447,13 +3614,13 @@ const DEFAULT_MENUS = [
 ];
 
 function getMenus(){
-  const saved = localStorage.getItem(K_MENUS);
+  const saved = _lsGet(K_MENUS);
   if(saved){
     try{ return JSON.parse(saved); }catch(e){}
   }
   return JSON.parse(JSON.stringify(DEFAULT_MENUS));
 }
-function saveMenus(menus){ localStorage.setItem(K_MENUS, JSON.stringify(menus)); }
+function saveMenus(menus){ try{localStorage.setItem(K_MENUS,JSON.stringify(menus));_memStore[K_MENUS]=JSON.stringify(menus);}catch(e){_memStore[K_MENUS]=JSON.stringify(menus);} }
 
 // ── Render the live nav bar ──
 function renderNavBar(){
@@ -3775,7 +3942,7 @@ function switchWindow(winId, silent){
     const allDefs = getWindowDefs();
     const userWindows = (CU && CU.windows) || ['schedules'];
     const sup = CU && CU.role === 'super';
-    const accessible = allDefs.filter(w=> sup || userWindows.includes(w.id));
+    const accessible = allDefs.filter(w=> sup || canViewWindow(w.id));
     switcher.style.display = accessible.length > 1 ? 'flex' : 'none';
   }
 
@@ -3838,6 +4005,23 @@ function openDept(deptId){
   const backBtn = document.querySelector('.dept-back-btn');
   if(backBtn){ backBtn.onclick = showDeptGrid; backBtn.textContent = '← Back to Departments'; }
 
+  const scheduleBtn = `
+    <button onclick="openDeptSchedule('${deptId}')" style="
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      width:100%;padding:18px 20px;
+      background:linear-gradient(135deg,#15803d,#065f46);
+      color:white;border:none;border-radius:14px;
+      font-family:'Cinzel',serif;font-size:0.92rem;font-weight:800;
+      cursor:pointer;letter-spacing:0.05em;
+      box-shadow:0 4px 16px rgba(6,95,70,0.25);
+      transition:transform 0.15s,box-shadow 0.15s;">
+      <span style="font-size:1.6rem;">📋</span>
+      <div style="text-align:left;">
+        <div>Schedule / Ratiba</div>
+        <div style="font-size:0.68rem;font-weight:400;opacity:0.75;font-family:'Nunito',sans-serif;margin-top:2px;">View and manage department schedule</div>
+      </div>
+    </button>`;
+
   if(deptId === 'ushers'){
     document.getElementById('dept-detail-body').innerHTML = `
       <div style="display:flex;flex-direction:column;gap:10px;">
@@ -3857,14 +4041,13 @@ function openDept(deptId){
             <div style="font-size:0.68rem;font-weight:400;opacity:0.75;font-family:'Nunito',sans-serif;margin-top:2px;">Track attendance by day, age group &amp; gender</div>
           </div>
         </button>
+        ${scheduleBtn}
       </div>`;
   } else {
-    const d = getDeptDefs().find(x=>x.id===deptId);
+    const def = getDeptDefs().find(x=>x.id===deptId);
     document.getElementById('dept-detail-body').innerHTML = `
-      <div class="empty" style="padding:30px 0;">
-        <span class="eico">${d?.icon||'🏛️'}</span>
-        <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:8px;"><strong>${d?.name||''} Department</strong></p>
-        <p style="color:var(--text-light);font-size:0.82rem;">Content for this department will appear here.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${scheduleBtn}
       </div>`;
   }
 }
@@ -3874,6 +4057,376 @@ function showDeptGrid(){
   document.getElementById('dept-detail-view').style.display = 'none';
 }
 
+let _currentDeptId = null;
+
+function openDeptSchedule(deptId){
+  _currentDeptId = deptId;
+  const def = getDeptDefs().find(x=>x.id===deptId);
+  const name = def ? def.name : deptId;
+  const icon = def ? def.icon : '🏛️';
+
+  // Update header
+  document.getElementById('dept-detail-icon').textContent = icon;
+  document.getElementById('dept-detail-name').textContent = name + ' — Schedule';
+  document.getElementById('dept-detail-badge').textContent = 'Ratiba';
+
+  // Back button goes back to dept detail
+  const backBtn = document.querySelector('.dept-back-btn');
+  if(backBtn){
+    backBtn.textContent = '← Back to ' + name;
+    backBtn.onclick = ()=>openDept(deptId);
+  }
+
+  if(deptId === 'ushers'){
+    renderUsherSchedule();
+  } else {
+    document.getElementById('dept-detail-body').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:8px;">📋</div>
+          <div style="font-family:'Cinzel',serif;font-size:0.88rem;font-weight:800;color:#15803d;margin-bottom:6px;">Schedule Coming Soon</div>
+          <div style="font-size:0.78rem;color:#166534;line-height:1.5;">
+            Department schedule will appear here.<br>
+            <span style="font-size:0.72rem;opacity:0.7;">Ratiba ya idara itaonekana hapa.</span>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+// ── Usher Schedule Data ──
+const K_USHER_SCHED = 'mom_usher_sched_v1';
+
+function getUsherSchedule(){
+  return ld(K_USHER_SCHED, {
+    title: 'Usher Schedule',
+    period: 'April – July 2026',
+    service: 'Sunday Worship Service',
+    rows: [
+      {date:'April 5',  lead:'John M.',    regular:'Sarah K.',   tasks:'Entrance, Seating, Offering'},
+      {date:'April 12', lead:'Peter S.',   regular:'Ruth N.',    tasks:'Greeting, Seating, Offering'},
+      {date:'April 19', lead:'Samuel K.',  regular:'Lydia P.',   tasks:'Entrance, Security, Offering'},
+      {date:'April 26', lead:'Michael A.', regular:'Deborah L.', tasks:'Greeting, Seating, Cleanup'},
+      {date:'May 3',    lead:'John M.',    regular:'Sarah K.',   tasks:'Entrance, Seating, Offering'},
+      {date:'May 10',   lead:'Peter S.',   regular:'Ruth N.',    tasks:'Greeting, Seating, Offering'},
+      {date:'May 17',   lead:'Samuel K.',  regular:'Lydia P.',   tasks:'Entrance, Security, Offering'},
+    ],
+    duties: [
+      {task:'Entrance',  desc:'Welcome members at the door.'},
+      {task:'Seating',   desc:'Assist guests to seats.'},
+      {task:'Offering',  desc:'Manage offering baskets.'},
+      {task:'Security',  desc:'Monitor safety during service.'},
+      {task:'Cleanup',   desc:'Ensure church is organized after service.'},
+    ]
+  });
+}
+
+function saveUsherSchedule(data){ sv(K_USHER_SCHED, data); }
+
+function isUsherEditor(){
+  if(!CU) return false;
+  if(CU.role==='super') return true;
+  const cfg = getReportConfig();
+  return cfg.leadUsername && CU.username === cfg.leadUsername;
+}
+
+function renderUsherSchedule(){
+  const data = getUsherSchedule();
+  const canEdit = isUsherEditor();
+
+  const rowsHtml = data.rows.map((r,i) => `
+    <tr style="background:${i%2===0?'white':'#fafafa'};">
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.85rem;color:#1e293b;">${esc(r.date)}</td>
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.85rem;color:#1e40af;font-weight:700;text-align:center;">${esc(r.lead)}</td>
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.85rem;color:#1e40af;font-weight:700;text-align:center;">${esc(r.regular)}</td>
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.83rem;color:#92400e;background:#fef9c3;text-align:center;">${esc(r.tasks)}</td>
+    </tr>`).join('');
+
+  const dutiesHtml = data.duties.map((d,i) => `
+    <tr style="background:${i%2===0?'white':'#f8fafc'};">
+      <td style="padding:9px 14px;border-bottom:1px solid #e2e8f0;font-size:0.82rem;font-weight:800;color:#1e40af;width:110px;">${esc(d.task)}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e2e8f0;font-size:0.82rem;color:#374151;">${esc(d.desc)}</td>
+    </tr>`).join('');
+
+  document.getElementById('dept-detail-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:0;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.12);">
+
+      <!-- Header Banner -->
+      <div style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:20px 16px 16px;text-align:center;position:relative;">
+        ${canEdit ? `<button onclick="openUsherSchedEdit()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:white;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>` : ''}
+        <div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;">Mount of Olives Ministry</div>
+        <div style="font-family:'Cinzel',serif;font-size:1.5rem;font-weight:800;color:white;letter-spacing:0.04em;">
+          USHER <span style="color:#fbbf24;">SCHEDULE</span>
+        </div>
+        <div style="font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.85);margin-top:8px;background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 14px;display:inline-block;">
+          ${esc(data.period)} &nbsp;•&nbsp; ${esc(data.service)}
+        </div>
+      </div>
+
+      <!-- Schedule Table -->
+      <div style="overflow-x:auto;background:white;">
+        <table style="width:100%;border-collapse:collapse;min-width:420px;">
+          <thead>
+            <tr style="background:#1d4ed8;">
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;color:white;text-align:left;border-right:1px solid rgba(255,255,255,0.2);">Date</th>
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;color:white;text-align:center;border-right:1px solid rgba(255,255,255,0.2);">Usher Lead</th>
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;color:white;text-align:center;border-right:1px solid rgba(255,255,255,0.2);">Usher (Regular)</th>
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;color:white;text-align:center;">Tasks</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+
+      <!-- Usher Duties -->
+      <div style="background:#f8f9fa;border-top:3px solid #e2e8f0;padding:16px;">
+        <div style="font-family:'Cinzel',serif;font-size:0.92rem;font-weight:800;color:#1e293b;text-align:center;margin-bottom:12px;">Usher Duties</div>
+        <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#64748b;">
+                <th style="padding:8px 14px;font-size:0.75rem;font-weight:700;color:white;text-align:left;width:110px;">Task</th>
+                <th style="padding:8px 14px;font-size:0.75rem;font-weight:700;color:white;text-align:left;">Description</th>
+              </tr>
+            </thead>
+            <tbody>${dutiesHtml}</tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+// ── Usher Schedule Edit Modal ──
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function getSundaysInRange(startMonth, startYear, endMonth, endYear){
+  const sundays = [];
+  const start = new Date(startYear, startMonth, 1);
+  const end   = new Date(endYear, endMonth + 1, 0); // last day of endMonth
+  const d = new Date(start);
+  // Find first Sunday
+  while(d.getDay() !== 0) d.setDate(d.getDate()+1);
+  while(d <= end){
+    const label = MONTHS[d.getMonth()].slice(0,3)+' '+d.getDate();
+    sundays.push(label);
+    d.setDate(d.getDate()+7);
+  }
+  return sundays;
+}
+
+function openUsherSchedEdit(){
+  const data = getUsherSchedule();
+  const curYear = new Date().getFullYear();
+
+  // Build year options
+  const years = [];
+  for(let y=curYear-1; y<=curYear+3; y++) years.push(y);
+
+  const monthOpts = MONTHS.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+  const yearOpts  = years.map(y=>`<option value="${y}">${y}</option>`).join('');
+
+  // Build rows editor
+  const rowsEditor = data.rows.map((r,i)=>`
+    <div id="usr-row-${i}" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="${esc(r.date)}"   id="usr-date-${i}"    placeholder="Date"         style="${_editInputStyle}" readonly/>
+      <input value="${esc(r.lead)}"   id="usr-lead-${i}"    placeholder="Usher Lead"   style="${_editInputStyle}"/>
+      <input value="${esc(r.regular)}" id="usr-reg-${i}"   placeholder="Regular"      style="${_editInputStyle}"/>
+      <button onclick="removeSchedRow(${i})" style="${_delBtnStyle}">✕</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <input value="${esc(r.tasks)}" id="usr-tasks-${i}" placeholder="Tasks (comma separated)" style="${_editInputStyle}"/>
+    </div>`).join('');
+
+  // Build duties editor
+  const dutiesEditor = data.duties.map((d,i)=>`
+    <div id="usr-duty-${i}" style="display:grid;grid-template-columns:1fr 2fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="${esc(d.task)}" id="usr-dtask-${i}" placeholder="Task" style="${_editInputStyle}"/>
+      <input value="${esc(d.desc)}" id="usr-ddesc-${i}" placeholder="Description" style="${_editInputStyle}"/>
+      <button onclick="removeDutyRow(${i})" style="${_delBtnStyle}">✕</button>
+    </div>`).join('');
+
+  document.getElementById('usher-sched-edit-modal').style.display='flex';
+  document.getElementById('usher-sched-edit-body').innerHTML = `
+    <!-- Period & Service -->
+    <div style="margin-bottom:14px;">
+      <div class="sec-label" style="margin-bottom:6px;">📅 Service Info</div>
+      <input id="use-service" value="${esc(data.service)}" placeholder="e.g. Sunday Worship Service"
+        style="${_editInputStyle};margin-bottom:6px;"/>
+
+      <!-- Month Range Picker -->
+      <div style="font-size:0.72rem;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Month Range → Auto-populate Sundays</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:8px;">
+        <select id="use-sm" style="${_editInputStyle}">${monthOpts}</select>
+        <select id="use-sy" style="${_editInputStyle}">${yearOpts}</select>
+        <select id="use-em" style="${_editInputStyle}">${monthOpts}</select>
+        <select id="use-ey" style="${_editInputStyle}">${yearOpts}</select>
+        <button onclick="populateSundaysFromRange()" style="padding:8px 10px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:0.72rem;font-weight:800;cursor:pointer;white-space:nowrap;">↻ Populate</button>
+      </div>
+      <div style="font-size:0.68rem;color:var(--text-light);margin-top:-4px;">Selecting a range will replace dates with all Sundays in that period. Lead, Regular & Tasks fields stay editable.</div>
+    </div>
+
+    <!-- Schedule Rows -->
+    <div style="margin-bottom:14px;">
+      <div class="sec-label" style="margin-bottom:8px;">📋 Schedule Rows</div>
+      <div style="font-size:0.68rem;color:var(--text-light);margin-bottom:8px;">Date&nbsp;·&nbsp;Usher Lead&nbsp;·&nbsp;Usher Regular&nbsp;·&nbsp;Tasks</div>
+      <div id="use-rows-wrap">${rowsEditor}</div>
+      <button onclick="addSchedRow()" style="width:100%;padding:9px;border:2px dashed #93c5fd;background:#eff6ff;color:#1d4ed8;border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;margin-top:4px;">+ Add Row</button>
+    </div>
+
+    <!-- Usher Duties -->
+    <div style="margin-bottom:6px;">
+      <div class="sec-label" style="margin-bottom:8px;">🗂️ Usher Duties</div>
+      <div id="use-duties-wrap">${dutiesEditor}</div>
+      <button onclick="addDutyRow()" style="width:100%;padding:9px;border:2px dashed #86efac;background:#f0fdf4;color:#15803d;border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;margin-top:4px;">+ Add Duty</button>
+    </div>`;
+
+  // Set current month/year values based on data.period
+  document.getElementById('use-sy').value = curYear;
+  document.getElementById('use-ey').value = curYear;
+}
+
+const _editInputStyle = "width:100%;padding:7px 9px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;box-sizing:border-box;";
+const _delBtnStyle    = "padding:6px 9px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:7px;font-size:0.75rem;font-weight:800;cursor:pointer;flex-shrink:0;";
+
+function populateSundaysFromRange(){
+  const sm = parseInt(document.getElementById('use-sm').value);
+  const sy = parseInt(document.getElementById('use-sy').value);
+  const em = parseInt(document.getElementById('use-em').value);
+  const ey = parseInt(document.getElementById('use-ey').value);
+  if(ey < sy || (ey===sy && em < sm)){ showToast('End must be after start','error'); return; }
+
+  const sundays = getSundaysInRange(sm, sy, em, ey);
+  const data = getUsherSchedule();
+
+  // Build new rows — preserve existing lead/regular/tasks where possible
+  const newRows = sundays.map((date,i)=>{
+    const existing = data.rows[i] || {};
+    return { date, lead: existing.lead||'', regular: existing.regular||'', tasks: existing.tasks||'' };
+  });
+
+  // Update period label
+  const periodLabel = MONTHS[sm]+' – '+MONTHS[em]+' '+ey;
+  document.getElementById('use-service') && null; // already set
+
+  // Re-render rows section
+  const wrap = document.getElementById('use-rows-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = newRows.map((r,i)=>`
+    <div id="usr-row-${i}" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="${esc(r.date)}"    id="usr-date-${i}"  placeholder="Date"       style="${_editInputStyle}" readonly/>
+      <input value="${esc(r.lead)}"    id="usr-lead-${i}"  placeholder="Usher Lead" style="${_editInputStyle}"/>
+      <input value="${esc(r.regular)}" id="usr-reg-${i}"   placeholder="Regular"    style="${_editInputStyle}"/>
+      <button onclick="removeSchedRow(${i})" style="${_delBtnStyle}">✕</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <input value="${esc(r.tasks)}" id="usr-tasks-${i}" placeholder="Tasks (comma separated)" style="${_editInputStyle}"/>
+    </div>`).join('');
+
+  showToast(`✅ Populated ${sundays.length} Sundays for ${periodLabel}`, 'success');
+}
+
+function addSchedRow(){
+  const wrap = document.getElementById('use-rows-wrap');
+  if(!wrap) return;
+  const i = wrap.querySelectorAll('[id^="usr-row-"]').length;
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div id="usr-row-${i}" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="" id="usr-date-${i}"  placeholder="e.g. June 1" style="${_editInputStyle}"/>
+      <input value="" id="usr-lead-${i}"  placeholder="Usher Lead"   style="${_editInputStyle}"/>
+      <input value="" id="usr-reg-${i}"   placeholder="Regular"      style="${_editInputStyle}"/>
+      <button onclick="this.closest('[id^=usr-row]').remove();this.closest('div').nextElementSibling?.remove();" style="${_delBtnStyle}">✕</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <input value="" id="usr-tasks-${i}" placeholder="Tasks (comma separated)" style="${_editInputStyle}"/>
+    </div>`;
+  wrap.appendChild(div);
+}
+
+function removeSchedRow(i){
+  const row = document.getElementById('usr-row-'+i);
+  if(row){ 
+    const tasksDiv = row.nextElementSibling;
+    row.remove();
+    if(tasksDiv) tasksDiv.remove();
+  }
+}
+
+function addDutyRow(){
+  const wrap = document.getElementById('use-duties-wrap');
+  if(!wrap) return;
+  const i = wrap.querySelectorAll('[id^="usr-duty-"]').length;
+  const div = document.createElement('div');
+  div.id = `usr-duty-${i}`;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 2fr auto;gap:6px;margin-bottom:6px;align-items:center;';
+  div.innerHTML = `
+    <input value="" id="usr-dtask-${i}" placeholder="Task"        style="${_editInputStyle}"/>
+    <input value="" id="usr-ddesc-${i}" placeholder="Description" style="${_editInputStyle}"/>
+    <button onclick="this.parentElement.remove()" style="${_delBtnStyle}">✕</button>`;
+  wrap.appendChild(div);
+}
+
+function removeDutyRow(i){
+  const row = document.getElementById('usr-duty-'+i);
+  if(row) row.remove();
+}
+
+function saveUsherSchedEdit(){
+  const data = getUsherSchedule();
+
+  // Collect service
+  data.service = document.getElementById('use-service')?.value.trim() || data.service;
+
+  // Collect rows
+  const wrap = document.getElementById('use-rows-wrap');
+  const newRows = [];
+  if(wrap){
+    wrap.querySelectorAll('[id^="usr-row-"]').forEach(rowEl=>{
+      const i = rowEl.id.split('-').pop();
+      const date    = document.getElementById('usr-date-'+i)?.value.trim();
+      const lead    = document.getElementById('usr-lead-'+i)?.value.trim();
+      const regular = document.getElementById('usr-reg-'+i)?.value.trim();
+      const tasks   = document.getElementById('usr-tasks-'+i)?.value.trim();
+      if(date||lead||regular) newRows.push({date:date||'', lead:lead||'', regular:regular||'', tasks:tasks||''});
+    });
+  }
+  data.rows = newRows;
+
+  // Build period label from first/last dates
+  if(newRows.length > 0){
+    const firstMonth = newRows[0].date.split(' ')[0];
+    const lastEntry  = newRows[newRows.length-1].date;
+    const lastMonth  = lastEntry.split(' ')[0];
+    const year = new Date().getFullYear();
+    // Try to get year from month selectors
+    const sy = document.getElementById('use-sy')?.value;
+    const ey = document.getElementById('use-ey')?.value;
+    data.period = firstMonth+(firstMonth!==lastMonth?' – '+lastMonth:'')+(ey?' '+ey:' '+year);
+  }
+
+  // Collect duties
+  const dwrap = document.getElementById('use-duties-wrap');
+  const newDuties = [];
+  if(dwrap){
+    dwrap.querySelectorAll('[id^="usr-duty-"]').forEach(dutyEl=>{
+      const i = dutyEl.id.split('-').pop();
+      const task = document.getElementById('usr-dtask-'+i)?.value.trim();
+      const desc = document.getElementById('usr-ddesc-'+i)?.value.trim();
+      if(task) newDuties.push({task, desc:desc||''});
+    });
+  }
+  data.duties = newDuties;
+
+  saveUsherSchedule(data);
+  closeUsherSchedEdit();
+  renderUsherSchedule();
+  showToast('✅ Schedule saved','success');
+}
+
+function closeUsherSchedEdit(){
+  document.getElementById('usher-sched-edit-modal').style.display='none';
+}
 // ═══════════════════════════════════════════════════════════════
 // ── HEADCOUNT / HESABU SYSTEM ──
 // ═══════════════════════════════════════════════════════════════
@@ -4639,11 +5192,11 @@ const DEFAULT_EV_MENUS = [
 ];
 
 function getEvMenus(){
-  const saved = localStorage.getItem(K_EV_MENUS);
+  const saved = _lsGet(K_EV_MENUS);
   if(saved){ try{ return JSON.parse(saved); }catch(e){} }
   return JSON.parse(JSON.stringify(DEFAULT_EV_MENUS));
 }
-function saveEvMenus(m){ localStorage.setItem(K_EV_MENUS, JSON.stringify(m)); }
+function saveEvMenus(m){ try{localStorage.setItem(K_EV_MENUS,JSON.stringify(m));_memStore[K_EV_MENUS]=JSON.stringify(m);}catch(e){_memStore[K_EV_MENUS]=JSON.stringify(m);} }
 
 // ═══════════════════════════════════════════════════════════════
 // ── ADD WINDOWS & DEPARTMENTS TO EDIT USER MODAL ──
@@ -4664,12 +5217,16 @@ const MONTH_NAMES_RPT = ['','January','February','March','April','May','June','J
 function checkMonthlyReportReminder(){
   if(!CU) return;
   const cfg = getReportConfig();
-  if(!cfg.leadUsername || CU.username !== cfg.leadUsername) return;
 
-  const now  = new Date();
-  const day  = now.getDate();
+  // Allow: designated usher lead OR any super admin as fallback
+  const isLead = cfg.leadUsername && CU.username === cfg.leadUsername;
+  const isSuperFallback = CU.role === 'super';
+  if(!isLead && !isSuperFallback) return;
 
-  // Only trigger from day 5 onwards (5 days after month end)
+  const now = new Date();
+  const day = now.getDate();
+
+  // Only trigger from day 5 onwards
   if(day < 5) return;
 
   // Target = previous month
@@ -4680,7 +5237,7 @@ function checkMonthlyReportReminder(){
   const log = getReportLog();
   if(log.some(r=>r.month===prevYM)) return;
 
-  // Auto-send silently — no popup
+  // Auto-send silently
   autoSubmitMonthlyReport(prevYM);
 }
 
@@ -5035,31 +5592,46 @@ function renderCustomWinButtons(userWindows){
 }
 
 function renderWindowManager(){
-  const list = document.getElementById('win-mgr-list');
-  if(!list) return;
-  const defs = getWindowDefs();
-  list.innerHTML = defs.map((w,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-      <span style="font-size:1.3rem;">${w.icon}</span>
-      <div style="flex:1;">
-        <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:var(--blue-deep);">${esc(w.name)}</div>
-        <div style="font-size:0.65rem;color:var(--text-light);">ID: ${w.id} ${w.builtin?'· Built-in':''}</div>
-      </div>
-      <button onclick="openEditWindowModal('${w.id}')"
-        style="padding:5px 12px;background:var(--blue-pale);color:var(--blue-bright);border:1.5px solid var(--blue-bright);border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">
-        ✏️ Edit
-      </button>
-      ${!w.builtin?`<button onclick="deleteCustomWindow('${w.id}')"
-        style="padding:5px 10px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">
-        ✕
-      </button>`:''}
-    </div>`).join('');
+  // Update built-in window names/icons from saved overrides
+  try {
+    const defs = getWindowDefs();
+    defs.forEach(w=>{
+      const nameEl = document.getElementById('wml-name-'+w.id);
+      if(nameEl) nameEl.textContent = w.name;
+    });
+    // Render custom windows
+    const customSlot = document.getElementById('win-mgr-custom');
+    const custom = ld(K_WINDOWS,[]);
+    if(customSlot){
+      customSlot.innerHTML = custom.map(w=>`
+        <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
+          <span style="font-size:1.3rem;">${w.icon||'🗂️'}</span>
+          <div style="flex:1;">
+            <div style="font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;color:#0a1f5c;">${esc(w.name)}</div>
+            <div style="font-size:0.65rem;color:#64748b;">ID: ${w.id}</div>
+          </div>
+          <button onclick="openEditWindowModal('${w.id}')" style="padding:5px 12px;background:#dbeafe;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>
+          <button onclick="deleteCustomWindow('${w.id}')" style="padding:5px 10px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✕</button>
+        </div>`).join('');
+    }
+  } catch(e){ console.warn('renderWindowManager error:', e); }
 
-  // Also refresh nu-win-rows in Add User form
-  const nuRows = document.getElementById('nu-win-rows');
-  if(nuRows) nuRows.innerHTML = getWindowDefs().map(w=>
-    `<div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">${w.icon} ${w.name}</span><label class="toggle"><input type="checkbox" id="nu-win-${w.id}" ${w.id==='schedules'?'checked':''}/><span class="tog-slider"></span></label></div>`
-  ).join('');
+  // Render Wasimamizi editors panel
+  try { renderWasimEditorsPanel(); } catch(e){}
+
+  // Refresh nu-win-rows in Add User form with 3-way selectors
+  try {
+    const nuRows = document.getElementById('nu-win-rows');
+    if(nuRows) nuRows.innerHTML = getWindowDefs().map(w=>`
+      <div class="perm-row" style="margin-bottom:6px;">
+        <span style="font-size:0.83rem;font-weight:700;">${w.icon} ${w.name}</span>
+        <div style="display:flex;gap:4px;">
+          <label style="cursor:pointer;"><input type="radio" name="nu-wperm-${w.id}" value="none" ${w.id!=='schedules'?'checked':''} style="accent-color:#dc2626;"/> <span style="font-size:0.7rem;color:#dc2626;font-weight:700;">None</span></label>
+          <label style="cursor:pointer;margin-left:8px;"><input type="radio" name="nu-wperm-${w.id}" value="view" ${w.id==='schedules'?'checked':''} style="accent-color:#0284c7;"/> <span style="font-size:0.7rem;color:#0284c7;font-weight:700;">View</span></label>
+          <label style="cursor:pointer;margin-left:8px;"><input type="radio" name="nu-wperm-${w.id}" value="edit" style="accent-color:#15803d;"/> <span style="font-size:0.7rem;color:#15803d;font-weight:700;">Edit</span></label>
+        </div>
+      </div>`).join('');
+  } catch(e){}
 }
 
 let _editWinId = null;
@@ -5197,9 +5769,445 @@ function saveChangePw(){
   showToast('✅ Password updated successfully','success');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ── WASIMAMIZI SCHEDULE SYSTEM ──
+// ═══════════════════════════════════════════════════════════════
+
+const K_WASIM_SUN  = 'mom_wasim_sun_v1';
+const K_WASIM_SAT  = 'mom_wasim_sat_v1';
+const K_WASIM_ACCESS = 'mom_wasim_access_v1';
+
+// Who can edit Wasimamizi schedules
+function getWasimEditors(){ return ld(K_WASIM_ACCESS, []); }
+function saveWasimEditors(arr){ sv(K_WASIM_ACCESS, arr); }
+
+function canEditWasim(){
+  return canEditWindow('wasimamizi');
+}
+
+function canEditWindow(winId){
+  if(!CU) return false;
+  if(CU.role==='super') return true;
+  // Check new windowPerms first
+  const perms = CU.windowPerms || {};
+  if(perms[winId] === 'edit') return true;
+  // Legacy: check wasimamizi-specific editors list
+  if(winId==='wasimamizi' && getWasimEditors().includes(CU.username)) return true;
+  return false;
+}
+
+function canViewWindow(winId){
+  if(!CU) return false;
+  if(CU.role==='super') return true;
+  const perms = CU.windowPerms || {};
+  if(perms[winId]==='view' || perms[winId]==='edit') return true;
+  if((CU.windows||[]).includes(winId)) return true;
+  if(winId==='wasimamizi' && getWasimEditors().includes(CU.username)) return true;
+  return false;
+}
+
+function grantWasimEditor(){
+  const sel = document.getElementById('wasim-grant-user');
+  const username = sel?.value||'';
+  if(!username){ showToast('Select a user first','error'); return; }
+  const editors = getWasimEditors();
+  if(editors.includes(username)){ showToast('User already has access','error'); return; }
+  editors.push(username);
+  saveWasimEditors(editors);
+  if(sel) sel.value='';
+  showToast(`✅ Wasimamizi edit access granted to @${username}`,'success');
+  renderWasimEditorsPanel();
+}
+
+function revokeWasimEditor(username){
+  const editors = getWasimEditors().filter(u=>u!==username);
+  saveWasimEditors(editors);
+  showToast(`✅ Access removed for @${username}`,'success');
+  renderWasimEditorsPanel();
+}
+
+function renderWasimEditorsPanel(){
+  const list = document.getElementById('wasim-editors-list');
+  const sel  = document.getElementById('wasim-grant-user');
+  if(!list && !sel) return;
+
+  const admins  = ld(K.admins, DA);
+  const editors = getWasimEditors();
+
+  // Render current editors
+  if(list){
+    if(!editors.length){
+      list.innerHTML = '<div style="font-size:0.75rem;color:#92400e;padding:6px 0;">No users granted yet. Super Admins always have access.</div>';
+    } else {
+      list.innerHTML = editors.map(u=>{
+        const user = admins.find(a=>a.username===u);
+        const name = user ? user.displayName : u;
+        return `<div style="display:flex;align-items:center;justify-content:space-between;background:white;border-radius:8px;padding:7px 10px;margin-bottom:6px;">
+          <span style="font-size:0.82rem;font-weight:700;color:#1e293b;">👤 ${esc(name)} <span style="color:#64748b;font-weight:400;">@${esc(u)}</span></span>
+          <button onclick="revokeWasimEditor('${esc(u)}')" style="padding:3px 9px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:7px;font-size:0.7rem;font-weight:800;cursor:pointer;">Revoke</button>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Populate grant dropdown — non-super users without access
+  if(sel){
+    const eligible = admins.filter(a=>a.role!=='super' && !editors.includes(a.username));
+    const opts = eligible.map(a=>`<option value="${esc(a.username)}">${esc(a.displayName)} (@${esc(a.username)})</option>`).join('');
+    sel.innerHTML = `<option value="">— Select user to grant access —</option>${opts}`;
+  }
+}
+
+let _currentWasimDay = null; // 'sunday' or 'saturday'
+
+const WASIM_DEFAULTS = {
+  sunday: {
+    title: 'Wasimamizi wa Jumapili',
+    period: 'April – July 2026',
+    service: 'Sunday Worship Service',
+    col1: 'Msimamizi Mkuu',
+    col2: 'Msimamizi (Kawaida)',
+    rows: [
+      {date:'April 5',  lead:'',regular:'',tasks:''},
+      {date:'April 12', lead:'',regular:'',tasks:''},
+      {date:'April 19', lead:'',regular:'',tasks:''},
+    ],
+    duties: [
+      {task:'Uongozi',  desc:'Kusimamia huduma ya Jumapili.'},
+      {task:'Maombi',   desc:'Kuongoza kikao cha maombi.'},
+      {task:'Utaratibu',desc:'Kuhakikisha utaratibu wa kanisa.'},
+    ]
+  },
+  saturday: {
+    title: 'Wasimamizi wa Jumamosi',
+    period: 'April – July 2026',
+    service: 'Saturday Worship Service',
+    col1: 'Msimamizi Mkuu',
+    col2: 'Msimamizi (Kawaida)',
+    rows: [
+      {date:'April 4',  lead:'',regular:'',tasks:''},
+      {date:'April 11', lead:'',regular:'',tasks:''},
+      {date:'April 18', lead:'',regular:'',tasks:''},
+    ],
+    duties: [
+      {task:'Uongozi',  desc:'Kusimamia huduma ya Jumamosi.'},
+      {task:'Maombi',   desc:'Kuongoza kikao cha maombi.'},
+      {task:'Utaratibu',desc:'Kuhakikisha utaratibu wa kanisa.'},
+    ]
+  }
+};
+
+function getWasimSchedule(day){
+  const key = day==='sunday' ? K_WASIM_SUN : K_WASIM_SAT;
+  return ld(key, WASIM_DEFAULTS[day]);
+}
+function saveWasimSchedule(day, data){
+  const key = day==='sunday' ? K_WASIM_SUN : K_WASIM_SAT;
+  sv(key, data);
+}
+
+function openWasimSchedule(day){
+  _currentWasimDay = day;
+  document.getElementById('wasimamizi-main-view').style.display = 'none';
+  const sv2 = document.getElementById('wasimamizi-sched-view');
+  sv2.style.display = 'flex';
+  renderWasimSchedule(day);
+}
+
+function closeWasimSchedule(){
+  _currentWasimDay = null;
+  document.getElementById('wasimamizi-sched-view').style.display = 'none';
+  document.getElementById('wasimamizi-main-view').style.display = 'block';
+}
+
+function renderWasimSchedule(day){
+  const data = getWasimSchedule(day);
+  const canEdit = canEditWasim();
+  const accent  = day === 'sunday' ? '#b45309' : '#1d4ed8';
+  const accentDark = day === 'sunday' ? '#78350f' : '#0a1f5c';
+  const icon    = day === 'sunday'   ? '☀️' : '🌤️';
+
+  const rowsHtml = data.rows.map((r,i) => `
+    <tr style="background:${i%2===0?'white':'#fafafa'};">
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.85rem;color:#1e293b;">${esc(r.date)}</td>
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.85rem;color:${accent};font-weight:700;text-align:center;">${esc(r.lead)}</td>
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.85rem;color:${accent};font-weight:700;text-align:center;">${esc(r.regular)}</td>
+      <td style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font-size:0.83rem;color:#92400e;background:#fef9c3;text-align:center;">${esc(r.tasks)}</td>
+    </tr>`).join('');
+
+  const dutiesHtml = data.duties.map((d,i) => `
+    <tr style="background:${i%2===0?'white':'#f8fafc'};">
+      <td style="padding:9px 14px;border-bottom:1px solid #e2e8f0;font-size:0.82rem;font-weight:800;color:${accent};width:130px;">${esc(d.task)}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e2e8f0;font-size:0.82rem;color:#374151;">${esc(d.desc)}</td>
+    </tr>`).join('');
+
+  document.getElementById('wasim-sched-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:0;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.12);">
+
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,${accent},${accentDark});padding:20px 16px 16px;text-align:center;position:relative;">
+        ${canEdit ? `<button onclick="openWasimSchedEdit('${day}')" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:white;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">✏️ Edit</button>` : ''}
+        <div style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;">Mount of Olives Ministry</div>
+        <div style="font-family:'Cinzel',serif;font-size:1.3rem;font-weight:800;color:white;letter-spacing:0.04em;">
+          ${icon} <span style="color:#fbbf24;">${esc(data.title).toUpperCase()}</span>
+        </div>
+        <div style="font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.85);margin-top:8px;background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 14px;display:inline-block;">
+          ${esc(data.period)} &nbsp;•&nbsp; ${esc(data.service)}
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-x:auto;background:white;">
+        <table style="width:100%;border-collapse:collapse;min-width:380px;">
+          <thead>
+            <tr style="background:${accent};">
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:800;color:white;text-align:left;border-right:1px solid rgba(255,255,255,0.2);">Tarehe</th>
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:800;color:white;text-align:center;border-right:1px solid rgba(255,255,255,0.2);">${esc(data.col1||'Msimamizi Mkuu')}</th>
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:800;color:white;text-align:center;border-right:1px solid rgba(255,255,255,0.2);">${esc(data.col2||'Msimamizi (Kawaida)')}</th>
+              <th style="padding:11px 14px;font-family:'Cinzel',serif;font-size:0.75rem;font-weight:800;color:white;text-align:center;">Majukumu</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+
+      <!-- Duties -->
+      <div style="background:#f8f9fa;border-top:3px solid #e2e8f0;padding:16px;">
+        <div style="font-family:'Cinzel',serif;font-size:0.92rem;font-weight:800;color:#1e293b;text-align:center;margin-bottom:12px;">Majukumu ya Wasimamizi</div>
+        <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#64748b;">
+                <th style="padding:8px 14px;font-size:0.75rem;font-weight:700;color:white;text-align:left;width:130px;">Jukumu</th>
+                <th style="padding:8px 14px;font-size:0.75rem;font-weight:700;color:white;text-align:left;">Maelezo</th>
+              </tr>
+            </thead>
+            <tbody>${dutiesHtml}</tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+function openWasimSchedEdit(day){
+  _currentWasimDay = day;
+  const data = getWasimSchedule(day);
+  const curYear = new Date().getFullYear();
+  const years = [];
+  for(let y=curYear-1; y<=curYear+3; y++) years.push(y);
+  const monthOpts = MONTHS.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+  const yearOpts  = years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  const accent = day==='sunday'?'#b45309':'#1d4ed8';
+  const icon   = day==='sunday'?'☀️':'🌤️';
+
+  // Update modal header colour
+  const hdr = document.getElementById('wasim-edit-hdr');
+  if(hdr) hdr.style.background = day==='sunday'?'linear-gradient(135deg,#b45309,#78350f)':'linear-gradient(135deg,#1d4ed8,#0a1f5c)';
+  document.getElementById('wasim-edit-title').textContent = `✏️ Edit — ${icon} ${data.title}`;
+
+  const getDaysInRange = day==='sunday' ? getSundaysInRange : getSaturdaysInRange;
+
+  const rowsEditor = data.rows.map((r,i)=>`
+    <div id="wsr-row-${i}" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="${esc(r.date)}"    id="wsr-date-${i}"  placeholder="Tarehe"        style="${_editInputStyle}" readonly/>
+      <input value="${esc(r.lead)}"    id="wsr-lead-${i}"  placeholder="Msimamizi Mkuu" style="${_editInputStyle}"/>
+      <input value="${esc(r.regular)}" id="wsr-reg-${i}"   placeholder="Kawaida"        style="${_editInputStyle}"/>
+      <button onclick="removeWsrRow(${i})" style="${_delBtnStyle}">✕</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <input value="${esc(r.tasks)}" id="wsr-tasks-${i}" placeholder="Majukumu (tenganisha kwa koma)" style="${_editInputStyle}"/>
+    </div>`).join('');
+
+  const dutiesEditor = data.duties.map((d,i)=>`
+    <div id="wsd-duty-${i}" style="display:grid;grid-template-columns:1fr 2fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="${esc(d.task)}" id="wsd-task-${i}" placeholder="Jukumu"  style="${_editInputStyle}"/>
+      <input value="${esc(d.desc)}" id="wsd-desc-${i}" placeholder="Maelezo" style="${_editInputStyle}"/>
+      <button onclick="removeWsdDuty(${i})" style="${_delBtnStyle}">✕</button>
+    </div>`).join('');
+
+  document.getElementById('wasim-sched-edit-modal').style.display='flex';
+  document.getElementById('wasim-sched-edit-body').innerHTML = `
+    <!-- Service Info -->
+    <div style="margin-bottom:14px;">
+      <div class="sec-label" style="margin-bottom:6px;">📅 Huduma</div>
+      <input id="wse-service" value="${esc(data.service)}" placeholder="e.g. Sunday Worship Service" style="${_editInputStyle};margin-bottom:6px;"/>
+      <input id="wse-col1"    value="${esc(data.col1||'Msimamizi Mkuu')}"       placeholder="Column 1 header" style="${_editInputStyle};margin-bottom:6px;"/>
+      <input id="wse-col2"    value="${esc(data.col2||'Msimamizi (Kawaida)')}"  placeholder="Column 2 header" style="${_editInputStyle}"/>
+    </div>
+
+    <!-- Range Picker -->
+    <div style="margin-bottom:14px;">
+      <div class="sec-label" style="margin-bottom:6px;">📆 Chagua Kipindi → Jaza Tarehe</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:6px;">
+        <select id="wse-sm" style="${_editInputStyle}">${monthOpts}</select>
+        <select id="wse-sy" style="${_editInputStyle}">${yearOpts}</select>
+        <select id="wse-em" style="${_editInputStyle}">${monthOpts}</select>
+        <select id="wse-ey" style="${_editInputStyle}">${yearOpts}</select>
+        <button onclick="populateWasimDays()" style="padding:8px 10px;background:${accent};color:white;border:none;border-radius:8px;font-size:0.72rem;font-weight:800;cursor:pointer;white-space:nowrap;">↻ Jaza</button>
+      </div>
+    </div>
+
+    <!-- Schedule Rows -->
+    <div style="margin-bottom:14px;">
+      <div class="sec-label" style="margin-bottom:8px;">📋 Ratiba</div>
+      <div id="wse-rows-wrap">${rowsEditor}</div>
+      <button onclick="addWsrRow()" style="width:100%;padding:9px;border:2px dashed ${accent}33;background:${accent}11;color:${accent};border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;margin-top:4px;">+ Ongeza Mstari</button>
+    </div>
+
+    <!-- Duties -->
+    <div>
+      <div class="sec-label" style="margin-bottom:8px;">🗂️ Majukumu</div>
+      <div id="wse-duties-wrap">${dutiesEditor}</div>
+      <button onclick="addWsdDuty()" style="width:100%;padding:9px;border:2px dashed #86efac;background:#f0fdf4;color:#15803d;border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;margin-top:4px;">+ Ongeza Jukumu</button>
+    </div>`;
+
+  document.getElementById('wse-sy').value = curYear;
+  document.getElementById('wse-ey').value = curYear;
+}
+
+function getSaturdaysInRange(startMonth, startYear, endMonth, endYear){
+  const saturdays = [];
+  const d = new Date(startYear, startMonth, 1);
+  const end = new Date(endYear, endMonth+1, 0);
+  while(d.getDay() !== 6) d.setDate(d.getDate()+1);
+  while(d <= end){
+    saturdays.push(MONTHS[d.getMonth()].slice(0,3)+' '+d.getDate());
+    d.setDate(d.getDate()+7);
+  }
+  return saturdays;
+}
+
+function populateWasimDays(){
+  const sm = parseInt(document.getElementById('wse-sm').value);
+  const sy = parseInt(document.getElementById('wse-sy').value);
+  const em = parseInt(document.getElementById('wse-em').value);
+  const ey = parseInt(document.getElementById('wse-ey').value);
+  if(ey < sy || (ey===sy && em < sm)){ showToast('Mwisho lazima uwe baada ya mwanzo','error'); return; }
+
+  const getFn = _currentWasimDay==='sunday' ? getSundaysInRange : getSaturdaysInRange;
+  const days   = getFn(sm, sy, em, ey);
+  const data   = getWasimSchedule(_currentWasimDay);
+
+  const wrap = document.getElementById('wse-rows-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = days.map((date,i)=>{
+    const ex = data.rows[i]||{};
+    return `
+      <div id="wsr-row-${i}" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+        <input value="${esc(date)}"         id="wsr-date-${i}"  placeholder="Tarehe"  style="${_editInputStyle}" readonly/>
+        <input value="${esc(ex.lead||'')}"  id="wsr-lead-${i}"  placeholder="Msimamizi Mkuu" style="${_editInputStyle}"/>
+        <input value="${esc(ex.regular||'')}" id="wsr-reg-${i}" placeholder="Kawaida" style="${_editInputStyle}"/>
+        <button onclick="removeWsrRow(${i})" style="${_delBtnStyle}">✕</button>
+      </div>
+      <div style="margin-bottom:10px;">
+        <input value="${esc(ex.tasks||'')}" id="wsr-tasks-${i}" placeholder="Majukumu (tenganisha kwa koma)" style="${_editInputStyle}"/>
+      </div>`;
+  }).join('');
+  showToast(`✅ Jumano ${days.length} zimejazwa`,'success');
+}
+
+function addWsrRow(){
+  const wrap = document.getElementById('wse-rows-wrap');
+  if(!wrap) return;
+  const i = wrap.querySelectorAll('[id^="wsr-row-"]').length;
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div id="wsr-row-${i}" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center;">
+      <input value="" id="wsr-date-${i}"  placeholder="Tarehe"          style="${_editInputStyle}"/>
+      <input value="" id="wsr-lead-${i}"  placeholder="Msimamizi Mkuu"  style="${_editInputStyle}"/>
+      <input value="" id="wsr-reg-${i}"   placeholder="Kawaida"         style="${_editInputStyle}"/>
+      <button onclick="this.closest('[id^=wsr-row]').remove();this.closest('div').nextElementSibling?.remove();" style="${_delBtnStyle}">✕</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <input value="" id="wsr-tasks-${i}" placeholder="Majukumu" style="${_editInputStyle}"/>
+    </div>`;
+  wrap.appendChild(div);
+}
+
+function removeWsrRow(i){
+  const row = document.getElementById('wsr-row-'+i);
+  if(row){ const next=row.nextElementSibling; row.remove(); if(next) next.remove(); }
+}
+
+function addWsdDuty(){
+  const wrap = document.getElementById('wse-duties-wrap');
+  if(!wrap) return;
+  const i = wrap.querySelectorAll('[id^="wsd-duty-"]').length;
+  const div = document.createElement('div');
+  div.id=`wsd-duty-${i}`;
+  div.style.cssText='display:grid;grid-template-columns:1fr 2fr auto;gap:6px;margin-bottom:6px;align-items:center;';
+  div.innerHTML=`
+    <input value="" id="wsd-task-${i}" placeholder="Jukumu"  style="${_editInputStyle}"/>
+    <input value="" id="wsd-desc-${i}" placeholder="Maelezo" style="${_editInputStyle}"/>
+    <button onclick="this.parentElement.remove()" style="${_delBtnStyle}">✕</button>`;
+  wrap.appendChild(div);
+}
+
+function removeWsdDuty(i){
+  const row=document.getElementById('wsd-duty-'+i);
+  if(row) row.remove();
+}
+
+function saveWasimSchedEdit(){
+  const day  = _currentWasimDay;
+  if(!day) return;
+  const data = getWasimSchedule(day);
+
+  data.service = document.getElementById('wse-service')?.value.trim()||data.service;
+  data.col1    = document.getElementById('wse-col1')?.value.trim()||data.col1;
+  data.col2    = document.getElementById('wse-col2')?.value.trim()||data.col2;
+
+  // Rows
+  const wrap = document.getElementById('wse-rows-wrap');
+  const newRows = [];
+  if(wrap){
+    wrap.querySelectorAll('[id^="wsr-row-"]').forEach(rowEl=>{
+      const i = rowEl.id.split('-').pop();
+      const date    = document.getElementById('wsr-date-'+i)?.value.trim();
+      const lead    = document.getElementById('wsr-lead-'+i)?.value.trim();
+      const regular = document.getElementById('wsr-reg-'+i)?.value.trim();
+      const tasks   = document.getElementById('wsr-tasks-'+i)?.value.trim();
+      if(date||lead||regular) newRows.push({date:date||'',lead:lead||'',regular:regular||'',tasks:tasks||''});
+    });
+  }
+  data.rows = newRows;
+
+  // Period label
+  if(newRows.length>0){
+    const sy = document.getElementById('wse-sy')?.value;
+    const ey = document.getElementById('wse-ey')?.value;
+    const first = newRows[0].date.split(' ')[0];
+    const last  = newRows[newRows.length-1].date.split(' ')[0];
+    data.period = first+(first!==last?' – '+last:'')+(ey?' '+ey:'');
+  }
+
+  // Duties
+  const dwrap = document.getElementById('wse-duties-wrap');
+  const newDuties = [];
+  if(dwrap){
+    dwrap.querySelectorAll('[id^="wsd-duty-"]').forEach(dutyEl=>{
+      const i = dutyEl.id.split('-').pop();
+      const task = document.getElementById('wsd-task-'+i)?.value.trim();
+      const desc = document.getElementById('wsd-desc-'+i)?.value.trim();
+      if(task) newDuties.push({task,desc:desc||''});
+    });
+  }
+  data.duties = newDuties;
+
+  saveWasimSchedule(day, data);
+  closeWasimSchedEdit();
+  renderWasimSchedule(day);
+  showToast('✅ Ratiba imehifadhiwa','success');
+}
+
+function closeWasimSchedEdit(){
+  document.getElementById('wasim-sched-edit-modal').style.display='none';
+}
+
 function hardResetApp(){
   if(!confirm('This will clear your session and reload the app. Continue?')) return;
-  try { localStorage.removeItem(K.session); } catch(e){}
+  try { _lsDel(K.session); } catch(e){}
   try { sessionStorage.clear(); } catch(e){}
   CU = null;
   location.reload();
