@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -1929,8 +1931,8 @@ function sv(k,v){
   if(_lsOK){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
   _memStore[k]=v;
 }
-function _lsGet(k){try{return _lsGet(k);}catch(e){return _memStore[k]!==undefined?JSON.stringify(_memStore[k]):null;}}
-function _lsDel(k){try{_lsDel(k);}catch(e){} delete _memStore[k];}
+function _lsGet(k){try{return localStorage.getItem(k);}catch(e){return _memStore[k]!==undefined?JSON.stringify(_memStore[k]):null;}}
+function _lsDel(k){try{localStorage.removeItem(k);}catch(e){} delete _memStore[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 const DATA_VERSION = 'v2025-03-19b';
 try {
