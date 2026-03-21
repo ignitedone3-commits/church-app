@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#0a1f5c"/>
 <title>Mount of Olives Ministry</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
   --blue-deep:#0a1f5c; --blue-mid:#1a3a8f; --blue-bright:#2563eb;
@@ -554,6 +555,75 @@ html, body {
   cursor: pointer; padding: 10px 14px; text-transform: uppercase; letter-spacing: 0.05em;
 }
 .dept-back-btn:hover { color: var(--blue-deep); }
+
+/* ── Headcount Entry — Image Style ── */
+.hce-wrap { background: #dbeafe; border-radius: 18px; padding: 0 0 18px; overflow: hidden; margin-bottom: 12px; }
+.hce-header { background: linear-gradient(135deg, #1d4ed8, #1e40af); padding: 18px 16px; text-align: center; }
+.hce-header-main { font-family: 'Cinzel', serif; font-size: clamp(1rem, 4vw, 1.25rem); font-weight: 800; color: white; }
+.hce-header-accent { font-family: 'Cinzel', serif; font-size: clamp(1rem, 4vw, 1.25rem); font-weight: 800; color: #fde047; margin-left: 8px; }
+
+/* 3-col grid */
+.hce-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px 10px 0; }
+
+/* Each day column card */
+.hce-col { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(29,78,216,0.12); border: 2px solid #bfdbfe; }
+.hce-col-header { background: #1d4ed8; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.hce-col-icon { font-size: 1.3rem; }
+.hce-col-title { font-family: 'Cinzel', serif; font-size: clamp(0.62rem, 2.2vw, 0.82rem); font-weight: 800; color: white; letter-spacing: 0.03em; }
+.hce-col-badge { font-size: 0.6rem; font-family: 'Nunito', sans-serif; font-weight: 800; background: #fde047; color: #1d4ed8; padding: 2px 7px; border-radius: 20px; }
+.hce-col-body { padding: 10px 8px; }
+
+/* Field rows */
+.hce-field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.hce-field-icon { font-size: 1.2rem; flex-shrink: 0; width: 22px; text-align: center; }
+.hce-field-label { font-size: clamp(0.6rem, 1.8vw, 0.72rem); font-weight: 700; color: #334155; flex: 1; white-space: nowrap; }
+.hce-input {
+  width: 56px; padding: 8px 4px; border: 1.5px solid #bfdbfe; border-radius: 8px;
+  font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800;
+  text-align: center; color: #1d4ed8; background: #f0f9ff; outline: none;
+  min-height: 40px; -webkit-appearance: none; appearance: none;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+.hce-input:focus { border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.15); background: white; }
+
+/* Total row inside each card */
+.hce-total-row { display: flex; align-items: center; justify-content: space-between; background: #dbeafe; border-radius: 8px; padding: 7px 10px; margin: 8px 0 8px; }
+.hce-total-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #1e40af; }
+.hce-total-val { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 800; color: #1d4ed8; }
+
+/* Date inside each card */
+.hce-date-wrap { margin-bottom: 4px; }
+.hce-date-input { width: 100%; padding: 7px 6px; border: 1.5px solid #bfdbfe; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.72rem; outline: none; color: #334155; background: white; min-height: 38px; }
+.hce-date-input:focus { border-color: #1d4ed8; }
+.hce-meta { font-size: 0.58rem; color: #94a3b8; text-align: center; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Bottom bar */
+.hce-bottom-bar { padding: 12px 10px 0; }
+.hce-bottom-hint { font-size: 0.68rem; color: #64748b; text-align: center; margin-bottom: 10px; }
+.hce-btn-row { display: flex; gap: 10px; }
+.hce-clear-btn { flex: 1; padding: 14px; background: white; color: #dc2626; border: 2px solid #fca5a5; border-radius: 14px; font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: 800; cursor: pointer; min-height: 52px; -webkit-tap-highlight-color: transparent; }
+.hce-submit-btn { flex: 2; padding: 14px; background: linear-gradient(135deg, #1d4ed8, #1e40af); color: white; border: none; border-radius: 14px; font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 800; cursor: pointer; min-height: 52px; letter-spacing: 0.04em; box-shadow: 0 4px 16px rgba(29,78,216,0.3); -webkit-tap-highlight-color: transparent; transition: opacity 0.15s; }
+.hce-submit-btn:active { opacity: 0.88; }
+
+/* Old classes kept for analytics */
+.hc-history-item { background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 9px; border: 1.5px solid var(--border); border-left: 4px solid var(--blue-bright); }
+.hc-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
+
+/* Primary label (Adults / Children) */
+.hce-primary-label { font-family: 'Cinzel', serif; font-size: clamp(0.65rem,2vw,0.78rem); font-weight: 800; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; margin-top: 2px; }
+.hce-input-primary { width: 100%; font-size: 1.5rem !important; padding: 10px 6px !important; margin-bottom: 5px; border-color: #93c5fd !important; background: #eff6ff !important; }
+.hce-input-primary:focus { border-color: #1d4ed8 !important; }
+
+/* Optional gender row */
+.hce-optional-label { font-size: 0.58rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.hce-gender-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 4px; }
+.hce-gender-cell { display: flex; align-items: center; gap: 4px; background: #f8fafc; border-radius: 7px; padding: 4px 6px; border: 1px solid #e2e8f0; }
+.hce-gender-tag { font-size: 0.62rem; font-weight: 800; border-radius: 4px; padding: 2px 5px; flex-shrink: 0; }
+.hce-gender-tag.male   { background: #dbeafe; color: #1d4ed8; }
+.hce-gender-tag.female { background: #fce7f3; color: #be185d; }
+.hce-input-sm { flex: 1; min-width: 0; font-size: 0.9rem !important; padding: 5px 4px !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+.hce-input-sm:focus { border: none !important; box-shadow: none !important; outline: none; }
+.hce-divider { height: 1px; background: #e2e8f0; margin: 8px 0; }
 </style>
 </head><body>
 
@@ -747,6 +817,143 @@ html, body {
     </div>
   </div>
 
+  <!-- Add Department Modal -->
+  <div id="add-dept-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99997;align-items:flex-end;justify-content:center;padding:0;">
+    <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:22px 18px 36px;box-shadow:0 -8px 40px rgba(0,0,0,0.2);">
+      <div style="width:40px;height:4px;background:#e2e8f0;border-radius:4px;margin:0 auto 18px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;font-weight:800;color:#0a1f5c;margin:0;">➕ Add New Department</h3>
+        <button onclick="closeAddDeptModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;">✕</button>
+      </div>
+      <!-- Icon + Name -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:0.63rem;font-weight:800;text-transform:uppercase;color:#64748b;margin-bottom:5px;">Icon</div>
+          <input id="new-dept-icon" type="text" value="🏛️" maxlength="2"
+            style="width:54px;padding:11px 6px;border:2px solid var(--border);border-radius:10px;font-size:1.2rem;text-align:center;outline:none;"/>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:0.63rem;font-weight:800;text-transform:uppercase;color:#64748b;margin-bottom:5px;">Department Name</div>
+          <input id="new-dept-name" type="text" placeholder="e.g. Media, Youth, Choir..." maxlength="30"
+            style="width:100%;padding:11px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;box-sizing:border-box;"
+            onkeydown="if(event.key==='Enter')saveNewDept()"/>
+        </div>
+      </div>
+      <!-- Color picker -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.63rem;font-weight:800;text-transform:uppercase;color:#64748b;margin-bottom:8px;">Card Colour</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="new-dept-colors">
+          ${[
+            {bg:'#dbeafe',border:'#93c5fd',label:'Blue'},
+            {bg:'#d1fae5',border:'#6ee7b7',label:'Green'},
+            {bg:'#fef3c7',border:'#fde68a',label:'Yellow'},
+            {bg:'#ede9fe',border:'#c4b5fd',label:'Purple'},
+            {bg:'#ffe4e6',border:'#fda4af',label:'Pink'},
+            {bg:'#ffedd5',border:'#fdba74',label:'Orange'},
+            {bg:'#f1f5f9',border:'#cbd5e1',label:'Grey'},
+            {bg:'#dcfce7',border:'#86efac',label:'Mint'},
+          ].map((c,i)=>`<button onclick="selectDeptColor(this,'${c.bg}','${c.border}')"
+            data-bg="${c.bg}" data-border="${c.border}"
+            style="width:32px;height:32px;border-radius:8px;background:${c.bg};border:2.5px solid ${c.border};cursor:pointer;transition:transform 0.15s;${i===0?'outline:2.5px solid #1d4ed8;outline-offset:2px;':''}">
+          </button>`).join('')}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeAddDeptModal()" style="flex:1;padding:13px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:12px;font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;cursor:pointer;">Cancel</button>
+        <button onclick="saveNewDept()" style="flex:2;padding:13px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;cursor:pointer;">✅ Add Department</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Headcount Reset Modal -->
+  <div id="hc-reset-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:flex-end;justify-content:center;padding:0;">
+    <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:22px 18px 36px;box-shadow:0 -8px 40px rgba(0,0,0,0.22);max-height:90vh;overflow-y:auto;">
+      <div style="width:40px;height:4px;background:#e2e8f0;border-radius:4px;margin:0 auto 18px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="font-size:1.5rem;">🗑️</span>
+        <h3 style="font-family:'Cinzel',serif;font-size:1rem;font-weight:800;color:#0a1f5c;margin:0;">Clear Attendance Data</h3>
+      </div>
+      <p style="font-size:0.78rem;color:#64748b;margin-bottom:16px;line-height:1.5;">Choose what to clear. All deletions are permanent and cannot be undone.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px;">
+        <button id="hcr-mode-month" onclick="setHcResetMode('month')" style="padding:10px 4px;border:2px solid #1d4ed8;border-radius:10px;background:#1d4ed8;color:white;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;min-height:42px;">📅 By Month</button>
+        <button id="hcr-mode-day"   onclick="setHcResetMode('day')"   style="padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:white;color:#64748b;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;min-height:42px;">📆 By Day</button>
+        <button id="hcr-mode-all"   onclick="setHcResetMode('all')"   style="padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:white;color:#64748b;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;min-height:42px;">⚠️ Clear All</button>
+      </div>
+      <div id="hcr-section-month">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.63rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#64748b;margin-bottom:5px;">Year</div>
+            <select id="hc-reset-year" onchange="updateHcResetPreview()" style="width:100%;padding:11px;border:2px solid #e2e8f0;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;outline:none;background:white;color:#0a1f5c;min-height:46px;"><option value="">-- Year --</option></select>
+          </div>
+          <div>
+            <div style="font-size:0.63rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#64748b;margin-bottom:5px;">Month</div>
+            <select id="hc-reset-month" onchange="updateHcResetPreview()" style="width:100%;padding:11px;border:2px solid #e2e8f0;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;outline:none;background:white;color:#0a1f5c;min-height:46px;">
+              <option value="">-- Month --</option>
+              <option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option>
+              <option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option>
+              <option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="hcr-section-day" style="display:none;margin-bottom:12px;">
+        <div style="font-size:0.63rem;font-weight:800;text-transform:uppercase;color:#64748b;margin-bottom:8px;">Select Day to Clear</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <button id="hcr-day-sunday"   onclick="selectHcResetDay('sunday')"   style="padding:12px 6px;border:2px solid #e2e8f0;border-radius:10px;background:white;color:#334155;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;min-height:46px;">☀️ Sunday</button>
+          <button id="hcr-day-saturday" onclick="selectHcResetDay('saturday')" style="padding:12px 6px;border:2px solid #e2e8f0;border-radius:10px;background:white;color:#334155;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;min-height:46px;">🌤️ Saturday</button>
+          <button id="hcr-day-friday"   onclick="selectHcResetDay('friday')"   style="padding:12px 6px;border:2px solid #e2e8f0;border-radius:10px;background:white;color:#334155;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;min-height:46px;">🌙 Friday</button>
+        </div>
+      </div>
+      <div id="hcr-section-all" style="display:none;background:#fff5f5;border:2px solid #fca5a5;border-radius:10px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:0.88rem;font-weight:800;color:#7f1d1d;margin-bottom:6px;">⚠️ Delete ALL attendance data</div>
+        <div style="font-size:0.78rem;color:#7f1d1d;line-height:1.5;">This will permanently erase every record across all days, all months, and all years. The entry form will be completely reset to zero.</div>
+      </div>
+      <div id="hc-reset-preview" style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:12px;margin-bottom:14px;font-size:0.78rem;color:#7f1d1d;min-height:44px;">Select options above to preview what will be deleted.</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeHcResetModal()" style="flex:1;padding:14px;background:white;color:#475569;border:2px solid #e2e8f0;border-radius:12px;font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;cursor:pointer;min-height:52px;">Cancel</button>
+        <button id="hc-reset-confirm-btn" onclick="confirmHcReset()" style="flex:2;padding:14px;background:linear-gradient(135deg,#dc2626,#991b1b);color:white;border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:0.82rem;font-weight:800;cursor:pointer;min-height:52px;opacity:0.35;pointer-events:none;transition:opacity 0.15s;">🗑️ Delete Records</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Report Reminder Modal -->
+  <div id="hc-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99998;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:white;border-radius:20px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#1d4ed8,#0a1f5c);padding:20px 20px 16px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:6px;">📊</div>
+        <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:800;color:white;">Monthly Report Ready</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);margin-top:4px;" id="hcr-report-period"></div>
+      </div>
+      <!-- Report preview -->
+      <div style="padding:16px 18px;max-height:55vh;overflow-y:auto;">
+        <div style="background:#f0f9ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-family:'Cinzel',serif;font-size:0.72rem;font-weight:800;color:#1e40af;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">📋 Report Summary</div>
+          <div id="hcr-report-preview"></div>
+        </div>
+        <div id="hcr-email-section" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:14px;">
+          <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;color:#64748b;margin-bottom:6px;">📧 Report destination</div>
+          <div id="hcr-email-display" style="font-size:0.82rem;font-weight:700;color:#0a1f5c;"></div>
+        </div>
+        <div style="font-size:0.75rem;color:#64748b;line-height:1.5;margin-bottom:4px;">
+          This report summarises attendance data for the month. Press <strong>Submit Report</strong> to notify the Super Admin, or <strong>Remind Me Later</strong> to be reminded next time you open the app.
+        </div>
+      </div>
+      <!-- Buttons -->
+      <div style="padding:14px 18px 20px;display:flex;flex-direction:column;gap:8px;">
+        <button onclick="submitMonthlyReport()" style="width:100%;padding:15px;background:linear-gradient(135deg,#1d4ed8,#0a1f5c);color:white;border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;cursor:pointer;min-height:52px;letter-spacing:0.04em;">
+          📤 Submit Report
+        </button>
+        <div style="display:flex;gap:8px;">
+          <button onclick="remindMeLater()" style="flex:1;padding:12px;background:white;color:#64748b;border:2px solid #e2e8f0;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;cursor:pointer;">⏰ Remind Me Later</button>
+          <button onclick="dismissReport()" style="flex:1;padding:12px;background:white;color:#94a3b8;border:2px solid #e2e8f0;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">✕ Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Sticky Note Write Modal -->
   <div class="sticky-modal-bg" id="sticky-modal-bg">
     <div class="sticky-modal">
@@ -778,6 +985,7 @@ html, body {
     <button class="atn" id="atn-menus" onclick="switchATab('menus');renderMenuManager()" style="display:none;">&#128203; Menu Manager</button>
     <button class="atn" id="atn-users" onclick="switchATab('users')" style="display:none;">&#128101; Manage Admins</button>
     <button class="atn" id="atn-activity" onclick="switchATab('activity');renderActivityLog()" style="display:none;">📊 Activity Log</button>
+    <button class="atn" id="atn-reports" onclick="switchATab('reports');renderReportsPanel()" style="display:none;">📤 Reports</button>
   </div>
   <div class="admin-body">
     <div class="admin-content">
@@ -1297,6 +1505,70 @@ html, body {
           </div>
         </div>
       </div>
+
+      <!-- Reports Panel -->
+      <div class="admin-panel" id="ap-reports">
+        <div class="card">
+          <div class="card-hdr"><span>📤</span><h2>Monthly Reports</h2><span class="badge">Headcount</span></div>
+          <div class="card-body">
+
+            <!-- Access notice -->
+            <div style="background:#fef3c7;border:1.5px solid #fde68a;border-radius:10px;padding:11px 13px;margin-bottom:16px;display:flex;gap:8px;align-items:flex-start;">
+              <span style="font-size:1.1rem;">🔒</span>
+              <div style="font-size:0.78rem;color:#78350f;line-height:1.5;">
+                <strong>Super Admin only</strong> by default. Use the access section below to grant specific users permission to view submitted reports.
+              </div>
+            </div>
+
+            <!-- Email config -->
+            <div id="rp-email-section" style="margin-bottom:16px;">
+              <div class="sec-label" style="margin-bottom:8px;">📧 Church Report Email</div>
+              <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:10px;">Reports will be sent to this email address. The usher lead will be prompted at the end of each month.</p>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="email" id="rp-church-email" placeholder="church@example.com"
+                  style="flex:1;padding:10px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;"/>
+                <button onclick="saveReportEmail()" style="padding:10px 16px;background:var(--blue-bright);color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Save</button>
+              </div>
+              <div id="rp-email-saved" style="font-size:0.72rem;color:#15803d;margin-top:5px;"></div>
+            </div>
+
+            <!-- Usher lead config -->
+            <div id="rp-lead-section" style="margin-bottom:16px;">
+              <div class="sec-label" style="margin-bottom:8px;">👤 Usher Lead (Report Sender)</div>
+              <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:10px;">This user will see the end-of-month report reminder popup.</p>
+              <select id="rp-lead-user" style="width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;background:white;">
+                <option value="">-- Select User --</option>
+              </select>
+              <button onclick="saveReportLead()" style="margin-top:8px;width:100%;padding:10px;background:var(--blue-bright);color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Save Usher Lead</button>
+              <div id="rp-lead-saved" style="font-size:0.72rem;color:#15803d;margin-top:5px;"></div>
+            </div>
+
+            <!-- Report Viewer Access -->
+            <div id="rp-viewers-section" style="margin-bottom:16px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:13px;">
+              <div class="sec-label" style="margin-bottom:6px;color:#15803d;">👁️ Report Viewer Access</div>
+              <p style="font-size:0.78rem;color:#166534;margin-bottom:12px;line-height:1.5;">
+                Super Admins always have full access. Select a user below to grant them read-only access to submitted reports.
+              </p>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+                <select id="rp-grant-user" style="flex:1;padding:10px 12px;border:2px solid #86efac;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;background:white;">
+                  <option value="">-- Select user to grant access --</option>
+                </select>
+                <button onclick="grantReportViewer()" style="padding:10px 16px;background:#15803d;color:white;border:none;border-radius:10px;font-family:'Cinzel',serif;font-size:0.78rem;font-weight:800;cursor:pointer;white-space:nowrap;">+ Grant</button>
+              </div>
+              <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#166534;margin-bottom:7px;">Granted Users</div>
+              <div id="rp-viewers-list">
+                <div style="font-size:0.78rem;color:#64748b;font-style:italic;">No users granted access yet.</div>
+              </div>
+            </div>
+
+            <!-- Report log -->
+            <div>
+              <div class="sec-label" style="margin-bottom:8px;">📜 Submitted Reports</div>
+              <div id="rp-log-list" style="max-height:40vh;overflow-y:auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1413,7 +1685,9 @@ const K={admins:'mom_a6',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',ses
   draftW:'mom_dw4',draftK:'mom_dk4',draftT:'mom_dt4',draftStatus:'mom_ds4',settings:'mom_cfg4',
   eventWalawi:'mom_evw1',eventKawaida:'mom_evk1',eventTestimony:'mom_evt1',
   specialEvent:'mom_sev1',depts:'mom_depts1',
-  activityLog:'mom_activity_log',failedAttempts:'mom_failed_attempts',securityAlerts:'mom_security_alerts'};
+  activityLog:'mom_activity_log',failedAttempts:'mom_failed_attempts',securityAlerts:'mom_security_alerts',
+  headcount:'mom_headcount_v1',reportLog:'mom_report_log_v1',reportConfig:'mom_report_cfg_v1',
+  subDepts:'mom_subdepts_v1'};
 const DEF_HEADERS = {
   wh1:'Wakati / Time', wh2:'Jina / Name',    wh3:'Kazi / Role',
   kh1:'Wakati / Time', kh2:'Shughuli / Activity', kh3:'Kiongozi / Leader',
@@ -2024,6 +2298,9 @@ function openAdmin(){
   document.getElementById('atn-branding').style.display=sup?'inline-block':'none';
   document.getElementById('atn-menus').style.display=sup?'inline-block':'none';
   document.getElementById('atn-activity').style.display=sup?'inline-block':'none';
+  document.getElementById('atn-reports').style.display=(sup||canViewReports())?'inline-block':'none';
+  // Hide config sections from non-super viewers
+  const isReportViewer = !sup && canViewReports();
   renderAW();renderAK();renderNames();if(sup)renderUsers();
   loadHeaders(); _populateTitleInputs();
   switchATab('schedules'); show('admin');
@@ -3329,13 +3606,21 @@ function addMenuTab(){
 // ── WINDOWS & DEPARTMENTS SYSTEM ──
 // ═══════════════════════════════════════════════════════════════
 
-const DEPT_DEFS = [
-  {id:'ushers',     name:'Ushers',       icon:'🚪', color:'#dbeafe', border:'#93c5fd'},
-  {id:'financial',  name:'Financial',    icon:'💰', color:'#d1fae5', border:'#6ee7b7'},
-  {id:'event',      name:'Event',        icon:'🎉', color:'#fef3c7', border:'#fde68a'},
-  {id:'intercessors',name:'Intercessors',icon:'🙏', color:'#ede9fe', border:'#c4b5fd'},
-  {id:'elders',     name:'Elders',       icon:'📖', color:'#ffe4e6', border:'#fda4af'},
+const DEPT_DEFS_DEFAULT = [
+  {id:'ushers',     name:'Ushers',       icon:'🚪', color:'#dbeafe', border:'#93c5fd', builtin:true},
+  {id:'financial',  name:'Financial',    icon:'💰', color:'#d1fae5', border:'#6ee7b7', builtin:true},
+  {id:'event',      name:'Event',        icon:'🎉', color:'#fef3c7', border:'#fde68a', builtin:true},
+  {id:'intercessors',name:'Intercessors',icon:'🙏', color:'#ede9fe', border:'#c4b5fd', builtin:true},
+  {id:'elders',     name:'Elders',       icon:'📖', color:'#ffe4e6', border:'#fda4af', builtin:true},
 ];
+const K_CUSTOM_DEPTS = 'mom_custom_depts_v1';
+
+function getDeptDefs(){
+  const custom = ld(K_CUSTOM_DEPTS,[]);
+  return [...DEPT_DEFS_DEFAULT, ...custom];
+}
+// Alias so all existing code using DEPT_DEFS still works
+Object.defineProperty(window,'DEPT_DEFS',{get:getDeptDefs});
 
 function switchWindow(winId, silent){
   // Hide landing screen
@@ -3359,7 +3644,7 @@ function switchWindow(winId, silent){
   const btn = document.getElementById('win-btn-'+winId);
   if(panel) panel.classList.add('active');
   if(btn) btn.classList.add('active');
-  if(winId === 'departments') renderDeptGrid();
+  if(winId === 'departments'){ renderDeptGrid(); setTimeout(checkMonthlyReportReminder, 800); }
 }
 
 function renderDeptGrid(){
@@ -3367,17 +3652,31 @@ function renderDeptGrid(){
   if(!container) return;
   const userDepts = (CU && CU.departments) ? CU.departments : [];
   const sup = CU && CU.role === 'super';
-  // Show all depts for super admin, only assigned ones for others
-  const visibleDepts = DEPT_DEFS.filter(d => sup || userDepts.includes(d.id));
-  if(visibleDepts.length === 0){
+  const allDepts = getDeptDefs();
+  const visibleDepts = allDepts.filter(d => sup || userDepts.includes(d.id));
+  if(visibleDepts.length === 0 && !sup){
     container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-light);font-size:0.88rem;">No departments assigned.<br>Contact your admin.</div>';
     return;
   }
-  container.innerHTML = visibleDepts.map(d => `
-    <div class="dept-card" onclick="openDept('${d.id}')" style="border-color:${d.border};background:${d.color};">
+  const allSubDepts = ld(K.subDepts, {});
+  let html = visibleDepts.map(d => {
+    const delBtn = (sup && !d.builtin) ? `<button onclick="event.stopPropagation();deleteDept('${d.id}')"
+      style="position:absolute;top:6px;right:6px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:6px;font-size:0.65rem;font-weight:800;padding:2px 6px;cursor:pointer;font-family:'Nunito',sans-serif;">✕</button>` : '';
+    return `<div class="dept-card" onclick="openDept('${d.id}')" style="border-color:${d.border};background:${d.color};position:relative;">
+      ${delBtn}
       <div class="dept-icon">${d.icon}</div>
       <div class="dept-name">${d.name}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+
+  if(sup){
+    html += `<div class="dept-card" onclick="openAddDeptModal()"
+      style="border-color:#1d4ed8;background:white;border-style:dashed;cursor:pointer;">
+      <div class="dept-icon" style="font-size:1.6rem;color:#1d4ed8;">➕</div>
+      <div class="dept-name" style="color:#1d4ed8;">Add Department</div>
+    </div>`;
+  }
+  container.innerHTML = html;
 }
 
 function openDept(deptId){
@@ -3389,18 +3688,794 @@ function openDept(deptId){
   document.getElementById('dept-detail-icon').textContent = d.icon;
   document.getElementById('dept-detail-name').textContent = d.name;
   document.getElementById('dept-detail-badge').textContent = d.name;
-  document.getElementById('dept-detail-body').innerHTML = `
-    <div class="empty" style="padding:30px 0;">
-      <span class="eico">${d.icon}</span>
-      <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:8px;"><strong>${d.name} Department</strong></p>
-      <p style="color:var(--text-light);font-size:0.82rem;">Content for this department will appear here.<br>Super admins can manage this section.</p>
-    </div>`;
+
+  // Always restore back button to go back to departments grid
+  const backBtn = document.querySelector('.dept-back-btn');
+  if(backBtn){ backBtn.onclick = showDeptGrid; backBtn.textContent = '← Back to Departments'; }
+
+  if(deptId === 'ushers'){
+    document.getElementById('dept-detail-body').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:4px;">Ushers Department tools and tracking.</p>
+        <button onclick="openHeadcount()" style="
+          display:flex;align-items:center;justify-content:center;gap:10px;
+          width:100%;padding:18px 20px;
+          background:linear-gradient(135deg,#1e40af,#0a1f5c);
+          color:white;border:none;border-radius:14px;
+          font-family:'Cinzel',serif;font-size:0.92rem;font-weight:800;
+          cursor:pointer;letter-spacing:0.05em;
+          box-shadow:0 4px 16px rgba(10,31,92,0.25);
+          transition:transform 0.15s,box-shadow 0.15s;">
+          <span style="font-size:1.6rem;">🔢</span>
+          <div style="text-align:left;">
+            <div>Headcount / Hesabu</div>
+            <div style="font-size:0.68rem;font-weight:400;opacity:0.75;font-family:'Nunito',sans-serif;margin-top:2px;">Track attendance by day, age group &amp; gender</div>
+          </div>
+        </button>
+      </div>`;
+  } else {
+    const d = getDeptDefs().find(x=>x.id===deptId);
+    document.getElementById('dept-detail-body').innerHTML = `
+      <div class="empty" style="padding:30px 0;">
+        <span class="eico">${d?.icon||'🏛️'}</span>
+        <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:8px;"><strong>${d?.name||''} Department</strong></p>
+        <p style="color:var(--text-light);font-size:0.82rem;">Content for this department will appear here.</p>
+      </div>`;
+  }
 }
 
 function showDeptGrid(){
   document.getElementById('dept-grid-view').style.display = 'block';
   document.getElementById('dept-detail-view').style.display = 'none';
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ── HEADCOUNT / HESABU SYSTEM ──
+// ═══════════════════════════════════════════════════════════════
+const HC_DAYS = [
+  {id:'sunday',   label:'Sunday',   icon:'☀️',  color:'#fef3c7', border:'#fde68a'},
+  {id:'saturday', label:'Saturday', icon:'🌤️', color:'#dbeafe', border:'#93c5fd'},
+  {id:'friday',   label:'Friday',   icon:'🌙',  color:'#ede9fe', border:'#c4b5fd'},
+];
+
+function getHeadcountData(){ return ld(K.headcount, {}); }
+function saveHeadcountData(d){ sv(K.headcount, d); }
+
+function openHeadcount(){
+  document.getElementById('dept-detail-name').textContent = 'Headcount / Hesabu';
+  document.getElementById('dept-detail-icon').textContent = '🔢';
+  document.getElementById('dept-detail-badge').textContent = 'Ushers';
+  _hcMonthMode = 'single';
+  _hcYearMode  = 'all';
+  // Back: Headcount → Ushers (Ushers back button → Departments)
+  const backBtn = document.querySelector('.dept-back-btn');
+  if(backBtn){ backBtn.onclick = ()=>openDept('ushers'); backBtn.textContent = '← Back to Ushers'; }
+  renderHeadcount();
+}
+
+function renderHeadcount(){
+  const body = document.getElementById('dept-detail-body');
+  if(!body) return;
+  const hcData = getHeadcountData();
+
+  const colsHtml = HC_DAYS.map((day,idx)=>{
+    const saved = hcData[day.id] || {};
+    const dt = saved.date||'';
+    const ts = saved.timestamp||'', by = saved.enteredBy||'';
+    const grand = saved.total||0;
+    return `<div class="hce-col" id="hce-col-${day.id}">
+      <div class="hce-col-header">
+        <span class="hce-col-icon">${day.icon}</span>
+        <span class="hce-col-title">${day.label}</span>
+        ${grand>0?`<span class="hce-col-badge">${grand}</span>`:''}
+      </div>
+      <div class="hce-col-body">
+
+        <div class="hce-primary-label">Adults</div>
+        <input type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+          id="hce-adultTotal-${day.id}" value="${saved.adults||''}" placeholder="0"
+          class="hce-input hce-input-primary" oninput="recalcHcTotal('${day.id}')"/>
+        <div class="hce-optional-label">Optional: M / F</div>
+        <div class="hce-gender-inline">
+          <div class="hce-gender-cell">
+            <span class="hce-gender-tag male">M</span>
+            <input type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+              id="hce-adultMale-${day.id}" value="${saved.adultMale||''}" placeholder="0"
+              class="hce-input hce-input-sm" oninput="recalcHcTotal('${day.id}')"/>
+          </div>
+          <div class="hce-gender-cell">
+            <span class="hce-gender-tag female">F</span>
+            <input type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+              id="hce-adultFemale-${day.id}" value="${saved.adultFemale||''}" placeholder="0"
+              class="hce-input hce-input-sm" oninput="recalcHcTotal('${day.id}')"/>
+          </div>
+        </div>
+
+        <div class="hce-divider"></div>
+
+        <div class="hce-primary-label">Children</div>
+        <input type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+          id="hce-childTotal-${day.id}" value="${saved.children||''}" placeholder="0"
+          class="hce-input hce-input-primary" oninput="recalcHcTotal('${day.id}')"/>
+        <div class="hce-optional-label">Optional: M / F</div>
+        <div class="hce-gender-inline">
+          <div class="hce-gender-cell">
+            <span class="hce-gender-tag male">M</span>
+            <input type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+              id="hce-childMale-${day.id}" value="${saved.childMale||''}" placeholder="0"
+              class="hce-input hce-input-sm" oninput="recalcHcTotal('${day.id}')"/>
+          </div>
+          <div class="hce-gender-cell">
+            <span class="hce-gender-tag female">F</span>
+            <input type="number" min="0" inputmode="numeric" pattern="[0-9]*"
+              id="hce-childFemale-${day.id}" value="${saved.childFemale||''}" placeholder="0"
+              class="hce-input hce-input-sm" oninput="recalcHcTotal('${day.id}')"/>
+          </div>
+        </div>
+
+        <div class="hce-total-row">
+          <span class="hce-total-label">Total</span>
+          <span class="hce-total-val" id="hc-total-num-${day.id}">${grand}</span>
+        </div>
+        <div class="hce-date-wrap">
+          <input type="date" id="hc-date-${day.id}" value="${dt}" class="hce-date-input"/>
+        </div>
+        <div class="hce-meta">${ts?`👤 ${esc(by)} · ${esc(dt)}`:'No data saved yet'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  body.innerHTML = `
+  <div class="hce-wrap">
+    <!-- Header -->
+    <div class="hce-header">
+      <span class="hce-header-main">Headcount</span>
+      <span class="hce-header-accent">Data Entry</span>
+    </div>
+
+    <!-- 3-column grid -->
+    <div class="hce-grid">
+      ${colsHtml}
+    </div>
+
+    <!-- Date row (shared) -->
+    <div class="hce-bottom-bar">
+      <div class="hce-bottom-hint">Set date per day above · All fields are optional</div>
+      <div class="hce-btn-row">
+        <button class="hce-clear-btn" onclick="openHcResetModal()">🗑️ Clear Month</button>
+        <button class="hce-submit-btn" onclick="saveAllHcDays()">Submit</button>
+      </div>
+    </div>
+  </div>
+  <!-- Analytics & History Section -->  <!-- Analytics & History Section -->
+  <div class="card" style="margin-top:10px;">
+    <div class="card-hdr"><span>📊</span><h2>Attendance Analytics</h2><span class="badge" id="hc-history-badge">0 records</span></div>
+    <div class="card-body">
+      <div style="background:var(--blue-pale);border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--blue-deep);margin-bottom:10px;">🔍 Filter & View</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <select id="hc-filter-mode" onchange="renderHcHistory()" style="padding:8px 10px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;background:white;flex:1;min-width:130px;">
+            <option value="monthly">📅 Monthly View</option>
+            <option value="yearly">📆 Yearly View</option>
+          </select>
+          <select id="hc-filter-day" onchange="renderHcHistory()" style="padding:8px 10px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;background:white;flex:1;min-width:110px;">
+            <option value="">All Days</option>
+            <option value="sunday">☀️ Sunday</option>
+            <option value="saturday">🌤️ Saturday</option>
+            <option value="friday">🌙 Friday</option>
+          </select>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:10px;">
+          <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue-bright);margin-bottom:7px;">📆 Year Filter</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <button id="hc-ymode-all" onclick="setHcYearMode('all')" style="flex:1;padding:11px 6px;min-height:44px;border:2px solid var(--blue-bright);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;cursor:pointer;background:var(--blue-bright);color:white;transition:all 0.15s;">🗓️ All Years</button>
+            <button id="hc-ymode-single" onclick="setHcYearMode('single')" style="flex:1;padding:11px 6px;min-height:44px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;cursor:pointer;background:white;color:var(--text-mid);transition:all 0.15s;">📅 Single Year</button>
+            <button id="hc-ymode-range" onclick="setHcYearMode('range')" style="flex:1;padding:11px 6px;min-height:44px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;cursor:pointer;background:white;color:var(--text-mid);transition:all 0.15s;">📆 Year Range</button>
+          </div>
+          <div id="hc-year-single-wrap" style="display:none;"><select id="hc-filter-year" onchange="renderHcHistory()" style="width:100%;padding:8px 10px;border:2px solid var(--blue-bright);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;outline:none;background:white;"><option value="">-- Select Year --</option></select></div>
+          <div id="hc-year-range-wrap" style="display:none;gap:8px;flex-wrap:wrap;align-items:center;">
+            <div style="flex:1;min-width:120px;"><div style="font-size:0.65rem;font-weight:800;color:var(--text-mid);margin-bottom:4px;text-transform:uppercase;">From Year</div><select id="hc-year-from" onchange="renderHcHistory()" style="width:100%;padding:8px 10px;border:2px solid var(--blue-bright);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;outline:none;background:white;"><option value="">-- From --</option></select></div>
+            <div style="font-size:1rem;color:var(--text-light);padding-top:18px;">→</div>
+            <div style="flex:1;min-width:120px;"><div style="font-size:0.65rem;font-weight:800;color:var(--text-mid);margin-bottom:4px;text-transform:uppercase;">To Year</div><select id="hc-year-to" onchange="renderHcHistory()" style="width:100%;padding:8px 10px;border:2px solid var(--blue-bright);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;outline:none;background:white;"><option value="">-- To --</option></select></div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:8px;">
+          <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue-bright);margin-bottom:7px;">📅 Month Filter</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <button id="hc-mmode-single" onclick="setHcMonthMode('single')" style="flex:1;padding:11px 6px;min-height:44px;border:2px solid var(--blue-bright);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;cursor:pointer;background:var(--blue-bright);color:white;transition:all 0.15s;">📅 Single Month</button>
+            <button id="hc-mmode-range" onclick="setHcMonthMode('range')" style="flex:1;padding:11px 6px;min-height:44px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;cursor:pointer;background:white;color:var(--text-mid);transition:all 0.15s;">📆 Month Range</button>
+            <button id="hc-mmode-all" onclick="setHcMonthMode('all')" style="flex:1;padding:11px 6px;min-height:44px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;cursor:pointer;background:white;color:var(--text-mid);transition:all 0.15s;">🗓️ All Months</button>
+          </div>
+          <div id="hc-month-single-wrap" style="display:flex;gap:8px;flex-wrap:wrap;"><select id="hc-filter-month" onchange="renderHcHistory()" style="padding:8px 10px;border:2px solid var(--blue-bright);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;background:white;flex:1;"><option value="">-- Select Month --</option><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+          <div id="hc-month-range-wrap" style="display:none;gap:8px;flex-wrap:wrap;align-items:center;">
+            <div style="flex:1;min-width:130px;"><div style="font-size:0.68rem;font-weight:800;color:var(--text-mid);margin-bottom:4px;text-transform:uppercase;">From</div><select id="hc-range-from" onchange="renderHcHistory()" style="width:100%;padding:8px 10px;border:2px solid var(--blue-bright);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;background:white;"><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+            <div style="font-size:1rem;color:var(--text-light);padding-top:18px;">→</div>
+            <div style="flex:1;min-width:130px;"><div style="font-size:0.68rem;font-weight:800;color:var(--text-mid);margin-bottom:4px;text-transform:uppercase;">To</div><select id="hc-range-to" onchange="renderHcHistory()" style="width:100%;padding:8px 10px;border:2px solid var(--blue-bright);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;background:white;"><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+          </div>
+        </div>
+        <div id="hc-filter-summary" style="margin-top:8px;font-size:0.72rem;color:var(--blue-bright);font-weight:700;"></div>
+      </div>
+      <div id="hc-summary-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;"></div>
+      <div id="hc-trend-badge" style="margin-bottom:14px;"></div>
+      <div id="hc-charts-wrap">
+        <canvas id="hc-bar-chart" height="200" style="width:100%;margin-bottom:16px;"></canvas>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:var(--blue-pale);border-radius:12px;padding:10px;"><div style="font-size:0.7rem;font-weight:800;color:var(--blue-deep);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;text-align:center;">Age Breakdown</div><canvas id="hc-pie-age" height="160"></canvas></div>
+          <div style="background:var(--blue-pale);border-radius:12px;padding:10px;"><div style="font-size:0.7rem;font-weight:800;color:var(--blue-deep);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;text-align:center;">Gender Breakdown</div><canvas id="hc-pie-gender" height="160"></canvas></div>
+        </div>
+      </div>
+      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-mid);margin-bottom:8px;">Detailed Records</div>
+      <div id="hc-history-list"></div>
+    </div>
+  </div>`;
+
+  renderHcHistory();
+  setTimeout(()=>{ setHcMonthMode(_hcMonthMode); setHcYearMode(_hcYearMode); }, 0);
+}
+
+function switchHcDay(dayId){
+  HC_DAYS.forEach(d=>{
+    const tab   = document.getElementById('hc-tab-'+d.id);
+    const panel = document.getElementById('hc-panel-'+d.id);
+    if(tab)   tab.classList.toggle('active', d.id===dayId);
+    if(panel) panel.classList.toggle('active', d.id===dayId);
+  });
+}
+function toggleHcDay(dayId){
+  const body = document.getElementById('hc-body-'+dayId);
+  const chev = document.getElementById('hc-chevron-'+dayId);
+  if(!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if(chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function recalcHcTotal(dayId){
+  const adults   = parseInt(document.getElementById('hce-adultTotal-'+dayId)?.value)||0;
+  const children = parseInt(document.getElementById('hce-childTotal-'+dayId)?.value)||0;
+  const total    = adults + children;
+  const numEl = document.getElementById('hc-total-num-'+dayId);
+  if(numEl) numEl.textContent = total || 0;
+}
+
+function saveAllHcDays(){
+  let saved = 0;
+  HC_DAYS.forEach(day=>{
+    const adults   = parseInt(document.getElementById('hce-adultTotal-'+day.id)?.value)||0;
+    const children = parseInt(document.getElementById('hce-childTotal-'+day.id)?.value)||0;
+    const adultMale  = parseInt(document.getElementById('hce-adultMale-'+day.id)?.value)||0;
+    const adultFem   = parseInt(document.getElementById('hce-adultFemale-'+day.id)?.value)||0;
+    const childMale  = parseInt(document.getElementById('hce-childMale-'+day.id)?.value)||0;
+    const childFem   = parseInt(document.getElementById('hce-childFemale-'+day.id)?.value)||0;
+    const total = adults + children;
+    if(!total) return;
+    const dateVal   = document.getElementById('hc-date-'+day.id)?.value || new Date().toISOString().slice(0,10);
+    const now       = new Date();
+    const ts        = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const enteredBy = CU ? CU.displayName : 'Unknown';
+    const hcData = getHeadcountData();
+    hcData[day.id] = {adults,children,adultMale,adultFemale:adultFem,childMale,childFemale:childFem,total,date:dateVal,timestamp:ts,enteredBy};
+    if(!hcData._history) hcData._history=[];
+    hcData._history.unshift({dayId:day.id,dayLabel:day.label,adults,children,adultMale,adultFemale:adultFem,childMale,childFemale:childFem,total,date:dateVal,timestamp:ts,enteredBy,id:Date.now()+Math.random()});
+    if(hcData._history.length>200) hcData._history.length=200;
+    saveHeadcountData(hcData);
+    saved++;
+  });
+  if(!saved){ showToast('Enter at least one attendance number','error'); return; }
+  showToast('✅ Attendance saved for '+saved+' day'+(saved>1?'s':''),'success');
+  renderHeadcount();
+  setTimeout(()=>renderHcHistory(),100);
+}
+
+function saveHcDay(dayId, dayLabel){
+  const dateVal   = document.getElementById('hc-date-'+dayId)?.value || new Date().toISOString().slice(0,10);
+  const adults    = parseInt(document.getElementById('hce-adultTotal-'+dayId)?.value)||0;
+  const children  = parseInt(document.getElementById('hce-childTotal-'+dayId)?.value)||0;
+  const adultMale = parseInt(document.getElementById('hce-adultMale-'+dayId)?.value)||0;
+  const adultFem  = parseInt(document.getElementById('hce-adultFemale-'+dayId)?.value)||0;
+  const childMale = parseInt(document.getElementById('hce-childMale-'+dayId)?.value)||0;
+  const childFem  = parseInt(document.getElementById('hce-childFemale-'+dayId)?.value)||0;
+  const total = adults + children;
+  if(!total) return showToast('Enter at least one number','error');
+  const now = new Date();
+  const ts  = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const enteredBy = CU ? CU.displayName : 'Unknown';
+  const hcData = getHeadcountData();
+  hcData[dayId] = {adults,children,adultMale,adultFemale:adultFem,childMale,childFemale:childFem,total,date:dateVal,timestamp:ts,enteredBy};
+  if(!hcData._history) hcData._history=[];
+  hcData._history.unshift({dayId,dayLabel,adults,children,adultMale,adultFemale:adultFem,childMale,childFemale:childFem,total,date:dateVal,timestamp:ts,enteredBy,id:Date.now()});
+  if(hcData._history.length>200) hcData._history.length=200;
+  saveHeadcountData(hcData);
+  showToast('✅ '+dayLabel+' saved — Total: '+total,'success');
+  renderHeadcount();
+  setTimeout(()=>renderHcHistory(),100);
+}
+
+function openHcResetModal(){
+  _hcResetMode = 'month';
+  _hcResetDay  = '';
+  // Populate year dropdown
+  const hcData = getHeadcountData();
+  const history = hcData._history || [];
+  const years = [...new Set(history.map(h=>h.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  const yearSel = document.getElementById('hc-reset-year');
+  if(yearSel){
+    yearSel.innerHTML = '<option value="">-- Year --</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+    yearSel.value='';
+  }
+  const monthSel = document.getElementById('hc-reset-month');
+  if(monthSel) monthSel.value='';
+  const preview = document.getElementById('hc-reset-preview');
+  if(preview) preview.innerHTML='Select options above to preview what will be deleted.';
+  const btn = document.getElementById('hc-reset-confirm-btn');
+  if(btn){ btn.style.opacity='0.35'; btn.style.pointerEvents='none'; }
+  setHcResetMode('month');
+  document.getElementById('hc-reset-modal').style.display='flex';
+}
+
+let _hcResetMode = 'month';
+let _hcResetDay  = '';
+
+function setHcResetMode(mode){
+  _hcResetMode = mode;
+  _hcResetDay  = '';
+  ['month','day','all'].forEach(m=>{
+    const btn = document.getElementById('hcr-mode-'+m);
+    const sec = document.getElementById('hcr-section-'+m);
+    if(btn){
+      const active = m===mode;
+      btn.style.background    = active?'#1d4ed8':'white';
+      btn.style.color         = active?'white':'#64748b';
+      btn.style.borderColor   = active?'#1d4ed8':'#e2e8f0';
+    }
+    if(sec) sec.style.display = m===mode?'block':'none';
+  });
+  // Reset day selection
+  ['sunday','saturday','friday'].forEach(d=>{
+    const b=document.getElementById('hcr-day-'+d);
+    if(b){ b.style.background='white'; b.style.borderColor='#e2e8f0'; b.style.color='#334155'; }
+  });
+  updateHcResetPreview();
+}
+
+function selectHcResetDay(dayId){
+  _hcResetDay = dayId;
+  ['sunday','saturday','friday'].forEach(d=>{
+    const b=document.getElementById('hcr-day-'+d);
+    if(!b) return;
+    const active = d===dayId;
+    b.style.background  = active?'#1d4ed8':'white';
+    b.style.color       = active?'white':'#334155';
+    b.style.borderColor = active?'#1d4ed8':'#e2e8f0';
+  });
+  updateHcResetPreview();
+}
+
+function updateHcResetPreview(){
+  const preview = document.getElementById('hc-reset-preview');
+  const btn     = document.getElementById('hc-reset-confirm-btn');
+  const hcData  = getHeadcountData();
+  const history = hcData._history || [];
+  const MNAMES  = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayIcons= {sunday:'☀️',saturday:'🌤️',friday:'🌙'};
+
+  let matching = [], label = '', valid = false;
+
+  if(_hcResetMode==='month'){
+    const year  = document.getElementById('hc-reset-year')?.value||'';
+    const month = document.getElementById('hc-reset-month')?.value||'';
+    if(year && month){
+      label    = MNAMES[parseInt(month)]+' '+year;
+      matching = history.filter(h=>h.date?.slice(0,4)===year && h.date?.slice(5,7)===month);
+      // Also count per-day snapshots with no-date entries
+      HC_DAYS.forEach(d=>{
+        const s=hcData[d.id];
+        if(s && s.total>0 && (!s.date || (s.date.slice(0,4)===year && s.date.slice(5,7)===month))) valid=true;
+      });
+      valid = matching.length>0 || valid;
+    }
+  } else if(_hcResetMode==='day' && _hcResetDay){
+    const dayLabel = HC_DAYS.find(d=>d.id===_hcResetDay)?.label||_hcResetDay;
+    label    = dayLabel+' (all records)';
+    matching = history.filter(h=>h.dayId===_hcResetDay);
+    const snap = hcData[_hcResetDay];
+    valid = matching.length>0 || (snap && snap.total>0);
+  } else if(_hcResetMode==='all'){
+    label    = 'ALL attendance data';
+    matching = history;
+    valid    = history.length>0 || HC_DAYS.some(d=>hcData[d.id]?.total>0);
+  }
+
+  if(!valid){
+    if(preview) preview.innerHTML = matching.length===0&&_hcResetMode!=='all'
+      ? '<span style="color:#64748b;">No records found for the selected option.</span>'
+      : 'Select options above to preview what will be deleted.';
+    if(btn){ btn.style.opacity='0.35'; btn.style.pointerEvents='none'; }
+    return;
+  }
+
+  const total = matching.reduce((s,h)=>s+(h.total||0),0);
+  const rows  = matching.slice(0,8).map(h=>`
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #fecaca;font-size:0.73rem;">
+      <span>${dayIcons[h.dayId]||'📅'} ${h.dayLabel} · ${h.date||'—'}</span>
+      <span style="font-weight:800;">👥 ${h.total}</span>
+    </div>`).join('');
+  const more = matching.length>8?`<div style="font-size:0.7rem;color:#ef4444;margin-top:4px;">…and ${matching.length-8} more records</div>`:'';
+
+  if(preview) preview.innerHTML=`
+    <div style="font-weight:800;margin-bottom:7px;">⚠️ Will delete: <strong>${label}</strong></div>
+    <div style="font-size:0.72rem;margin-bottom:6px;">${matching.length} history record${matching.length!==1?'s':''} · ${total} total people</div>
+    ${rows}${more}
+    <div style="margin-top:8px;font-size:0.73rem;font-weight:800;color:#7f1d1d;">Entry form totals will also be cleared to zero.</div>`;
+  if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; }
+}
+
+function closeHcResetModal(){
+  document.getElementById('hc-reset-modal').style.display='none';
+}
+
+function confirmHcReset(){
+  const hcData = getHeadcountData();
+  const history= hcData._history||[];
+  const MNAMES = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  let label='', before=history.length;
+
+  if(_hcResetMode==='month'){
+    const year  = document.getElementById('hc-reset-year')?.value||'';
+    const month = document.getElementById('hc-reset-month')?.value||'';
+    if(!year||!month) return;
+    label = MNAMES[parseInt(month)]+' '+year;
+    showModal('Delete Records',`Permanently delete all records for ${label}?`,()=>{
+      hcData._history = history.filter(h=>!(h.date?.slice(0,4)===year&&h.date?.slice(5,7)===month));
+      // Clear per-day snapshot if it matches OR has no date (so it gets wiped)
+      HC_DAYS.forEach(d=>{
+        const s=hcData[d.id];
+        if(s){ if(!s.date||(s.date.slice(0,4)===year&&s.date.slice(5,7)===month)) delete hcData[d.id]; }
+      });
+      _finishReset(hcData, before, label);
+    });
+  } else if(_hcResetMode==='day' && _hcResetDay){
+    const dayLabel = HC_DAYS.find(d=>d.id===_hcResetDay)?.label||_hcResetDay;
+    label = dayLabel+' (all records)';
+    showModal('Delete Records',`Permanently delete all ${dayLabel} records?`,()=>{
+      hcData._history = history.filter(h=>h.dayId!==_hcResetDay);
+      delete hcData[_hcResetDay];
+      _finishReset(hcData, before, label);
+    });
+  } else if(_hcResetMode==='all'){
+    showModal('Delete ALL Data','This will permanently erase every attendance record. Are you absolutely sure?',()=>{
+      hcData._history=[];
+      HC_DAYS.forEach(d=>{ delete hcData[d.id]; });
+      _finishReset(hcData, before, 'all data');
+    });
+  }
+}
+
+function _finishReset(hcData, before, label){
+  const removed = before - (hcData._history||[]).length;
+  saveHeadcountData(hcData);
+  closeHcResetModal();
+  renderHeadcount();
+  setTimeout(()=>renderHcHistory(),100);
+  showToast(`🗑️ Cleared ${label} — ${removed} record${removed!==1?'s':''} removed`,'success');
+}
+
+// ── Chart instances (destroy before redraw) ──
+let _hcBarChart = null, _hcPieAge = null, _hcPieGender = null;
+let _hcMonthMode = 'single'; // 'single' | 'range' | 'all'
+let _hcYearMode  = 'all';    // 'all' | 'single' | 'range'
+
+function _destroyHcCharts(){
+  if(_hcBarChart){ _hcBarChart.destroy(); _hcBarChart=null; }
+  if(_hcPieAge){   _hcPieAge.destroy();   _hcPieAge=null; }
+  if(_hcPieGender){_hcPieGender.destroy();_hcPieGender=null; }
+}
+
+function setHcYearMode(mode){
+  _hcYearMode = mode;
+  ['all','single','range'].forEach(m=>{
+    const btn = document.getElementById('hc-ymode-'+m);
+    if(!btn) return;
+    const active = m === mode;
+    btn.style.background  = active ? 'var(--blue-bright)' : 'white';
+    btn.style.color       = active ? 'white' : 'var(--text-mid)';
+    btn.style.borderColor = active ? 'var(--blue-bright)' : 'var(--border)';
+  });
+  const sw = document.getElementById('hc-year-single-wrap');
+  const rw = document.getElementById('hc-year-range-wrap');
+  if(sw) sw.style.display = mode==='single' ? 'block' : 'none';
+  if(rw) rw.style.display = mode==='range'  ? 'flex'  : 'none';
+  renderHcHistory();
+}
+
+function setHcMonthMode(mode){
+  _hcMonthMode = mode;
+  // Update button styles
+  ['single','range','all'].forEach(m=>{
+    const btn = document.getElementById('hc-mmode-'+m);
+    if(!btn) return;
+    const active = m === mode;
+    btn.style.background = active ? 'var(--blue-bright)' : 'white';
+    btn.style.color = active ? 'white' : 'var(--text-mid)';
+    btn.style.borderColor = active ? 'var(--blue-bright)' : 'var(--border)';
+  });
+  // Show/hide pickers
+  const sw = document.getElementById('hc-month-single-wrap');
+  const rw = document.getElementById('hc-month-range-wrap');
+  if(sw) sw.style.display = mode==='single' ? 'flex' : 'none';
+  if(rw) rw.style.display = mode==='range'  ? 'flex' : 'none';
+  renderHcHistory();
+}
+
+const MONTH_NAMES = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderHcHistory(){
+  const hcData = getHeadcountData();
+  let history = hcData._history || [];
+  const badge = document.getElementById('hc-history-badge');
+  if(badge) badge.textContent = history.length+' records';
+
+  // Populate year dropdowns
+  const allYears = [...new Set(history.map(h=>h.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  ['hc-filter-year','hc-year-from','hc-year-to'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    const cur = sel.value;
+    const ph = id==='hc-filter-year'?'-- Select Year --':id==='hc-year-from'?'-- From --':'-- To --';
+    sel.innerHTML=`<option value="">${ph}</option>`+allYears.map(y=>`<option value="${y}"${cur===y?' selected':''}>${y}</option>`).join('');
+  });
+
+  const mode      = document.getElementById('hc-filter-mode')?.value||'monthly';
+  const filterD   = document.getElementById('hc-filter-day')?.value||'';
+  const filterY   = _hcYearMode==='single'?(document.getElementById('hc-filter-year')?.value||''):'';
+  const yearFrom  = _hcYearMode==='range'?(document.getElementById('hc-year-from')?.value||''):'';
+  const yearTo    = _hcYearMode==='range'?(document.getElementById('hc-year-to')?.value||''):'';
+  const filterM   = _hcMonthMode==='single'?(document.getElementById('hc-filter-month')?.value||''):'';
+  const rangeFrom = _hcMonthMode==='range'?(document.getElementById('hc-range-from')?.value||'01'):'';
+  const rangeTo   = _hcMonthMode==='range'?(document.getElementById('hc-range-to')?.value||'12'):'';
+
+  let filtered = history.filter(h=>{
+    const hY=h.date?.slice(0,4)||'', hM=h.date?.slice(5,7)||'';
+    if(_hcYearMode==='single'&&filterY&&hY!==filterY) return false;
+    if(_hcYearMode==='range'&&yearFrom&&yearTo&&(hY<yearFrom||hY>yearTo)) return false;
+    if(_hcYearMode==='range'&&yearFrom&&!yearTo&&hY<yearFrom) return false;
+    if(_hcYearMode==='range'&&!yearFrom&&yearTo&&hY>yearTo) return false;
+    if(_hcMonthMode==='single'&&filterM&&hM!==filterM) return false;
+    if(_hcMonthMode==='range'&&hM&&(hM<rangeFrom||hM>rangeTo)) return false;
+    if(filterD&&h.dayId!==filterD) return false;
+    return true;
+  });
+
+  // Filter summary
+  const sumEl = document.getElementById('hc-filter-summary');
+  if(sumEl){
+    let parts=[];
+    if(_hcYearMode==='single'&&filterY) parts.push('Year: '+filterY);
+    if(_hcYearMode==='range'&&(yearFrom||yearTo)) parts.push('Years: '+(yearFrom||'…')+' → '+(yearTo||'…'));
+    if(_hcYearMode==='all') parts.push('All Years');
+    if(_hcMonthMode==='single'&&filterM) parts.push('Month: '+MONTH_NAMES[parseInt(filterM)]);
+    if(_hcMonthMode==='range') parts.push(MONTH_NAMES[parseInt(rangeFrom)]+' → '+MONTH_NAMES[parseInt(rangeTo)]);
+    if(_hcMonthMode==='all') parts.push('All Months');
+    if(filterD) parts.push('Day: '+(filterD.charAt(0).toUpperCase()+filterD.slice(1)));
+    sumEl.textContent = parts.length?'📌 Showing: '+parts.join(' · '):'📌 Showing all records';
+  }
+
+  _destroyHcCharts();
+
+  // ── Build Summary HTML ──
+  const summaryEl = document.getElementById('hc-summary-cards');
+  const trendEl   = document.getElementById('hc-trend-badge');
+  const chartsWrap= document.getElementById('hc-charts-wrap');
+  const list      = document.getElementById('hc-history-list');
+
+  if(!filtered.length){
+    if(summaryEl) summaryEl.innerHTML='';
+    if(trendEl)   trendEl.innerHTML='';
+    if(chartsWrap) chartsWrap.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light);font-size:0.85rem;">No records for selected filter.</div>';
+    if(list) list.innerHTML='';
+    return;
+  }
+
+  // ── Per-day stats ──
+  const dayDefs = [{id:'sunday',label:'Sunday',color:'#dc2626',light:'#fee2e2'},{id:'saturday',label:'Saturday',color:'#ea580c',light:'#ffedd5'},{id:'friday',label:'Friday',color:'#1d4ed8',light:'#dbeafe'}];
+  const dayStats = {};
+  dayDefs.forEach(d=>{
+    const recs = filtered.filter(h=>h.dayId===d.id);
+    dayStats[d.id]={
+      adults:  recs.reduce((s,h)=>s+(h.adults||0),0),
+      children:recs.reduce((s,h)=>s+(h.children||0),0),
+      male:    recs.reduce((s,h)=>s+(h.adultMale||0)+(h.childMale||0),0),
+      female:  recs.reduce((s,h)=>s+(h.adultFemale||0)+(h.childFemale||0),0),
+      total:   recs.reduce((s,h)=>s+(h.total||0),0),
+      count:   recs.length
+    };
+  });
+
+  const totalAll = dayDefs.reduce((s,d)=>s+dayStats[d.id].total,0);
+
+  // ── SECTION 1: Per-Day Stats Grid (like the top of the image) ──
+  if(summaryEl){
+    summaryEl.innerHTML = `
+    <div style="margin-bottom:4px;">
+      <div style="text-align:center;background:linear-gradient(135deg,#0a1f5c,#1e40af);border-radius:14px 14px 0 0;padding:14px 10px;">
+        <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:800;color:white;">Headcount </span><span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:800;color:#fde047;">Summary</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);border:2px solid #e2e8f0;border-top:none;border-radius:0 0 14px 14px;overflow:hidden;background:white;">
+        ${dayDefs.map((d,di)=>{
+          const s=dayStats[d.id];
+          const pct = totalAll?Math.round(s.total/totalAll*100):0;
+          return `<div style="padding:12px 8px;text-align:center;${di<2?'border-right:2px solid #e2e8f0;':''}">
+            <div style="background:${d.color};color:white;font-family:'Cinzel',serif;font-size:0.72rem;font-weight:800;padding:5px 4px;margin:-12px -8px 10px;letter-spacing:0.03em;">${d.label}</div>
+            <div style="display:flex;justify-content:center;gap:4px;margin-bottom:6px;">
+              <span style="font-size:1.6rem;">👤</span><span style="font-size:1.3rem;color:${d.color};">👦</span><span style="font-size:1.1rem;color:#6b7280;">👩</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-bottom:6px;">
+              <div style="font-size:0.55rem;font-weight:800;color:#94a3b8;text-transform:uppercase;">Adults</div>
+              <div style="font-size:0.55rem;font-weight:800;color:#94a3b8;text-transform:uppercase;">Children</div>
+              <div style="font-size:0.55rem;font-weight:800;color:#94a3b8;text-transform:uppercase;">Males</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-bottom:4px;">
+              <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:800;color:#1e40af;">${s.adults}</div>
+              <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:800;color:#1e40af;">${s.children}</div>
+              <div style="font-family:'Cinzel',serif;font-size:1rem;font-weight:800;color:#1e40af;">${s.male}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;">
+              <div style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:${d.color};">${s.female}</div>
+              <div style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:${d.color};">${s.total}</div>
+              <div style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:${d.color};">${pct}%</div>
+            </div>
+            <div style="margin-top:6px;background:${d.light};border-radius:20px;padding:3px 8px;">
+              <span style="font-size:0.65rem;font-weight:800;color:${d.color};">Total: ${s.total}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ── Trend ──
+  if(trendEl){
+    const sorted=[...filtered].sort((a,b)=>a.date?.localeCompare(b.date));
+    if(sorted.length>=2){
+      const half=Math.floor(sorted.length/2);
+      const fAvg=sorted.slice(0,half).reduce((s,h)=>s+h.total,0)/half;
+      const lAvg=sorted.slice(half).reduce((s,h)=>s+h.total,0)/(sorted.length-half);
+      const pct=fAvg?Math.round(((lAvg-fAvg)/fAvg)*100):0;
+      const g=pct>=5,dc=pct<=-5;
+      trendEl.innerHTML=`<div style="display:flex;align-items:center;gap:10px;background:${g?'#d1fae5':dc?'#fee2e2':'#fef3c7'};border-radius:10px;padding:10px 14px;margin-bottom:12px;border:1.5px solid ${g?'#6ee7b7':dc?'#fca5a5':'#fde68a'};">
+        <span style="font-size:1.4rem;">${g?'📈':dc?'📉':'➡️'}</span>
+        <div style="font-size:0.78rem;color:${g?'#065f46':dc?'#7f1d1d':'#78350f'};">
+          <strong>Attendance ${g?'Growing ↑':dc?'Declining ↓':'Stable →'}</strong> (${pct>=0?'+':''}${pct}%)
+          <div style="font-size:0.68rem;opacity:0.8;margin-top:2px;">Earlier avg: ${Math.round(fAvg)} · Recent avg: ${Math.round(lAvg)} · ${filtered.length} sessions</div>
+        </div>
+      </div>`;
+    } else { trendEl.innerHTML=''; }
+  }
+
+  // ── SECTION 2: Charts ──
+  if(chartsWrap){
+    const totalA  = filtered.reduce((s,h)=>s+(h.adults||0),0);
+    const totalC  = filtered.reduce((s,h)=>s+(h.children||0),0);
+    const totalM  = filtered.reduce((s,h)=>s+(h.adultMale||0)+(h.childMale||0),0);
+    const totalF  = filtered.reduce((s,h)=>s+(h.adultFemale||0)+(h.childFemale||0),0);
+
+    // Group for bar
+    const groups={};
+    filtered.forEach(h=>{
+      const key=mode==='yearly'?(h.date?.slice(0,4)||'?'):(h.date?.slice(0,7)||'?');
+      if(!groups[key]){groups[key]={total:0,adults:0,children:0,count:0};}
+      groups[key].total+=h.total||0; groups[key].adults+=h.adults||0; groups[key].children+=h.children||0; groups[key].count++;
+    });
+    const glabels=Object.keys(groups).sort();
+    const gtotals=glabels.map(k=>groups[k].total);
+    const gadults=glabels.map(k=>groups[k].adults);
+    const gchilds=glabels.map(k=>groups[k].children);
+
+    chartsWrap.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:white;border:2px solid #e2e8f0;border-radius:14px;padding:12px;">
+          <div style="font-family:'Cinzel',serif;font-size:0.72rem;font-weight:800;color:#0a1f5c;text-align:center;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e2e8f0;">Attendance Breakdown</div>
+          <canvas id="hc-pie-age" height="160"></canvas>
+        </div>
+        <div style="background:white;border:2px solid #e2e8f0;border-radius:14px;padding:12px;">
+          <div style="font-family:'Cinzel',serif;font-size:0.72rem;font-weight:800;color:#0a1f5c;text-align:center;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e2e8f0;">Daily Attendance</div>
+          <canvas id="hc-bar-chart" height="160"></canvas>
+        </div>
+      </div>`;
+
+    // Pie chart (Sunday/Saturday/Friday breakdown like the image)
+    const pieCtx = document.getElementById('hc-pie-age')?.getContext('2d');
+    if(pieCtx){
+      const dTotals = dayDefs.map(d=>dayStats[d.id].total);
+      const dLabels = dayDefs.map((d,i)=>{ const pct=totalAll?Math.round(dayStats[d.id].total/totalAll*100):0; return d.label+' '+pct+'%'; });
+      _hcPieAge = new Chart(pieCtx,{
+        type:'pie',
+        data:{labels:dLabels,datasets:[{data:dTotals,backgroundColor:['#dc2626','#ea580c','#1d4ed8'],borderWidth:3,borderColor:'white'}]},
+        options:{responsive:true,plugins:{legend:{position:'right',labels:{font:{size:10,weight:'bold'},boxWidth:12,padding:8}},tooltip:{callbacks:{label:ctx=>`${ctx.raw} people (${Math.round(ctx.raw/(totalAll||1)*100)}%)`}}}}
+      });
+    }
+
+    // Bar chart (daily totals like the image)
+    const barCtx = document.getElementById('hc-bar-chart')?.getContext('2d');
+    if(barCtx){
+      const dBarLabels = dayDefs.map(d=>d.label);
+      const dBarData   = dayDefs.map(d=>dayStats[d.id].total);
+      _hcBarChart = new Chart(barCtx,{
+        type:'bar',
+        data:{labels:dBarLabels,datasets:[{data:dBarData,backgroundColor:['#dc2626','#ea580c','#1d4ed8'],borderRadius:6,borderSkipped:false}]},
+        options:{responsive:true,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} people`}}},
+          scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:9}}},x:{grid:{display:false},ticks:{font:{size:10,weight:'bold'}}}}}
+      });
+    }
+  }
+
+  // ── SECTION 3: Monthly Breakdown Table ──
+  const monthlyMap={};
+  filtered.forEach(h=>{
+    const ym=h.date?.slice(0,7)||'?';
+    if(!monthlyMap[ym]){monthlyMap[ym]={adults:0,children:0,total:0,male:0,female:0};}
+    monthlyMap[ym].adults  +=h.adults||0;
+    monthlyMap[ym].children+=h.children||0;
+    monthlyMap[ym].total   +=h.total||0;
+    monthlyMap[ym].male    +=(h.adultMale||0)+(h.childMale||0);
+    monthlyMap[ym].female  +=(h.adultFemale||0)+(h.childFemale||0);
+  });
+  const monthlyKeys=Object.keys(monthlyMap).sort();
+
+  const grandAdults  =monthlyKeys.reduce((s,k)=>s+monthlyMap[k].adults,0);
+  const grandChildren=monthlyKeys.reduce((s,k)=>s+monthlyMap[k].children,0);
+  const grandTotal   =monthlyKeys.reduce((s,k)=>s+monthlyMap[k].total,0);
+
+  if(list){
+    list.innerHTML = monthlyKeys.length ? `
+    <div style="background:white;border:2px solid #e2e8f0;border-radius:14px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#0a1f5c,#1e40af);padding:12px;text-align:center;">
+        <span style="font-family:'Cinzel',serif;font-size:0.88rem;font-weight:800;color:white;">Monthly </span><span style="font-family:'Cinzel',serif;font-size:0.88rem;font-weight:800;color:#fde047;">Breakdown</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+          <thead>
+            <tr style="background:#1e40af;">
+              <th style="padding:10px 12px;text-align:left;color:white;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.04em;font-weight:800;">Month</th>
+              <th style="padding:10px 8px;text-align:center;color:white;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.04em;font-weight:800;">Adults</th>
+              <th style="padding:10px 8px;text-align:center;color:white;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.04em;font-weight:800;">Children</th>
+              <th style="padding:10px 8px;text-align:center;color:white;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.04em;font-weight:800;">Male</th>
+              <th style="padding:10px 8px;text-align:center;color:white;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.04em;font-weight:800;">Female</th>
+              <th style="padding:10px 8px;text-align:center;color:#fde047;font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.04em;font-weight:800;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${monthlyKeys.map((ym,i)=>{
+              const r=monthlyMap[ym];
+              const [y,m]=ym.split('-');
+              const mName=(MONTH_NAMES[parseInt(m)]||ym)+' '+y;
+              const bg=i%2===0?'white':'#f8fafc';
+              return `<tr style="background:${bg};border-bottom:1px solid #e2e8f0;">
+                <td style="padding:10px 12px;font-weight:700;color:#0a1f5c;">${mName}</td>
+                <td style="padding:10px 8px;text-align:center;color:#1e40af;font-weight:800;">${r.adults}</td>
+                <td style="padding:10px 8px;text-align:center;color:#1e40af;font-weight:800;">${r.children}</td>
+                <td style="padding:10px 8px;text-align:center;color:#475569;font-weight:700;">${r.male||'—'}</td>
+                <td style="padding:10px 8px;text-align:center;color:#475569;font-weight:700;">${r.female||'—'}</td>
+                <td style="padding:10px 8px;text-align:center;font-family:'Cinzel',serif;font-size:0.9rem;font-weight:800;color:#0a1f5c;">${r.total}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:#0a1f5c;">
+              <td style="padding:10px 12px;color:white;font-family:'Cinzel',serif;font-size:0.72rem;font-weight:800;letter-spacing:0.04em;">GRAND TOTAL</td>
+              <td style="padding:10px 8px;text-align:center;color:#fde047;font-family:'Cinzel',serif;font-weight:800;">${grandAdults}</td>
+              <td style="padding:10px 8px;text-align:center;color:#fde047;font-family:'Cinzel',serif;font-weight:800;">${grandChildren}</td>
+              <td style="padding:10px 8px;text-align:center;color:rgba(255,255,255,0.6);font-weight:700;">—</td>
+              <td style="padding:10px 8px;text-align:center;color:rgba(255,255,255,0.6);font-weight:700;">—</td>
+              <td style="padding:10px 8px;text-align:center;color:#fde047;font-family:'Cinzel',serif;font-size:1rem;font-weight:800;">${grandTotal}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>` : '<div style="text-align:center;color:var(--text-light);padding:20px;font-size:0.85rem;">No records for selected filter.</div>';
+  }
+}
+
 
 // ═══════════════════════════════════════════════════════════════
 // ── SPECIAL EVENT MENU ──
@@ -3427,6 +4502,397 @@ function saveEvMenus(m){ localStorage.setItem(K_EV_MENUS, JSON.stringify(m)); }
 
 // ═══════════════════════════════════════════════════════════════
 // ── ADD WINDOWS & DEPARTMENTS TO EDIT USER MODAL ──
+
+
+// ═══════════════════════════════════════════════════════════════
+// ── MONTHLY REPORT SYSTEM ──
+// ═══════════════════════════════════════════════════════════════
+
+function getReportConfig(){ return ld(K.reportConfig,{churchEmail:'',leadUsername:'',dismissedMonths:[]}); }
+function saveReportConfig(cfg){ sv(K.reportConfig,cfg); }
+function getReportLog(){ return ld(K.reportLog,[]); }
+function saveReportLog(log){ sv(K.reportLog,log); }
+
+const MONTH_NAMES_RPT = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ── Check if end-of-month reminder should show ──
+function checkMonthlyReportReminder(){
+  if(!CU) return;
+  const cfg = getReportConfig();
+  if(!cfg.leadUsername || CU.username !== cfg.leadUsername) return; // only for usher lead
+  const now   = new Date();
+  const day   = now.getDate();
+  const total = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const daysLeft = total - day;
+  if(daysLeft > 3) return; // only in last 3 days of month
+
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const dismissed = cfg.dismissedMonths || [];
+  const log = getReportLog();
+  const alreadySubmitted = log.some(r=>r.month===thisMonth);
+  if(alreadySubmitted) return;
+  if(dismissed.includes(thisMonth)) return;
+
+  // Show the reminder
+  showMonthlyReportModal(thisMonth);
+}
+
+function showMonthlyReportModal(ym){
+  const [y,m] = ym.split('-');
+  const label = MONTH_NAMES_RPT[parseInt(m)]+' '+y;
+  const cfg   = getReportConfig();
+
+  // Build report data
+  const hcData = getHeadcountData();
+  const history = (hcData._history||[]).filter(h=>h.date?.startsWith(ym));
+  const dayDefs = [{id:'sunday',label:'Sunday',icon:'☀️'},{id:'saturday',label:'Saturday',icon:'🌤️'},{id:'friday',label:'Friday',icon:'🌙'}];
+
+  const totalPeople   = history.reduce((s,h)=>s+(h.total||0),0);
+  const totalAdults   = history.reduce((s,h)=>s+(h.adults||0),0);
+  const totalChildren = history.reduce((s,h)=>s+(h.children||0),0);
+  const sessions      = history.length;
+
+  const periodEl  = document.getElementById('hcr-report-period');
+  const previewEl = document.getElementById('hcr-report-preview');
+  const emailEl   = document.getElementById('hcr-email-display');
+
+  if(periodEl)  periodEl.textContent = label;
+  if(emailEl)   emailEl.textContent  = cfg.churchEmail || '(No email configured — Super Admin will receive in-app)';
+
+  if(previewEl) previewEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      ${[
+        {icon:'👥',label:'Total Attendance',val:totalPeople,bg:'#dbeafe',c:'#1e40af'},
+        {icon:'📅',label:'Sessions',val:sessions,bg:'#d1fae5',c:'#065f46'},
+        {icon:'👨‍👩',label:'Adults',val:totalAdults,bg:'#ede9fe',c:'#5b21b6'},
+        {icon:'👦👧',label:'Children',val:totalChildren,bg:'#fef3c7',c:'#92400e'},
+      ].map(s=>`<div style="background:${s.bg};border-radius:9px;padding:9px;text-align:center;">
+        <div style="font-size:1rem;">${s.icon}</div>
+        <div style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:800;color:${s.c};">${s.val}</div>
+        <div style="font-size:0.58rem;font-weight:800;text-transform:uppercase;color:${s.c};opacity:0.75;">${s.label}</div>
+      </div>`).join('')}
+    </div>
+    ${dayDefs.map(d=>{
+      const recs = history.filter(h=>h.dayId===d.id);
+      const tot  = recs.reduce((s,h)=>s+(h.total||0),0);
+      return tot>0?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e2e8f0;font-size:0.78rem;">
+        <span>${d.icon} ${d.label} (${recs.length} session${recs.length!==1?'s':''})</span>
+        <strong style="color:#1e40af;">${tot} people</strong>
+      </div>`:'';
+    }).join('')}
+    ${!sessions?'<div style="text-align:center;color:#64748b;padding:10px;font-size:0.8rem;">No attendance data recorded for '+label+'.</div>':''}
+  `;
+
+  // Store current month for submit
+  document.getElementById('hc-report-modal').dataset.month = ym;
+  document.getElementById('hc-report-modal').dataset.label = label;
+  document.getElementById('hc-report-modal').style.display = 'flex';
+}
+
+function submitMonthlyReport(){
+  const modal = document.getElementById('hc-report-modal');
+  const ym    = modal.dataset.month;
+  const label = modal.dataset.label;
+  const cfg   = getReportConfig();
+
+  // Build full report text
+  const hcData  = getHeadcountData();
+  const history = (hcData._history||[]).filter(h=>h.date?.startsWith(ym));
+  const totalP  = history.reduce((s,h)=>s+(h.total||0),0);
+  const totalA  = history.reduce((s,h)=>s+(h.adults||0),0);
+  const totalC  = history.reduce((s,h)=>s+(h.children||0),0);
+  const totM    = history.reduce((s,h)=>s+(h.adultMale||0)+(h.childMale||0),0);
+  const totF    = history.reduce((s,h)=>s+(h.adultFemale||0)+(h.childFemale||0),0);
+
+  const report = {
+    id: Date.now(),
+    month: ym,
+    label,
+    submittedBy: CU.displayName,
+    submittedAt: new Date().toLocaleString(),
+    destination: cfg.churchEmail||'In-app only',
+    summary: { total:totalP, adults:totalA, children:totalC, male:totM, female:totF, sessions:history.length },
+    records: history,
+    status: cfg.churchEmail ? 'sent' : 'logged'
+  };
+
+  // Save to report log
+  const log = getReportLog();
+  log.unshift(report);
+  if(log.length>50) log.length=50;
+  saveReportLog(log);
+
+  // Mark this month as submitted
+  const cfg2 = getReportConfig();
+  if(!cfg2.dismissedMonths) cfg2.dismissedMonths=[];
+  cfg2.dismissedMonths = cfg2.dismissedMonths.filter(m=>m!==ym);
+  saveReportConfig(cfg2);
+
+  // Log to activity log
+  logActivity({type:'login',username:CU.username,displayName:CU.displayName,
+    ts:new Date().toLocaleString(),detail:`Monthly report submitted for ${label}`});
+
+  // If email configured, open mailto (best available on mobile)
+  if(cfg.churchEmail){
+    const subject = encodeURIComponent(`Mount of Olives Ministry — Attendance Report: ${label}`);
+    const body = encodeURIComponent(
+      `MOUNT OF OLIVES MINISTRY\nAttendance Report: ${label}\n\n`+
+      `Submitted by: ${CU.displayName}\nDate: ${new Date().toLocaleString()}\n\n`+
+      `━━━ SUMMARY ━━━\n`+
+      `Total Attendance : ${totalP}\n`+
+      `Adults           : ${totalA}\n`+
+      `Children         : ${totalC}\n`+
+      `Male (optional)  : ${totM||'—'}\n`+
+      `Female (optional): ${totF||'—'}\n`+
+      `Sessions         : ${history.length}\n\n`+
+      `━━━ DAILY BREAKDOWN ━━━\n`+
+      ['sunday','saturday','friday'].map(dayId=>{
+        const recs = history.filter(h=>h.dayId===dayId);
+        const tot  = recs.reduce((s,h)=>s+(h.total||0),0);
+        const dayLabel = recs[0]?.dayLabel||dayId;
+        return recs.length?`${dayLabel}: ${tot} total (${recs.length} sessions)`:null;
+      }).filter(Boolean).join('\n')+
+      `\n\n━━━ RECORDS ━━━\n`+
+      history.map(h=>`${h.dayLabel} ${h.date}: Adults ${h.adults}, Children ${h.children}, Total ${h.total} — by ${h.enteredBy}`).join('\n')+
+      `\n\nGenerated automatically by Mount of Olives Ministry App.`
+    );
+    window.open(`mailto:${cfg.churchEmail}?subject=${subject}&body=${body}`, '_blank');
+  }
+
+  modal.style.display='none';
+  showToast('✅ Report submitted for '+label, 'success');
+}
+
+function remindMeLater(){
+  document.getElementById('hc-report-modal').style.display='none';
+  showToast('⏰ You will be reminded next time','success');
+}
+
+function dismissReport(){
+  const modal = document.getElementById('hc-report-modal');
+  const ym    = modal.dataset.month;
+  const cfg   = getReportConfig();
+  if(!cfg.dismissedMonths) cfg.dismissedMonths=[];
+  if(ym && !cfg.dismissedMonths.includes(ym)) cfg.dismissedMonths.push(ym);
+  saveReportConfig(cfg);
+  modal.style.display='none';
+}
+
+// ── Reports Admin Panel ──
+
+// Who can view reports: super admin + granted users
+function canViewReports(){
+  if(!CU) return false;
+  if(CU.role === 'super') return true;
+  const cfg = getReportConfig();
+  return (cfg.reportViewers||[]).includes(CU.username);
+}
+
+function toggleReportViewer(username, grant){
+  const cfg = getReportConfig();
+  if(!cfg.reportViewers) cfg.reportViewers=[];
+  if(grant){ if(!cfg.reportViewers.includes(username)) cfg.reportViewers.push(username); }
+  else      { cfg.reportViewers = cfg.reportViewers.filter(u=>u!==username); }
+  saveReportConfig(cfg);
+  showToast(grant?`✅ @${username} can now view reports`:`✅ @${username} access removed`,'success');
+}
+
+function grantReportViewer(){
+  const sel = document.getElementById('rp-grant-user');
+  const username = sel?.value||'';
+  if(!username){ showToast('Select a user first','error'); return; }
+  const cfg = getReportConfig();
+  if(!cfg.reportViewers) cfg.reportViewers=[];
+  if(cfg.reportViewers.includes(username)){ showToast('User already has access','error'); return; }
+  cfg.reportViewers.push(username);
+  saveReportConfig(cfg);
+  if(sel) sel.value='';
+  showToast(`✅ Access granted to @${username}`,'success');
+  renderReportsPanel();
+}
+
+function revokeReportViewer(username){
+  const cfg = getReportConfig();
+  cfg.reportViewers = (cfg.reportViewers||[]).filter(u=>u!==username);
+  saveReportConfig(cfg);
+  showToast(`✅ Access removed for @${username}`,'success');
+  renderReportsPanel();
+}
+
+function renderReportsPanel(){
+  const cfg    = getReportConfig();
+  const isSup  = CU && CU.role === 'super';
+
+  // Hide config sections for non-super viewers (they only see the report log)
+  ['rp-email-section','rp-lead-section','rp-viewers-section'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.style.display = isSup ? '' : 'none';
+  });
+
+  if(isSup){
+    // Email
+    const emailEl = document.getElementById('rp-church-email');
+    if(emailEl) emailEl.value = cfg.churchEmail||'';
+    const savedEl = document.getElementById('rp-email-saved');
+    if(savedEl) savedEl.textContent = cfg.churchEmail?`✅ Saved: ${cfg.churchEmail}`:'';
+
+    // Lead user dropdown
+    const leadSel = document.getElementById('rp-lead-user');
+    if(leadSel){
+      const admins = ld(K.admins,[]);
+      leadSel.innerHTML = '<option value="">-- Select User --</option>'+
+        admins.map(u=>`<option value="${esc(u.username)}" ${cfg.leadUsername===u.username?'selected':''}>${esc(u.displayName)} (@${esc(u.username)})</option>`).join('');
+    }
+    const leadSaved = document.getElementById('rp-lead-saved');
+    if(leadSaved) leadSaved.textContent = cfg.leadUsername?`✅ Lead: ${cfg.leadUsername}`:'';
+
+    // Viewer grant dropdown — populate with non-super users who don't already have access
+    const grantSel = document.getElementById('rp-grant-user');
+    if(grantSel){
+      const admins   = ld(K.admins,[]);
+      const viewers  = cfg.reportViewers||[];
+      const eligible = admins.filter(u=>u.role!=='super' && !viewers.includes(u.username));
+      grantSel.innerHTML = '<option value="">-- Select user to grant access --</option>'+
+        eligible.map(u=>`<option value="${esc(u.username)}">${esc(u.displayName)} (@${esc(u.username)})</option>`).join('');
+    }
+
+    // Granted users list
+    const viewersDiv = document.getElementById('rp-viewers-list');
+    if(viewersDiv){
+      const admins  = ld(K.admins,[]);
+      const viewers = cfg.reportViewers||[];
+      if(!viewers.length){
+        viewersDiv.innerHTML = '<div style="font-size:0.78rem;color:#64748b;font-style:italic;">No users granted access yet.</div>';
+      } else {
+        viewersDiv.innerHTML = viewers.map(uname=>{
+          const u = admins.find(a=>a.username===uname);
+          const label = u ? `${esc(u.displayName)} (@${esc(uname)})` : `@${esc(uname)}`;
+          return `<div style="display:flex;align-items:center;justify-content:space-between;background:white;border-radius:9px;padding:9px 11px;margin-bottom:7px;border:1.5px solid #d1fae5;">
+            <div>
+              <div style="font-size:0.82rem;font-weight:800;color:var(--blue-deep);">${label}</div>
+              <div style="font-size:0.65rem;color:#15803d;font-weight:700;">✅ View access granted</div>
+            </div>
+            <button onclick="revokeReportViewer('${esc(uname)}')"
+              style="padding:5px 12px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;cursor:pointer;">
+              Revoke
+            </button>
+          </div>`;
+        }).join('');
+      }
+    }
+  }
+
+  // Report log — visible to super admin and granted viewers
+  const log    = getReportLog();
+  const logDiv = document.getElementById('rp-log-list');
+  if(logDiv){
+    if(!log.length){
+      logDiv.innerHTML='<div style="text-align:center;color:var(--text-light);padding:16px;font-size:0.82rem;">No reports submitted yet.</div>';
+    } else {
+      logDiv.innerHTML = log.map(r=>`
+        <div style="background:white;border:1.5px solid var(--border);border-left:4px solid var(--blue-bright);border-radius:10px;padding:11px 13px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:5px;">
+            <strong style="font-size:0.82rem;color:var(--blue-deep);">📊 ${esc(r.label)}</strong>
+            <span style="font-size:0.68rem;background:${r.status==='sent'?'#d1fae5':'#dbeafe'};color:${r.status==='sent'?'#065f46':'#1e40af'};padding:2px 8px;border-radius:20px;font-weight:800;">${r.status==='sent'?'✅ Sent':'📋 Logged'}</span>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-light);display:flex;flex-wrap:wrap;gap:8px;">
+            <span>👤 ${esc(r.submittedBy)}</span>
+            <span>🕐 ${esc(r.submittedAt)}</span>
+            <span>📧 ${esc(r.destination)}</span>
+          </div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
+            <span style="font-size:0.7rem;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:20px;font-weight:800;">👥 ${r.summary?.total||0} total</span>
+            <span style="font-size:0.7rem;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:20px;font-weight:800;">📅 ${r.summary?.sessions||0} sessions</span>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+function saveReportEmail(){
+  const email = document.getElementById('rp-church-email')?.value.trim()||'';
+  const cfg   = getReportConfig();
+  cfg.churchEmail = email;
+  saveReportConfig(cfg);
+  const el = document.getElementById('rp-email-saved');
+  if(el) el.textContent = email?`✅ Saved: ${email}`:'Email cleared';
+  showToast('✅ Report email saved','success');
+}
+
+function saveReportLead(){
+  const user = document.getElementById('rp-lead-user')?.value||'';
+  const cfg  = getReportConfig();
+  cfg.leadUsername = user;
+  saveReportConfig(cfg);
+  const el = document.getElementById('rp-lead-saved');
+  if(el) el.textContent = user?`✅ Lead set: ${user}`:'Lead cleared';
+  showToast('✅ Usher lead saved','success');
+}
+// ═══════════════════════════════════════════════════════════════
+// ── CUSTOM DEPARTMENT MANAGEMENT ──
+// ═══════════════════════════════════════════════════════════════
+
+let _newDeptColor = {bg:'#dbeafe', border:'#93c5fd'};
+
+function openAddDeptModal(){
+  document.getElementById('new-dept-name').value='';
+  document.getElementById('new-dept-icon').value='🏛️';
+  _newDeptColor = {bg:'#dbeafe', border:'#93c5fd'};
+  // Reset color selection
+  document.querySelectorAll('#new-dept-colors button').forEach((btn,i)=>{
+    btn.style.outline = i===0 ? '2.5px solid #1d4ed8' : 'none';
+  });
+  document.getElementById('add-dept-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('new-dept-name').focus(),100);
+}
+
+function closeAddDeptModal(){
+  document.getElementById('add-dept-modal').style.display='none';
+}
+
+function selectDeptColor(btn, bg, border){
+  _newDeptColor = {bg, border};
+  document.querySelectorAll('#new-dept-colors button').forEach(b=>{
+    b.style.outline='none';
+    b.style.transform='';
+  });
+  btn.style.outline='2.5px solid #1d4ed8';
+  btn.style.outlineOffset='2px';
+  btn.style.transform='scale(1.15)';
+}
+
+function saveNewDept(){
+  const name = document.getElementById('new-dept-name')?.value.trim()||'';
+  const icon = document.getElementById('new-dept-icon')?.value.trim()||'🏛️';
+  if(!name){ showToast('Enter a department name','error'); return; }
+  // Check for duplicate name
+  const all = getDeptDefs();
+  if(all.find(d=>d.name.toLowerCase()===name.toLowerCase())){
+    showToast('A department with this name already exists','error'); return;
+  }
+  const id = 'dept_'+Date.now();
+  const custom = ld(K_CUSTOM_DEPTS,[]);
+  custom.push({id, name, icon, color:_newDeptColor.bg, border:_newDeptColor.border, builtin:false});
+  sv(K_CUSTOM_DEPTS, custom);
+  closeAddDeptModal();
+  renderDeptGrid();
+  showToast(`✅ "${name}" department added`,'success');
+}
+
+function deleteDept(deptId){
+  const d = getDeptDefs().find(x=>x.id===deptId);
+  if(!d || d.builtin){ showToast('Built-in departments cannot be deleted','error'); return; }
+  showModal('Delete Department',`Permanently delete the "${d.name}" department and all its sub-departments?`,()=>{
+    const custom = ld(K_CUSTOM_DEPTS,[]).filter(x=>x.id!==deptId);
+    sv(K_CUSTOM_DEPTS, custom);
+    // Also remove sub-depts
+    const allSubs = ld(K.subDepts,{});
+    delete allSubs[deptId];
+    sv(K.subDepts, allSubs);
+    showToast(`🗑️ "${d.name}" deleted`,'success');
+    renderDeptGrid();
+  });
+}
 
 
 loadSess();
