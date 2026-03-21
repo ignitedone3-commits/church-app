@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -1847,6 +1849,21 @@ const K={admins:'mom_a6',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',ses
   activityLog:'mom_activity_log',failedAttempts:'mom_failed_attempts',securityAlerts:'mom_security_alerts',
   headcount:'mom_headcount_v1',reportLog:'mom_report_log_v1',reportConfig:'mom_report_cfg_v1',
   subDepts:'mom_subdepts_v1'};
+const K_TYPO         = 'mom_typography_v1';
+const K_LOGO         = 'mom_custom_logo';
+const K_BG           = 'mom_custom_bg';
+const K_LOGO_SIZE    = 'mom_logo_size';
+const K_MENUS        = 'mom_menus_v1';
+const K_CUSTOM_DEPTS = 'mom_custom_depts_v1';
+const K_WINDOWS      = 'mom_windows_v1';
+const K_USHER_SCHED  = 'mom_usher_sched_v1';
+const K_SPECIAL_EVENT= 'mom_specialevent_v1';
+const K_EV_MENUS     = 'mom_evmenus_v1';
+const K_WASIM_SUN    = 'mom_wasim_sun_v1';
+const K_WASIM_SAT    = 'mom_wasim_sat_v1';
+const K_WASIM_ACCESS = 'mom_wasim_access_v2';
+const K_WIN_OVERRIDES= 'mom_win_overrides_v1';
+
 const DEF_HEADERS = {
   wh1:'Wakati / Time', wh2:'Jina / Name',    wh3:'Kazi / Role',
   kh1:'Wakati / Time', kh2:'Shughuli / Activity', kh3:'Kiongozi / Leader',
@@ -1911,7 +1928,7 @@ const DA=[
    permissions:{walawi:false,kawaida:false,ushuhuda:true,sendNote:true,receiveNote:false},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
    windows:['schedules'],departments:[]},
-  {username:'Msimamizi',password:null,displayName:'Msimamizi',role:'view',
+  {username:'Msimamizi',password:'Msimamizi2026',displayName:'Msimamizi',role:'view',
    permissions:{walawi:false,kawaida:false,ushuhuda:false,sendNote:false,receiveNote:true},
    access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
    windows:['schedules'],departments:[]},
@@ -1932,21 +1949,22 @@ function sv(k,v){
 function _lsGet(k){try{return localStorage.getItem(k);}catch(e){return _memStore[k]!==undefined?JSON.stringify(_memStore[k]):null;}}
 function _lsDel(k){try{localStorage.removeItem(k);}catch(e){} delete _memStore[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-const DATA_VERSION = 'v2026-03-21';
+const DATA_VERSION = 'v2026-03-21c';
 try {
   if(_lsGet('mom_data_ver') !== DATA_VERSION){
-    // Version changed — re-seed schedules AND force fresh admin list with correct passwords
     sv(K.walawi,DW); sv(K.kawaida,DK);
     sv(K.draftW,DW); sv(K.draftK,DK);
     sv(K.draftStatus,'clean');
-    sv(K.admins, DA);          // Force fresh admin list with correct passwords
-    sv(K.session, null);       // Clear any stale session
+    sv(K.admins, DA);
+    sv(K.session, null);
+    sv(K.failedAttempts, {});  // Clear ALL lockouts
     try { localStorage.setItem('mom_data_ver', DATA_VERSION); } catch(e){}
   }
 } catch(e) {
   sv(K.walawi,DW); sv(K.kawaida,DK);
   sv(K.draftW,DW); sv(K.draftK,DK);
   sv(K.admins, DA);
+  sv(K.failedAttempts, {});
 }
 if(!ld(K.admins,null)) sv(K.admins,DA);
 if(!ld(K.testimony,null)) sv(K.testimony,[]);
@@ -3143,7 +3161,6 @@ function saveHeader(id,val){
 // ══════════════════════════════════════
 //  TYPOGRAPHY SETTINGS
 // ══════════════════════════════════════
-const K_TYPO = 'mom_typography_v1';
 
 const DEF_TYPO = {
   headingFont:  'Cinzel',
@@ -3289,9 +3306,6 @@ function renderBrandingPanel(){
 // ══════════════════════════════════════
 //  BRANDING — Logo + Background
 // ══════════════════════════════════════
-const K_LOGO = 'mom_custom_logo';
-const K_BG   = 'mom_custom_bg';
-const K_LOGO_SIZE = 'mom_logo_size';
 const DEFAULT_LOGO_SIZE = 34;
 
 // ── Defaults ──
@@ -3588,7 +3602,6 @@ function resetBackground(){
 // ══════════════════════════════════════
 //  MENU MANAGER
 // ══════════════════════════════════════
-const K_MENUS = 'mom_menus_v1';
 
 // Default built-in menus (cannot be deleted)
 const DEFAULT_MENUS = [
@@ -3892,8 +3905,6 @@ const DEPT_DEFS_DEFAULT = [
   {id:'intercessors',name:'Intercessors',icon:'🙏', color:'#ede9fe', border:'#c4b5fd', builtin:true},
   {id:'elders',     name:'Elders',       icon:'📖', color:'#ffe4e6', border:'#fda4af', builtin:true},
 ];
-const K_CUSTOM_DEPTS = 'mom_custom_depts_v1';
-const K_WINDOWS = 'mom_windows_v1';
 
 function getDeptDefs(){
   const custom = ld(K_CUSTOM_DEPTS,[]);
@@ -4080,7 +4091,6 @@ function openDeptSchedule(deptId){
 }
 
 // ── Usher Schedule Data ──
-const K_USHER_SCHED = 'mom_usher_sched_v1';
 
 function getUsherSchedule(){
   return ld(K_USHER_SCHED, {
@@ -5164,8 +5174,6 @@ function renderHcHistory(){
 // ── SPECIAL EVENT MENU ──
 // ═══════════════════════════════════════════════════════════════
 
-const K_SPECIAL_EVENT = 'mom_specialevent_v1';
-const K_EV_MENUS = 'mom_evmenus_v1';
 
 function getSpecialEventEnabled(){ return ld(K_SPECIAL_EVENT, false); }
 function setSpecialEventEnabled(val){ sv(K_SPECIAL_EVENT, val); }
@@ -5522,7 +5530,7 @@ const WIN_DEFS_DEFAULT = [
 function getWindowDefs(){
   const custom = ld(K_WINDOWS, []);
   // Merge: start with defaults, apply any saved overrides for built-ins
-  const saved = ld('mom_win_overrides_v1', {});
+  const saved = ld(K_WIN_OVERRIDES, {});
   const base = WIN_DEFS_DEFAULT.map(w=>({
     ...w,
     name: saved[w.id]?.name || w.name,
@@ -5532,9 +5540,9 @@ function getWindowDefs(){
 }
 
 function saveWinOverride(id, name, icon){
-  const saved = ld('mom_win_overrides_v1', {});
+  const saved = ld(K_WIN_OVERRIDES, {});
   saved[id] = {name, icon};
-  sv('mom_win_overrides_v1', saved);
+  sv(K_WIN_OVERRIDES, saved);
 }
 
 function renderCustomWinButtons(userWindows){
@@ -5758,9 +5766,6 @@ function saveChangePw(){
 // ── WASIMAMIZI SCHEDULE SYSTEM ──
 // ═══════════════════════════════════════════════════════════════
 
-const K_WASIM_SUN  = 'mom_wasim_sun_v1';
-const K_WASIM_SAT  = 'mom_wasim_sat_v1';
-const K_WASIM_ACCESS = 'mom_wasim_access_v2';
 
 // Storage format: { username: { schedules: 'both'|'sunday'|'saturday', perm: 'view'|'edit' }, ... }
 function getWasimAccess(){ return ld(K_WASIM_ACCESS, {}); }
