@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -204,6 +205,15 @@ html, body {
 .dsr-btn { width:34px; height:34px; border-radius:9px; border:2px solid var(--blue-bright); background:white; color:var(--blue-bright); font-size:1.2rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; line-height:1; }
 .dsr-btn:hover { background:var(--blue-bright); color:white; }
 .dsr-val { min-width:42px; text-align:center; font-size:0.85rem; font-weight:800; color:var(--blue-deep); }
+/* Fix: modals inside #screen-main triggered from admin panel override parent visibility:hidden */
+#edit-win-modal,
+#add-dept-modal,
+#wasim-sched-edit-modal,
+#usher-sched-edit-modal {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
 </style>
 <style>
 #screen-draft { display: flex; flex-direction: column; }
@@ -505,7 +515,7 @@ html, body {
 }
 .win-btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.05); }
 .win-btn.active { color: #fde047; border-bottom: 3px solid #fde047; background: rgba(253,224,71,0.08); }
-.win-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.win-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; min-height: 0; }
 .win-panel.active { display: flex; }
 .win-landing {
   flex: 1; display: flex; flex-direction: column; align-items: center;
@@ -1656,7 +1666,8 @@ html, body {
             </div>
           </div>
         </div>
-      
+      </div><!-- end ap-reports -->
+
       <!-- Windows Manager Panel -->
       <div class="admin-panel" id="ap-winmgr">
         <div class="card">
@@ -2532,12 +2543,12 @@ function goBack(){show('main');}
 function switchATab(n){
   document.querySelectorAll('.admin-panel').forEach(p=>{
     p.classList.remove('active');
-    p.style.display='none';
+    p.style.removeProperty('display');
   });
   document.querySelectorAll('.atn').forEach(b=>b.classList.remove('active'));
   const panel = document.getElementById('ap-'+n);
   const btn   = document.getElementById('atn-'+n);
-  if(panel){ panel.classList.add('active'); panel.style.display='block'; }
+  if(panel){ panel.classList.add('active'); panel.style.removeProperty('display'); }
   if(btn)  btn.classList.add('active');
 }
 let _dragSrc=null;
