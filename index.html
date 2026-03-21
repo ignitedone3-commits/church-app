@@ -493,6 +493,67 @@ html, body {
   letter-spacing: 0.07em; color: #92400e; margin-bottom: 4px;
 }
 .read-note-text { font-size: 0.9rem; color: #1c1917; line-height: 1.45; }
+
+/* ── Window Switcher (Schedules / Departments) ── */
+.window-switcher {
+  display: flex; gap: 0; background: rgba(0,0,0,0.18);
+  border-bottom: 2px solid rgba(255,255,255,0.1); flex-shrink: 0;
+}
+.win-btn {
+  flex: 1; padding: 9px 6px; border: none; background: transparent;
+  color: rgba(255,255,255,0.55); font-family: 'Cinzel', serif;
+  font-size: clamp(0.55rem, 2vw, 0.78rem); font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
+  border-bottom: 3px solid transparent; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.win-btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.05); }
+.win-btn.active { color: #fde047; border-bottom: 3px solid #fde047; background: rgba(253,224,71,0.08); }
+.win-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.win-panel.active { display: flex; }
+.win-landing {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px 20px; gap: 16px;
+  background: var(--blue-pale);
+}
+.win-landing-title {
+  font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 800;
+  color: var(--blue-deep); text-align: center; letter-spacing: 0.05em;
+}
+.win-landing-sub { font-size: 0.82rem; color: var(--text-light); text-align: center; }
+.win-landing-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+.win-landing-btn {
+  padding: 14px 22px; border-radius: 14px; border: 2px solid var(--blue-bright);
+  background: white; color: var(--blue-deep); font-family: 'Cinzel', serif;
+  font-size: 0.85rem; font-weight: 800; cursor: pointer; letter-spacing: 0.04em;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-width: 130px; transition: all 0.18s;
+  box-shadow: 0 2px 10px rgba(37,99,235,0.1);
+}
+.win-landing-btn:hover { background: var(--blue-pale); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.18); }
+.win-landing-btn .wlb-icon { font-size: 1.8rem; }
+.win-landing-btn .wlb-label { font-size: 0.72rem; }
+
+/* ── Departments Panel ── */
+.dept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+.dept-card {
+  background: white; border-radius: 16px; padding: 20px 16px;
+  border: 2px solid var(--border); cursor: pointer;
+  transition: all 0.2s; text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.dept-card:hover { border-color: var(--blue-bright); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.15); }
+.dept-card.active { border-color: var(--blue-bright); background: var(--blue-pale); }
+.dept-icon { font-size: 2rem; margin-bottom: 8px; }
+.dept-name { font-family: 'Cinzel', serif; font-size: 0.72rem; font-weight: 800; color: var(--blue-deep); text-transform: uppercase; letter-spacing: 0.06em; }
+.dept-panel-area { flex: 1; overflow-y: auto; padding: 14px; }
+.dept-back-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--blue-bright);
+  font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 800;
+  cursor: pointer; padding: 10px 14px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.dept-back-btn:hover { color: var(--blue-deep); }
 </style>
 </head><body>
 
@@ -547,8 +608,34 @@ html, body {
     </div>
   </div>
   <nav class="app-nav" id="app-nav-bar"></nav>
-  <div class="app-body">
-    <div class="content">
+
+  <!-- Window Switcher: Schedules | Departments -->
+  <div class="window-switcher" id="window-switcher" style="display:none;">
+    <button class="win-btn" id="win-btn-schedules" onclick="switchWindow('schedules')">📅 Schedules</button>
+    <button class="win-btn" id="win-btn-departments" onclick="switchWindow('departments')">🏛️ Departments</button>
+  </div>
+
+  <!-- Landing: shown when user has both windows but none selected yet -->
+  <div id="win-landing" class="win-landing" style="display:none;">
+    <div style="font-size:2.4rem;">⛪</div>
+    <div class="win-landing-title">Choose a Window</div>
+    <div class="win-landing-sub">Select where you'd like to go</div>
+    <div class="win-landing-btns">
+      <button class="win-landing-btn" id="wlb-schedules" onclick="switchWindow('schedules')" style="display:none;">
+        <span class="wlb-icon">📅</span>
+        <span class="wlb-label">SCHEDULES</span>
+      </button>
+      <button class="win-landing-btn" id="wlb-departments" onclick="switchWindow('departments')" style="display:none;">
+        <span class="wlb-icon">🏛️</span>
+        <span class="wlb-label">DEPARTMENTS</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Schedules Window (existing tabs) -->
+  <div class="win-panel" id="win-panel-schedules">
+    <div class="app-body">
+      <div class="content">
       <div class="tab-panel active" id="panel-walawi">
         <div class="card">
           <div class="card-hdr"><span>📋</span><h2>Ratiba ya Walawi</h2><span class="badge">Ministers</span></div>
@@ -618,6 +705,25 @@ html, body {
       <div id="custom-tab-panels"></div>
     </div>
   </div>
+  </div><!-- end win-panel-schedules -->
+
+  <!-- Departments Window -->
+  <div class="win-panel" id="win-panel-departments">
+    <div id="dept-grid-view" class="dept-panel-area">
+      <div class="dept-grid" id="dept-cards-container"></div>
+    </div>
+    <div id="dept-detail-view" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <button class="dept-back-btn" onclick="showDeptGrid()">← Back to Departments</button>
+      <div class="dept-panel-area">
+        <div class="card">
+          <div class="card-hdr"><span id="dept-detail-icon">🏛️</span><h2 id="dept-detail-name">Department</h2><span class="badge" id="dept-detail-badge">Department</span></div>
+          <div class="card-body" id="dept-detail-body">
+            <div class="empty" style="padding:30px 0;"><span class="eico">🏛️</span><p style="color:var(--text-light);font-size:0.86rem;">Department content coming soon.<br>Super admins can add content here.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end win-panel-departments -->
 
   <!-- Sticky Note FAB (only shown to grace/erik/mizeituni) -->
   <button class="sticky-note-fab" id="sticky-note-fab" onclick="openStickyModal()" title="Send note to service leader" style="display:none;">📝</button>
@@ -671,6 +777,7 @@ html, body {
     <button class="atn" id="atn-branding" onclick="switchATab('branding');renderBrandingPanel()" style="display:none;">&#127912; Branding</button>
     <button class="atn" id="atn-menus" onclick="switchATab('menus');renderMenuManager()" style="display:none;">&#128203; Menu Manager</button>
     <button class="atn" id="atn-users" onclick="switchATab('users')" style="display:none;">&#128101; Manage Admins</button>
+    <button class="atn" id="atn-activity" onclick="switchATab('activity');renderActivityLog()" style="display:none;">📊 Activity Log</button>
   </div>
   <div class="admin-body">
     <div class="admin-content">
@@ -1010,13 +1117,31 @@ html, body {
 
       <div class="admin-panel" id="ap-menus">
         <div class="card">
-          <div class="card-hdr"><span>&#128203;</span><h2>Menu Manager</h2><span class="badge">Nav Tabs</span></div>
+          <div class="card-hdr"><span>📋</span><h2>Menu Manager</h2><span class="badge">Nav Tabs</span></div>
           <div class="card-body">
             <div class="menu-warning">
-              <span>&#9888;&#65039;</span>
+              <span>⚠️</span>
               <span>Changes apply immediately to all users. The 3 default menus cannot be deleted.</span>
             </div>
-            <div class="sec-label" style="margin-bottom:12px;">Current Menu Tabs (drag to reorder)</div>
+
+            <!-- Default Menus toggle section -->
+            <div class="sec-label" style="margin-bottom:10px;">📋 Default Menus (toggle on/off)</div>
+            <div style="background:var(--blue-pale);border-radius:11px;padding:11px;margin-bottom:14px;">
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">📋 Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="toggle-walawi" onchange="_toggleDefaultMenu('walawi',this.checked)"/><span class="tog-slider"></span></label></div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">🗓️ Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="toggle-kawaida" onchange="_toggleDefaultMenu('kawaida',this.checked)"/><span class="tog-slider"></span></label></div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">🎤 Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="toggle-ushuhuda" onchange="_toggleDefaultMenu('ushuhuda',this.checked)"/><span class="tog-slider"></span></label></div>
+            </div>
+
+            <!-- Special Event toggle -->
+            <div style="background:linear-gradient(135deg,#fef3c7,#fef9ee);border:1.5px solid #fde68a;border-radius:11px;padding:13px;margin-bottom:14px;">
+              <div class="perm-row" style="margin-bottom:8px;">
+                <span style="font-size:0.9rem;font-weight:800;color:#92400e;">🎉 Special Event Menu</span>
+                <label class="toggle"><input type="checkbox" id="toggle-special-event" onchange="_toggleSpecialEvent(this.checked)"/><span class="tog-slider"></span></label>
+              </div>
+              <p style="font-size:0.75rem;color:#a16207;margin:0;">When enabled, adds 3 event-specific tabs (Event Walawi, Event Kawaida, Event Ushuhuda) to the nav — with their own separate data.</p>
+            </div>
+
+            <div class="sec-label" style="margin-bottom:12px;">All Menu Tabs (drag to reorder)</div>
             <div id="menu-items-list"></div>
 
             <hr style="border:none;border-top:1.5px solid var(--border);margin:18px 0;"/>
@@ -1051,7 +1176,7 @@ html, body {
 
       <div class="admin-panel" id="ap-users">
         <div class="card">
-          <div class="card-hdr"><span>👥</span><h2>Admin Accounts</h2><span class="badge" id="user-count">0 / 5 users</span></div>
+          <div class="card-hdr"><span>👥</span><h2>Admin Accounts</h2><span class="badge" id="user-count">0 / 500 users</span></div>
           <div class="card-body">
             <div class="sec-label">Current Users / Watumiaji wa Sasa</div>
             <div id="users-list"></div>
@@ -1059,7 +1184,7 @@ html, body {
         </div>
         <div id="limit-msg" style="display:none;background:var(--red-light);border:1.5px solid #fca5a5;border-radius:14px;padding:16px 18px;margin-bottom:15px;text-align:center;">
           <div style="font-size:1.5rem;margin-bottom:6px;">🔒</div>
-          <strong style="color:var(--red);font-size:0.9rem;">Maximum 5 users reached</strong><br>
+          <strong style="color:var(--red);font-size:0.9rem;">Maximum 500 users reached</strong><br>
           <span style="font-size:0.8rem;color:var(--text-mid);">Remove a user before adding a new one.</span>
         </div>
         <div class="card" id="add-admin-card">
@@ -1088,7 +1213,12 @@ html, body {
               <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">📥 Receive Notes (Service Leader)</span><label class="toggle"><input type="checkbox" id="p-receive"/><span class="tog-slider"></span></label></div>
             </div>
 
-            <!-- Access Control -->
+            <!-- Window Access -->
+            <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:11px;padding:13px;margin-bottom:13px;">
+              <div class="sec-label" style="margin-bottom:9px;color:#1e40af;">🪟 Window Access</div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">📅 Schedules Window</span><label class="toggle"><input type="checkbox" id="nu-win-schedules" checked/><span class="tog-slider"></span></label></div>
+              <div class="perm-row"><span style="font-size:0.85rem;font-weight:700;">🏛️ Departments Window</span><label class="toggle"><input type="checkbox" id="nu-win-departments"/><span class="tog-slider"></span></label></div>
+            </div>
             <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:11px;padding:13px;margin-bottom:13px;">
               <div class="sec-label" style="margin-bottom:9px;color:#15803d;">🔐 Login Access Control</div>
               <div class="perm-row" style="margin-bottom:8px;">
@@ -1133,6 +1263,37 @@ html, body {
               <button onclick="closeEditUser()" style="flex:1;padding:10px;background:var(--blue-pale);border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.83rem;cursor:pointer;color:var(--text-mid);">Cancel</button>
               <button onclick="saveEditUser()" style="flex:2;padding:10px;background:linear-gradient(135deg,var(--blue-bright),var(--blue-deep));color:white;border:none;border-radius:9px;font-family:'Cinzel',serif;font-weight:700;font-size:0.83rem;cursor:pointer;">💾 Save Changes</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Log Panel -->
+      <div class="admin-panel" id="ap-activity">
+        <div class="card">
+          <div class="card-hdr"><span>📊</span><h2>Activity Log</h2><span class="badge" id="activity-badge">0 events</span></div>
+          <div class="card-body">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+              <select id="activity-filter-user" onchange="renderActivityLog()" style="flex:1;min-width:120px;padding:8px 10px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;">
+                <option value="">All Users</option>
+              </select>
+              <select id="activity-filter-type" onchange="renderActivityLog()" style="flex:1;min-width:120px;padding:8px 10px;border:2px solid var(--border);border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.82rem;outline:none;">
+                <option value="">All Events</option>
+                <option value="login">✅ Logins</option>
+                <option value="logout">🚪 Logouts</option>
+                <option value="failed">❌ Failed Attempts</option>
+                <option value="locked">🔒 Locked Out</option>
+              </select>
+              <button onclick="clearActivityLog()" style="padding:8px 12px;background:var(--red-light);color:var(--red);border:1.5px solid #fca5a5;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;">🗑️ Clear Log</button>
+            </div>
+
+            <!-- Security Alerts -->
+            <div id="security-alerts-wrap" style="display:none;margin-bottom:12px;background:#fee2e2;border:1.5px solid #fca5a5;border-radius:10px;padding:12px;">
+              <div style="font-family:'Cinzel',serif;font-size:0.8rem;font-weight:800;color:#dc2626;margin-bottom:8px;">🚨 Security Alerts</div>
+              <div id="security-alerts-list"></div>
+              <button onclick="clearSecurityAlerts()" style="margin-top:8px;padding:5px 10px;background:white;color:var(--red);border:1px solid #fca5a5;border-radius:7px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">Dismiss All</button>
+            </div>
+
+            <div id="activity-log-list" style="max-height:60vh;overflow-y:auto;"></div>
           </div>
         </div>
       </div>
@@ -1248,8 +1409,11 @@ html, body {
   </div>
 </div>
 <script>
-const K={admins:'mom_a5',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4',headers:'mom_h4',
-  draftW:'mom_dw4',draftK:'mom_dk4',draftT:'mom_dt4',draftStatus:'mom_ds4',settings:'mom_cfg4'};
+const K={admins:'mom_a6',testimony:'mom_t4',walawi:'mom_w4',kawaida:'mom_k4',session:'mom_s4',headers:'mom_h4',
+  draftW:'mom_dw4',draftK:'mom_dk4',draftT:'mom_dt4',draftStatus:'mom_ds4',settings:'mom_cfg4',
+  eventWalawi:'mom_evw1',eventKawaida:'mom_evk1',eventTestimony:'mom_evt1',
+  specialEvent:'mom_sev1',depts:'mom_depts1',
+  activityLog:'mom_activity_log',failedAttempts:'mom_failed_attempts',securityAlerts:'mom_security_alerts'};
 const DEF_HEADERS = {
   wh1:'Wakati / Time', wh2:'Jina / Name',    wh3:'Kazi / Role',
   kh1:'Wakati / Time', kh2:'Shughuli / Activity', kh3:'Kiongozi / Leader',
@@ -1304,16 +1468,20 @@ const DK=[
 const DA=[
   {username:'grace',password:null,displayName:'Grace',role:'super',firstLogin:true,
    permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true,receiveNote:true},
-   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
+   windows:['schedules','departments'],departments:['ushers','financial','event','intercessors','elders']},
   {username:'erik',password:null,displayName:'Erik',role:'super',firstLogin:true,
    permissions:{walawi:true,kawaida:true,ushuhuda:true,sendNote:true,receiveNote:true},
-   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
+   windows:['schedules','departments'],departments:['ushers','financial','event','intercessors','elders']},
   {username:'Mizeituni',password:'Huduma2026',displayName:'Mizeituni',role:'regular',firstLogin:false,
    permissions:{walawi:false,kawaida:false,ushuhuda:true,sendNote:true,receiveNote:false},
-   access:{enabled:true,days:[0],startTime:'09:00',endTime:'13:00'}},
+   access:{enabled:true,days:[0],startTime:'09:00',endTime:'13:00'},
+   windows:['schedules'],departments:[]},
   {username:'Msimamizi',password:null,displayName:'Msimamizi',role:'view',firstLogin:true,
    permissions:{walawi:false,kawaida:false,ushuhuda:false,sendNote:false,receiveNote:true},
-   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'}},
+   access:{enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'},
+   windows:['schedules'],departments:[]},
 ];
 function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
@@ -1341,39 +1509,208 @@ function doSignIn(){
   const err=document.getElementById('si-err');
   err.style.display='none';
   const admins=ld(K.admins,[]);
-  const found=admins.find(a=>a.username.toLowerCase()===user.toLowerCase());
-  if(!found){err.innerHTML='❌ Username au password si sahihi.';err.style.display='block';return;}
+  const now = new Date();
+  const ts = now.toLocaleString();
 
-  // ── Access control check ──
+  // Unknown username
+  const found=admins.find(a=>a.username.toLowerCase()===user.toLowerCase());
+  if(!found){
+    logActivity({type:'failed',username:user||'(unknown)',ts,detail:'Unknown username attempted login'});
+    err.innerHTML='❌ Username au password si sahihi.';err.style.display='block';return;
+  }
+
+  // Failed attempts tracking
+  const allAttempts = ld(K.failedAttempts, {});
+  const uAttempts = allAttempts[found.username] || {count:0, lastTs:null, locked:false};
+  // Reset if last failure was > 30 mins ago
+  if(uAttempts.lastTs && (Date.now()-uAttempts.lastTs)/60000 > 30){
+    uAttempts.count=0; uAttempts.locked=false;
+  }
+
+  // Locked out
+  if(uAttempts.locked){
+    err.innerHTML='🔒 Account temporarily locked after 3 failed attempts.<br><small>Contact your Super Admin to unlock.</small>';
+    err.style.display='block';
+    logActivity({type:'locked',username:found.username,displayName:found.displayName,ts,detail:'Attempted login while account is locked'});
+    return;
+  }
+
+  // Access: account enabled
   const ac = found.access || {enabled:true,days:[0,1,2,3,4,5,6],startTime:'00:00',endTime:'23:59'};
   if(!ac.enabled){
-    err.innerHTML='🔒 Access disabled for this account. Contact admin.';err.style.display='block';return;
+    err.innerHTML='🔒 Access disabled for this account. Contact admin.';err.style.display='block';
+    logActivity({type:'failed',username:found.username,displayName:found.displayName,ts,detail:'Login attempt — account disabled by admin'});
+    return;
   }
-  const now = new Date();
-  const todayDay = now.getDay(); // 0=Sun,6=Sat
+
+  // Access: day check
+  const todayDay = now.getDay();
   const allowedDays = ac.days || [0,1,2,3,4,5,6];
   if(!allowedDays.includes(todayDay)){
     const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const allowed = allowedDays.map(d=>dayNames[d]).join(', ');
-    err.innerHTML='📅 Login not allowed today.<br><small>Allowed days: '+allowed+'</small>';err.style.display='block';return;
+    err.innerHTML='📅 Login not allowed today.<br><small>Allowed days: '+allowed+'</small>';err.style.display='block';
+    logActivity({type:'failed',username:found.username,displayName:found.displayName,ts,detail:'Login on restricted day ('+dayNames[todayDay]+')'});
+    return;
   }
+
+  // Access: time check
   const nowMins = now.getHours()*60 + now.getMinutes();
   const [sh,sm] = (ac.startTime||'00:00').split(':').map(Number);
   const [eh,em] = (ac.endTime||'23:59').split(':').map(Number);
-  const startMins = sh*60+sm, endMins = eh*60+em;
-  if(nowMins < startMins || nowMins > endMins){
-    err.innerHTML='⏰ Login not allowed at this time.<br><small>Window: '+(ac.startTime||'00:00')+' – '+(ac.endTime||'23:59')+'</small>';err.style.display='block';return;
+  if(nowMins < sh*60+sm || nowMins > eh*60+em){
+    err.innerHTML='⏰ Login not allowed at this time.<br><small>Window: '+(ac.startTime||'00:00')+' – '+(ac.endTime||'23:59')+'</small>';err.style.display='block';
+    logActivity({type:'failed',username:found.username,displayName:found.displayName,ts,detail:'Login outside allowed time window'});
+    return;
   }
 
+  // First login setup
   if(found.firstLogin&&found.password===null){
     document.getElementById('setup-name').textContent=found.displayName;
     sessionStorage.setItem('su',found.username);
     show('setup');return;
   }
-  if(found.password!==pass){err.innerHTML='❌ Username au password si sahihi.';err.style.display='block';return;}
+
+  // Wrong password
+  if(found.password!==pass){
+    uAttempts.count++;
+    uAttempts.lastTs = Date.now();
+    const remaining = 3 - uAttempts.count;
+
+    if(uAttempts.count >= 3){
+      uAttempts.locked = true;
+      err.innerHTML='🔒 Account locked after 3 failed attempts.<br><small>Super Admin has been notified. Contact admin to unlock.</small>';
+      logActivity({type:'locked',username:found.username,displayName:found.displayName,ts,detail:'Account locked — 3 failed password attempts'});
+      addSecurityAlert({username:found.username,displayName:found.displayName,ts,
+        msg:'🔒 LOCKED: '+found.displayName+' (@'+found.username+') was locked after 3 failed login attempts at '+ts});
+    } else {
+      const warnMsg = remaining===1
+        ? '⚠️ Wrong password. <strong>1 attempt remaining</strong> before your account is locked.'
+        : '⚠️ Wrong password. <strong>'+remaining+' attempts remaining</strong> before lockout.';
+      err.innerHTML=warnMsg;
+      logActivity({type:'failed',username:found.username,displayName:found.displayName,ts,detail:'Wrong password — attempt '+uAttempts.count+' of 3'});
+      if(uAttempts.count===2){
+        addSecurityAlert({username:found.username,displayName:found.displayName,ts,
+          msg:'⚠️ WARNING: '+found.displayName+' (@'+found.username+') — 2 failed login attempts at '+ts+'. 1 attempt remaining before lockout.'});
+      }
+    }
+
+    err.style.display='block';
+    allAttempts[found.username] = uAttempts;
+    sv(K.failedAttempts, allAttempts);
+    return;
+  }
+
+  // Successful login — clear failed attempts
+  if(allAttempts[found.username]){
+    allAttempts[found.username] = {count:0,lastTs:null,locked:false};
+    sv(K.failedAttempts, allAttempts);
+  }
+  logActivity({type:'login',username:found.username,displayName:found.displayName,ts,detail:'Successful login'});
   saveSess(found); goMain();
 }
+
+// ── Activity & Security Log ──
+function logActivity(entry){
+  const log = ld(K.activityLog, []);
+  log.unshift({...entry, id: Date.now()});
+  if(log.length > 1000) log.length = 1000;
+  sv(K.activityLog, log);
+}
+
+function addSecurityAlert(alert){
+  const alerts = ld(K.securityAlerts, []);
+  alerts.unshift({...alert, id: Date.now()});
+  if(alerts.length > 100) alerts.length = 100;
+  sv(K.securityAlerts, alerts);
+}
+
+function unlockUser(username){
+  const allAttempts = ld(K.failedAttempts, {});
+  allAttempts[username] = {count:0, lastTs:null, locked:false};
+  sv(K.failedAttempts, allAttempts);
+  const ts = new Date().toLocaleString();
+  logActivity({type:'login',username,ts,detail:'Account unlocked by Super Admin ('+CU.displayName+')'});
+  showToast('🔓 @'+username+' unlocked','success');
+  renderActivityLog(); renderUsers();
+}
+
+function renderActivityLog(){
+  const log = ld(K.activityLog, []);
+  const alerts = ld(K.securityAlerts, []);
+  const filterUser = document.getElementById('activity-filter-user')?.value||'';
+  const filterType = document.getElementById('activity-filter-type')?.value||'';
+
+  // Populate user filter
+  const userSel = document.getElementById('activity-filter-user');
+  if(userSel){
+    const users = [...new Set(log.map(e=>e.username))].filter(Boolean);
+    const cur = userSel.value;
+    userSel.innerHTML = '<option value="">All Users</option>'+
+      users.map(u=>`<option value="${esc(u)}" ${cur===u?'selected':''}>${esc(u)}</option>`).join('');
+  }
+  const badge = document.getElementById('activity-badge');
+  if(badge) badge.textContent = log.length+' events';
+
+  // Security alerts
+  const alertsWrap = document.getElementById('security-alerts-wrap');
+  const alertsList = document.getElementById('security-alerts-list');
+  if(alertsWrap && alertsList){
+    alertsWrap.style.display = alerts.length ? 'block' : 'none';
+    alertsList.innerHTML = alerts.slice(0,20).map(a=>`
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #fca5a5;">
+        <div style="flex:1;font-size:0.78rem;color:#7f1d1d;">${esc(a.msg)}</div>
+        <button onclick="unlockUser('${esc(a.username)}')" style="flex-shrink:0;padding:3px 9px;background:#dc2626;color:white;border:none;border-radius:6px;font-size:0.7rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">🔓 Unlock</button>
+      </div>`).join('');
+  }
+
+  // Filter + render log
+  const filtered = log.filter(e=>{
+    if(filterUser && e.username!==filterUser) return false;
+    if(filterType && e.type!==filterType) return false;
+    return true;
+  });
+
+  const icons={login:'✅',logout:'🚪',failed:'❌',locked:'🔒'};
+  const colors={login:'#d1fae5',logout:'#dbeafe',failed:'#fee2e2',locked:'#fef9c3'};
+  const borders={login:'#6ee7b7',logout:'#93c5fd',failed:'#fca5a5',locked:'#fde047'};
+
+  const list = document.getElementById('activity-log-list');
+  if(!list) return;
+  if(!filtered.length){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light);font-size:0.85rem;">No activity found.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(e=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:7px;background:${colors[e.type]||'#f8fafc'};border:1.5px solid ${borders[e.type]||'#e2e8f0'};">
+      <span style="font-size:1.1rem;flex-shrink:0;">${icons[e.type]||'📌'}</span>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+          <strong style="font-size:0.82rem;color:#1e293b;">${esc(e.displayName||e.username)}</strong>
+          <span style="font-size:0.7rem;color:var(--text-light);">@${esc(e.username)}</span>
+          <span style="font-size:0.68rem;padding:2px 8px;border-radius:20px;background:white;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#374151;">${e.type}</span>
+          ${e.type==='locked'?`<button onclick="unlockUser('${esc(e.username)}')" style="padding:2px 8px;background:#dc2626;color:white;border:none;border-radius:6px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">🔓 Unlock</button>`:''}
+        </div>
+        <div style="font-size:0.75rem;color:#475569;margin-top:2px;">${esc(e.detail||'')}</div>
+        <div style="font-size:0.68rem;color:var(--text-light);margin-top:2px;">🕐 ${esc(e.ts||'')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function clearActivityLog(){
+  showModal('Clear Activity Log','Delete all activity log entries? This cannot be undone.',()=>{
+    sv(K.activityLog,[]); renderActivityLog(); showToast('🗑️ Activity log cleared','success');
+  });
+}
+
+function clearSecurityAlerts(){
+  sv(K.securityAlerts,[]); renderActivityLog(); showToast('✅ Alerts dismissed','success');
+}
 function doSignOut(){
+  if(CU){
+    logActivity({type:'logout',username:CU.username,displayName:CU.displayName,
+      ts:new Date().toLocaleString(),detail:'User signed out'});
+  }
   clearSess();
   document.getElementById('si-user').value='';
   document.getElementById('si-pass').value='';
@@ -1407,7 +1744,6 @@ function doSetupPw(){
 }
 function goMain(){
   if(!CU){show('signin');return;}
-  // Admin display names: Admin.G for grace, Admin.E for erik
   let displayLabel = CU.displayName;
   const uname = CU.username.toLowerCase();
   if(uname === 'grace') displayLabel = 'Admin.G';
@@ -1417,16 +1753,46 @@ function goMain(){
   const sup = CU.role==='super';
   const isView = CU.role==='view';
   const p = CU.permissions || {};
-  // Super admin gets draft + admin panel; view-only gets neither
   document.getElementById('btn-ap').style.display = sup ? 'inline-block' : 'none';
   document.getElementById('btn-draft').style.display = (!isView && sup) ? 'inline-block' : 'none';
   const cw = sup || p.walawi, ck = sup || p.kawaida, cu = sup || p.ushuhuda;
-  // View-only never gets edit controls
   document.getElementById('wth').style.display = (cw && !isView) ? '' : 'none';
   document.getElementById('w-addrow').style.display = (cw && !isView) ? 'block' : 'none';
   document.getElementById('kth').style.display = (ck && !isView) ? '' : 'none';
   document.getElementById('k-addrow').style.display = (ck && !isView) ? 'block' : 'none';
   document.getElementById('u-form').style.display = (cu && !isView) ? 'flex' : 'none';
+
+  // ── Window access setup ──
+  const userWindows = CU.windows || ['schedules'];
+  const hasBoth = userWindows.includes('schedules') && userWindows.includes('departments');
+  const switcher = document.getElementById('window-switcher');
+  const landing  = document.getElementById('win-landing');
+  // Hide all windows and switcher — user must click landing to open one
+  document.querySelectorAll('.win-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.win-btn').forEach(b => b.classList.remove('active'));
+  if(switcher) switcher.style.display = 'none'; // always hidden until a window is chosen
+  // Hide window buttons for inaccessible windows
+  const sb = document.getElementById('win-btn-schedules');
+  const db = document.getElementById('win-btn-departments');
+  if(sb) sb.style.display = userWindows.includes('schedules') ? '' : 'none';
+  if(db) db.style.display = userWindows.includes('departments') ? '' : 'none';
+  // Landing big buttons
+  const wlbs = document.getElementById('wlb-schedules');
+  const wlbd = document.getElementById('wlb-departments');
+  if(wlbs) wlbs.style.display = userWindows.includes('schedules') ? 'flex' : 'none';
+  if(wlbd) wlbd.style.display = userWindows.includes('departments') ? 'flex' : 'none';
+  if(hasBoth){
+    // Show landing prompt — nav and switcher stay hidden until window is chosen
+    if(landing) landing.style.display = 'flex';
+    const nav = document.getElementById('app-nav-bar');
+    if(nav) nav.style.display = 'none';
+  } else {
+    // Only one window — open it directly, no choice needed
+    if(landing) landing.style.display = 'none';
+    const onlyWin = userWindows[0] || 'schedules';
+    switchWindow(onlyWin);
+  }
+
   renderW();renderK();renderNames();
   loadHeaders();
   renderNavBar();
@@ -1541,6 +1907,96 @@ function addName(){const i=document.getElementById('u-inp');const v=i.value.trim
 function adminAddName(){const i=document.getElementById('an-inp');const v=i.value.trim();if(!v)return;const n=getNms();n.push(v);saveNms(n);i.value='';renderNames();showToast('&#9989; Name added!','success');}
 function delName(i){const n=getNms();n.splice(i,1);saveNms(n);renderNames();}
 function confirmClear(){showModal('Clear All Names','Remove ALL testimony names?',()=>{saveNms([]);renderNames();showToast('&#128465;&#65039; Cleared','success');});}
+
+// ── Special Event tab functions ──
+function getEvData(key){ return ld(key, []); }
+function saveEvData(key, data){ sv(key, data); }
+
+function renderEvTab(panelId, storageKey){
+  const isW = panelId === 'ev-walawi';
+  const tbodyId = isW ? 'ev-w-tbody' : 'ev-k-tbody';
+  const tbody = document.getElementById(tbodyId);
+  if(!tbody) return;
+  const data = getEvData(isW ? K.eventWalawi : K.eventKawaida);
+  const sup = CU && CU.role === 'super';
+  const thId = isW ? 'ev-wth' : 'ev-kth';
+  const addRowId = isW ? 'ev-w-addrow' : 'ev-k-addrow';
+  if(document.getElementById(thId)) document.getElementById(thId).style.display = sup ? '' : 'none';
+  if(document.getElementById(addRowId)) document.getElementById(addRowId).style.display = sup ? 'block' : 'none';
+  const cfg = getSettings();
+  tbody.innerHTML = data.map((row, i) => `<tr>
+    <td style="text-align:center;color:var(--text-light);font-size:0.78rem;">${i+1}</td>
+    <td style="white-space:nowrap;font-size:${cfg.titleWFontSize||16}px;">${esc(row.time||row.act||'')}</td>
+    <td style="font-size:${cfg.titleWFontSize||16}px;">${esc(isW?(row.name||''):(row.act||''))}</td>
+    ${sup ? `<td><button class="btn-del" onclick="delEvRow('${storageKey}',${i})">✕</button></td>` : ''}
+  </tr>`).join('');
+}
+
+function addEvWRow(){
+  const t=document.getElementById('ev-w-t').value.trim();
+  const n=document.getElementById('ev-w-n').value.trim();
+  const r=document.getElementById('ev-w-r').value.trim();
+  if(!n) return showToast('Enter a name','error');
+  const data = getEvData(K.eventWalawi);
+  data.push({time:t,name:n,role:r,fontSize:16});
+  saveEvData(K.eventWalawi, data);
+  document.getElementById('ev-w-t').value='';
+  document.getElementById('ev-w-n').value='';
+  document.getElementById('ev-w-r').value='';
+  renderEvTab('ev-walawi','eventWalawi');
+  showToast('✅ Added!','success');
+}
+
+function addEvKRow(){
+  const t=document.getElementById('ev-k-t').value.trim();
+  const a=document.getElementById('ev-k-a').value.trim();
+  const l=document.getElementById('ev-k-l').value.trim();
+  if(!a) return showToast('Enter an activity','error');
+  const data = getEvData(K.eventKawaida);
+  data.push({time:t,act:a,lead:l,fontSize:16});
+  saveEvData(K.eventKawaida, data);
+  document.getElementById('ev-k-t').value='';
+  document.getElementById('ev-k-a').value='';
+  document.getElementById('ev-k-l').value='';
+  renderEvTab('ev-kawaida','eventKawaida');
+  showToast('✅ Added!','success');
+}
+
+function delEvRow(storageKey, i){
+  const data = getEvData(K[storageKey] || storageKey);
+  data.splice(i,1);
+  saveEvData(K[storageKey] || storageKey, data);
+  if(storageKey==='eventWalawi') renderEvTab('ev-walawi','eventWalawi');
+  else renderEvTab('ev-kawaida','eventKawaida');
+}
+
+function renderEvNames(){
+  const sup = CU && CU.role === 'super';
+  const form = document.getElementById('ev-u-form');
+  if(form) form.style.display = sup ? 'flex' : 'none';
+  const data = getEvData(K.eventTestimony);
+  const list = document.getElementById('ev-u-list');
+  const empty = document.getElementById('ev-u-empty');
+  if(!list) return;
+  if(empty) empty.style.display = data.length ? 'none' : 'block';
+  list.innerHTML = data.map((n,i) => `<li class="name-item">
+    <span class="name-text">${esc(n)}</span>
+    ${sup ? `<button class="name-del" onclick="delEvName(${i})">✕</button>` : ''}
+  </li>`).join('');
+}
+
+function addEvName(){
+  const inp = document.getElementById('ev-u-inp');
+  const v = inp.value.trim(); if(!v) return;
+  const data = getEvData(K.eventTestimony);
+  data.push(v); saveEvData(K.eventTestimony, data);
+  inp.value=''; renderEvNames();
+}
+
+function delEvName(i){
+  const data = getEvData(K.eventTestimony);
+  data.splice(i,1); saveEvData(K.eventTestimony, data); renderEvNames();
+}
 const DSR_LIMITS = {titleWFontSize:{min:12,max:36},titleKFontSize:{min:12,max:36},titleUFontSize:{min:12,max:36},testimonyFontSize:{min:12,max:40}};
 const DSR_LABELS = {titleWFontSize:'Ratiba ya Walawi',titleKFontSize:'Ratiba ya Kawaida',titleUFontSize:'Majina ya Ushuhuda',testimonyFontSize:'Jina la Ushuhuda'};
 const DSR_MAP = {titleWFontSize:'titleW',titleKFontSize:'titleK',titleUFontSize:'titleU',testimonyFontSize:'testimony'};
@@ -1567,6 +2023,7 @@ function openAdmin(){
   document.getElementById('atn-users').style.display=sup?'inline-block':'none';
   document.getElementById('atn-branding').style.display=sup?'inline-block':'none';
   document.getElementById('atn-menus').style.display=sup?'inline-block':'none';
+  document.getElementById('atn-activity').style.display=sup?'inline-block':'none';
   renderAW();renderAK();renderNames();if(sup)renderUsers();
   loadHeaders(); _populateTitleInputs();
   switchATab('schedules'); show('admin');
@@ -1714,7 +2171,7 @@ function adminAddK(){
   renderAK();renderK();showToast('&#9989; Added!','success');
 }
 function adK(i){const d=ld(K.kawaida,[]);d.splice(i,1);sv(K.kawaida,d);renderAK();renderK();}
-const MAX_USERS=5;
+const MAX_USERS=500;
 const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const ROLE_LABELS={super:'⭐ Super Admin',regular:'✏️ Regular',view:'👁️ View Only'};
 
@@ -1730,6 +2187,7 @@ function renderUsers(){
   if(addForm) addForm.style.display=atLimit?'none':'block';
   const limitMsg=document.getElementById('limit-msg');
   if(limitMsg) limitMsg.style.display=atLimit?'block':'none';
+  const allAttempts = ld(K.failedAttempts, {});
   document.getElementById('users-list').innerHTML=a.map((u,i)=>{
     const isSelf = u.username===CU.username;
     const ac = getAccess(u);
@@ -1737,11 +2195,17 @@ function renderUsers(){
     const roleLabel = ROLE_LABELS[u.role] || u.role;
     const roleColor = u.role==='super'?'#92400e':u.role==='view'?'#1e40af':'#065f46';
     const roleBg = u.role==='super'?'#fef3c7':u.role==='view'?'#dbeafe':'#d1fae5';
-    const accessStatus = ac.enabled
-      ? `<span style="color:#15803d;font-size:0.7rem;font-weight:700;">✅ Login On</span>`
-      : `<span style="color:#dc2626;font-size:0.7rem;font-weight:700;">🔒 Login Off</span>`;
-    return `<div class="user-card" style="flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-      <div class="user-av">${u.displayName.charAt(0).toUpperCase()}</div>
+    const attempts = allAttempts[u.username] || {count:0,locked:false};
+    const isLocked = attempts.locked;
+    const accessStatus = isLocked
+      ? `<span style="color:#dc2626;font-size:0.7rem;font-weight:800;background:#fee2e2;padding:2px 7px;border-radius:20px;border:1px solid #fca5a5;">🔒 LOCKED</span>`
+      : ac.enabled
+        ? `<span style="color:#15803d;font-size:0.7rem;font-weight:700;">✅ Login On</span>`
+        : `<span style="color:#dc2626;font-size:0.7rem;font-weight:700;">⛔ Login Off</span>`;
+    const failCount = attempts.count > 0 && !isLocked
+      ? `<span style="font-size:0.68rem;color:#dc2626;font-weight:700;">⚠️ ${attempts.count} failed attempt${attempts.count>1?'s':''}</span>` : '';
+    return `<div class="user-card" style="flex-wrap:wrap;gap:8px;margin-bottom:10px;${isLocked?'border:2px solid #fca5a5;background:#fff5f5;':''}">
+      <div class="user-av" style="${isLocked?'background:#dc2626;':''}">${u.displayName.charAt(0).toUpperCase()}</div>
       <div class="user-info" style="flex:1;min-width:140px;">
         <strong style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           ${esc(u.displayName)}
@@ -1749,7 +2213,7 @@ function renderUsers(){
         </strong>
         <span style="font-size:0.72rem;color:var(--text-light);">@${esc(u.username)}${u.firstLogin?' · 🔑 Awaiting setup':''}</span>
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          ${accessStatus}
+          ${accessStatus}${failCount}
           <span style="font-size:0.68rem;color:var(--text-light);">📅 ${daysStr}</span>
           <span style="font-size:0.68rem;color:var(--text-light);">⏰ ${ac.startTime||'00:00'}–${ac.endTime||'23:59'}</span>
         </div>
@@ -1758,6 +2222,7 @@ function renderUsers(){
         ${isSelf
           ? '<span style="font-size:0.7rem;color:var(--text-light);">(You)</span>'
           : `<div style="display:flex;gap:5px;flex-wrap:wrap;">
+              ${isLocked ? `<button style="padding:4px 10px;border:1.5px solid #dc2626;background:#fee2e2;color:#dc2626;border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="unlockUser('${esc(u.username)}')">🔓 Unlock</button>` : ''}
               <button style="padding:4px 10px;border:1.5px solid var(--blue-bright);background:var(--blue-pale);color:var(--blue-deep);border-radius:8px;font-size:0.71rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="openEditUser(${i})">✏️ Edit</button>
               <button class="btn-dang" onclick="remUser(${i})">✕ Remove</button>
             </div>`
@@ -1780,9 +2245,12 @@ function addAdmin(){
   const r=document.getElementById('nu-r').value;
   if(!u||!p)return showToast('Fill username & password','error');
   const a=ld(K.admins,[]);
-  if(a.length>=MAX_USERS)return showToast('❌ Maximum 5 users reached!','error');
+  if(a.length>=MAX_USERS)return showToast('❌ Maximum 500 users reached!','error');
   if(a.find(x=>x.username.toLowerCase()===u.toLowerCase()))return showToast('Username already exists!','error');
   const days=[...document.querySelectorAll('#nu-days input:checked')].map(c=>parseInt(c.value));
+  const wins=[];
+  if(document.getElementById('nu-win-schedules')?.checked) wins.push('schedules');
+  if(document.getElementById('nu-win-departments')?.checked) wins.push('departments');
   a.push({
     username:u, password:p, displayName:dn, role:r, firstLogin:false,
     permissions:{
@@ -1797,7 +2265,9 @@ function addAdmin(){
       days: days.length?days:[0,1,2,3,4,5,6],
       startTime: document.getElementById('nu-start').value||'00:00',
       endTime: document.getElementById('nu-end').value||'23:59'
-    }
+    },
+    windows: wins.length ? wins : ['schedules'],
+    departments: []
   });
   sv(K.admins,a);
   document.getElementById('nu-u').value='';
@@ -1816,6 +2286,9 @@ function openEditUser(i){
   const ac=getAccess(u);
   const isSuper=u.role==='super';
   const isView=u.role==='view';
+  const uWindows = u.windows || ['schedules'];
+  const uDepts = u.departments || [];
+
   document.getElementById('edit-user-body').innerHTML=`
     <div style="margin-bottom:10px;">
       <div class="field-label">Display Name</div>
@@ -1826,16 +2299,33 @@ function openEditUser(i){
         <option value="regular"${u.role==='regular'?' selected':''}>✏️ Regular</option>
         <option value="super"${u.role==='super'?' selected':''}>⭐ Super Admin</option>
       </select>
+
+      <!-- Permissions (for regular role) -->
       <div id="eu-perms-wrap" style="background:var(--blue-pale);border-radius:10px;padding:11px;margin-bottom:10px;${isSuper||isView?'display:none;':''}">
         <div class="sec-label" style="margin-bottom:7px;">Permissions</div>
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Walawi</span><label class="toggle"><input type="checkbox" id="eu-w" ${u.permissions.walawi?'checked':''}/><span class="tog-slider"></span></label></div>
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Ratiba ya Kawaida</span><label class="toggle"><input type="checkbox" id="eu-k" ${u.permissions.kawaida?'checked':''}/><span class="tog-slider"></span></label></div>
         <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">Edit Majina ya Ushuhuda</span><label class="toggle"><input type="checkbox" id="eu-u" ${u.permissions.ushuhuda?'checked':''}/><span class="tog-slider"></span></label></div>
-        <div class="perm-row" style="margin-top:6px;padding-top:7px;border-top:1px solid var(--border);"><span style="font-size:0.82rem;font-weight:700;">📌 Send Notes to Service Leader</span><label class="toggle"><input type="checkbox" id="eu-notes" ${u.permissions.sendNote!==false?'checked':''}/><span class="tog-slider"></span></label></div>
-        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">📥 Receive Notes (Service Leader)</span><label class="toggle"><input type="checkbox" id="eu-receive" ${u.permissions.receiveNote?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row" style="margin-top:6px;padding-top:7px;border-top:1px solid var(--border);"><span style="font-size:0.82rem;font-weight:700;">📌 Send Notes</span><label class="toggle"><input type="checkbox" id="eu-notes" ${u.permissions.sendNote!==false?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">📥 Receive Notes</span><label class="toggle"><input type="checkbox" id="eu-receive" ${u.permissions.receiveNote?'checked':''}/><span class="tog-slider"></span></label></div>
       </div>
+
+      <!-- Window Access -->
+      <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:11px;margin-bottom:10px;">
+        <div class="sec-label" style="margin-bottom:8px;color:#1e40af;">🪟 Window Access</div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">📅 Schedules Window</span><label class="toggle"><input type="checkbox" id="eu-win-schedules" ${uWindows.includes('schedules')?'checked':''}/><span class="tog-slider"></span></label></div>
+        <div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">🏛️ Departments Window</span><label class="toggle"><input type="checkbox" id="eu-win-departments" ${uWindows.includes('departments')?'checked':''}/><span class="tog-slider"></span></label></div>
+      </div>
+
+      <!-- Department Access -->
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:10px;">
+        <div class="sec-label" style="margin-bottom:8px;color:#15803d;">🏛️ Department Access</div>
+        ${DEPT_DEFS.map(d=>`<div class="perm-row"><span style="font-size:0.82rem;font-weight:700;">${d.icon} ${d.name}</span><label class="toggle"><input type="checkbox" id="eu-dept-${d.id}" ${uDepts.includes(d.id)?'checked':''}/><span class="tog-slider"></span></label></div>`).join('')}
+      </div>
+
+      <!-- Access Control -->
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:11px;margin-bottom:6px;">
-        <div class="sec-label" style="margin-bottom:7px;color:#15803d;">🔐 Access Control</div>
+        <div class="sec-label" style="margin-bottom:7px;color:#15803d;">🔐 Login Access Control</div>
         <div class="perm-row" style="margin-bottom:8px;">
           <span style="font-size:0.82rem;font-weight:700;">Allow Login</span>
           <label class="toggle"><input type="checkbox" id="eu-enabled" ${ac.enabled?'checked':''}/><span class="tog-slider"></span></label>
@@ -1873,23 +2363,28 @@ function saveEditUser(){
   const u=a[_editIdx]; if(!u) return;
   const r=document.getElementById('eu-r').value;
   const days=[...document.querySelectorAll('#eu-days input:checked')].map(c=>parseInt(c.value));
+  // Windows & departments
+  const wins=[];
+  if(document.getElementById('eu-win-schedules')?.checked) wins.push('schedules');
+  if(document.getElementById('eu-win-departments')?.checked) wins.push('departments');
   u.displayName=document.getElementById('eu-dn').value.trim()||u.displayName;
   u.role=r;
   u.permissions={
-    walawi: r==='super'||(r==='regular'&&document.getElementById('eu-w').checked),
-    kawaida: r==='super'||(r==='regular'&&document.getElementById('eu-k').checked),
-    ushuhuda: r==='super'||(r==='regular'&&document.getElementById('eu-u').checked),
-    sendNote: r==='super'||document.getElementById('eu-notes').checked,
-    receiveNote: r==='super'||document.getElementById('eu-receive').checked
+    walawi:   r==='super'||(r==='regular'&&document.getElementById('eu-w')?.checked),
+    kawaida:  r==='super'||(r==='regular'&&document.getElementById('eu-k')?.checked),
+    ushuhuda: r==='super'||(r==='regular'&&document.getElementById('eu-u')?.checked),
+    sendNote: r==='super'||(document.getElementById('eu-notes')?.checked||false),
+    receiveNote: r==='super'||(document.getElementById('eu-receive')?.checked||false)
   };
   u.access={
-    enabled: document.getElementById('eu-enabled').checked,
+    enabled: document.getElementById('eu-enabled')?.checked!==false,
     days: days.length?days:[0,1,2,3,4,5,6],
-    startTime: document.getElementById('eu-start').value||'00:00',
-    endTime: document.getElementById('eu-end').value||'23:59'
+    startTime: document.getElementById('eu-start')?.value||'00:00',
+    endTime:   document.getElementById('eu-end')?.value||'23:59'
   };
+  u.windows = wins.length ? wins : ['schedules'];
+  u.departments = DEPT_DEFS.filter(d=>document.getElementById('eu-dept-'+d.id)?.checked).map(d=>d.id);
   sv(K.admins,a);
-  // Update session if editing self
   if(CU && CU.username===u.username){ saveSess(u); }
   closeEditUser(); renderUsers();
   showToast('✅ User updated: '+u.displayName,'success');
@@ -2559,7 +3054,12 @@ function saveMenus(menus){ localStorage.setItem(K_MENUS, JSON.stringify(menus));
 function renderNavBar(){
   const nav = document.getElementById('app-nav-bar');
   if(!nav) return;
-  const menus = getMenus().filter(m => m.visible !== false);
+  let menus = getMenus().filter(m => m.visible !== false);
+  // Append Special Event menus if enabled
+  if(getSpecialEventEnabled()){
+    const evMenus = getEvMenus().filter(m => m.visible !== false);
+    menus = menus.concat(evMenus);
+  }
   nav.innerHTML = menus.map((m, i) => {
     const isFirst = i === 0;
     return `<button class="nav-btn${isFirst?' active':''}" id="nt-${m.id}" onclick="switchTab('${m.id}')">
@@ -2578,7 +3078,9 @@ function renderCustomPanels(){
   if(!container) return;
   const menus = getMenus();
   const customMenus = menus.filter(m => !m.builtin);
-  container.innerHTML = customMenus.map(m => `
+
+  // Build custom + special event panels
+  let html = customMenus.map(m => `
     <div class="tab-panel" id="panel-${m.id}">
       <div class="card">
         <div class="card-hdr"><span>${m.icon}</span><h2>${esc(m.title||m.name)}</h2><span class="badge">${esc(m.desc||'')}</span></div>
@@ -2591,6 +3093,68 @@ function renderCustomPanels(){
         </div>
       </div>
     </div>`).join('');
+
+  // Special Event panels (created once, reused)
+  if(!document.getElementById('panel-ev-walawi')){
+    html += `
+    <div class="tab-panel" id="panel-ev-walawi">
+      <div class="card">
+        <div class="card-hdr"><span>📋</span><h2 id="ev-w-title">Event Ratiba ya Walawi</h2><span class="badge">Event</span></div>
+        <div class="card-body">
+          <table class="tbl"><thead><tr>
+            <th style="width:32px;text-align:center;">#</th>
+            <th>Wakati / Time</th><th>Jina / Name</th>
+            <th id="ev-wth" style="display:none;width:36px;"></th>
+          </tr></thead><tbody id="ev-w-tbody"></tbody></table>
+          <div id="ev-w-addrow" style="display:none;">
+            <div class="add-row">
+              <input type="text" id="ev-w-t" placeholder="Time" style="max-width:110px;"/>
+              <input type="text" id="ev-w-n" placeholder="Jina / Name"/>
+              <input type="text" id="ev-w-r" placeholder="Kazi / Role"/>
+              <button class="btn-sm" onclick="addEvWRow()">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-ev-kawaida">
+      <div class="card">
+        <div class="card-hdr"><span>🗓️</span><h2>Event Ratiba ya Kawaida</h2><span class="badge">Event</span></div>
+        <div class="card-body">
+          <table class="tbl"><thead><tr>
+            <th style="width:32px;text-align:center;">#</th>
+            <th>Wakati / Time</th><th>Shughuli / Activity</th>
+            <th id="ev-kth" style="display:none;width:36px;"></th>
+          </tr></thead><tbody id="ev-k-tbody"></tbody></table>
+          <div id="ev-k-addrow" style="display:none;">
+            <div class="add-row">
+              <input type="text" id="ev-k-t" placeholder="Time" style="max-width:110px;"/>
+              <input type="text" id="ev-k-a" placeholder="Shughuli / Activity"/>
+              <input type="text" id="ev-k-l" placeholder="Kiongozi / Leader"/>
+              <button class="btn-sm" onclick="addEvKRow()">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-ev-ushuhuda">
+      <div class="card">
+        <div class="card-hdr"><span>🎤</span><h2>Event Ushuhuda</h2><span class="badge">Event Live</span></div>
+        <div class="card-body">
+          <div class="live-bar"><div class="live-dot"></div>Live Event Names</div>
+          <div class="name-form" id="ev-u-form" style="display:none;">
+            <input type="text" id="ev-u-inp" placeholder="Andika jina la event..." maxlength="60"
+              onkeydown="if(event.key==='Enter')addEvName()"/>
+            <button class="btn-add" onclick="addEvName()">+ Add</button>
+          </div>
+          <ul class="names-list" id="ev-u-list"></ul>
+          <div class="empty" id="ev-u-empty"><span class="eico">🎤</span>Hakuna majina bado.</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  container.innerHTML += html;
 }
 
 // ── Override switchTab to work with dynamic menus ──
@@ -2602,22 +3166,56 @@ function switchTab(n){
   const btn   = document.getElementById('nt-'+n);
   if(panel) panel.classList.add('active');
   if(btn)   btn.classList.add('active');
-  // Also run built-in renders if applicable
   if(n==='walawi')   renderW();
   if(n==='kawaida')  renderK();
   if(n==='ushuhuda') renderNames();
+  // Special Event tabs render their own simple tables
+  if(n==='ev-walawi')   renderEvTab('ev-walawi','eventWalawi');
+  if(n==='ev-kawaida')  renderEvTab('ev-kawaida','eventKawaida');
+  if(n==='ev-ushuhuda') renderEvNames();
 }
 
 // ── Menu Manager Panel render ──
 let _menuDragSrc = null;
+
+function _toggleDefaultMenu(menuId, visible){
+  const menus = getMenus();
+  const idx = menus.findIndex(m => m.id === menuId);
+  if(idx < 0) return;
+  const visibleCount = menus.filter(m=>m.visible!==false).length;
+  if(!visible && visibleCount <= 1){
+    showToast('❌ At least one tab must remain visible','error');
+    renderMenuManager();
+    return;
+  }
+  menus[idx].visible = visible;
+  saveMenus(menus);
+  renderNavBar();
+  showToast(visible ? '✅ Tab shown' : '👁️ Tab hidden','success');
+}
+
+function _toggleSpecialEvent(enabled){
+  setSpecialEventEnabled(enabled);
+  renderNavBar();
+  showToast(enabled ? '🎉 Special Event tabs added!' : '✅ Special Event tabs removed','success');
+}
 
 function renderMenuManager(){
   const menus = getMenus();
   const list = document.getElementById('menu-items-list');
   if(!list) return;
 
+  // Sync default menu checkboxes
+  ['walawi','kawaida','ushuhuda'].forEach(id=>{
+    const m = menus.find(x=>x.id===id);
+    const el = document.getElementById('toggle-'+id);
+    if(el) el.checked = m ? m.visible!==false : true;
+  });
+  const sevEl = document.getElementById('toggle-special-event');
+  if(sevEl) sevEl.checked = getSpecialEventEnabled();
+
   list.innerHTML = menus.map((m, i) => `
-    <div class="menu-item-row${m.builtin?' builtin':''}" data-id="${m.id}" draggable="true"
+    <div class="menu-item-row${m.builtin?' builtin':''}${m.evBuiltin?' ev-builtin':''}" data-id="${m.id}" draggable="true"
       ondragstart="_menuDragStart(event,${i})"
       ondragover="_menuDragOver(event,this)"
       ondragleave="_menuDragLeave(this)"
@@ -2626,7 +3224,7 @@ function renderMenuManager(){
       <span class="menu-item-icon">${m.icon}</span>
       <div class="menu-item-info">
         <div class="menu-item-name">${esc(m.name)}</div>
-        <div class="menu-item-key">${m.id}${m.builtin?' · default':''}</div>
+        <div class="menu-item-key">${m.id}${m.builtin?' · default':''}${m.evBuiltin?' · event':''}</div>
       </div>
       <div class="menu-toggle-wrap">
         <span class="menu-toggle-label">${m.visible!==false?'Shown':'Hidden'}</span>
@@ -2634,7 +3232,7 @@ function renderMenuManager(){
           <input type="checkbox" ${m.visible!==false?'checked':''} onchange="_menuToggleVisible(${i},this.checked)"/>
           <span class="tog-slider"></span>
         </label>
-        ${!m.builtin ? `<button class="btn-del" onclick="_menuDelete(${i})" title="Delete tab">&#10005;</button>` : ''}
+        ${!m.builtin && !m.evBuiltin ? `<button class="btn-del" onclick="_menuDelete(${i})" title="Delete tab">&#10005;</button>` : ''}
       </div>
     </div>`).join('');
 }
@@ -2726,6 +3324,110 @@ function addMenuTab(){
   renderMenuManager();
   showToast('&#9989; Tab "'+name+'" added!','success');
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ── WINDOWS & DEPARTMENTS SYSTEM ──
+// ═══════════════════════════════════════════════════════════════
+
+const DEPT_DEFS = [
+  {id:'ushers',     name:'Ushers',       icon:'🚪', color:'#dbeafe', border:'#93c5fd'},
+  {id:'financial',  name:'Financial',    icon:'💰', color:'#d1fae5', border:'#6ee7b7'},
+  {id:'event',      name:'Event',        icon:'🎉', color:'#fef3c7', border:'#fde68a'},
+  {id:'intercessors',name:'Intercessors',icon:'🙏', color:'#ede9fe', border:'#c4b5fd'},
+  {id:'elders',     name:'Elders',       icon:'📖', color:'#ffe4e6', border:'#fda4af'},
+];
+
+function switchWindow(winId, silent){
+  // Hide landing screen
+  const landing = document.getElementById('win-landing');
+  if(landing) landing.style.display = 'none';
+  // Show the top switcher bar now that a window is active
+  const switcher = document.getElementById('window-switcher');
+  if(switcher){
+    const userWindows = (CU && CU.windows) || ['schedules'];
+    if(userWindows.includes('schedules') && userWindows.includes('departments')){
+      switcher.style.display = 'flex';
+    }
+  }
+  // Show nav bar only when Schedules window is active, hide for Departments
+  const nav = document.getElementById('app-nav-bar');
+  if(nav) nav.style.display = (winId === 'schedules') ? 'flex' : 'none';
+
+  document.querySelectorAll('.win-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.win-btn').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('win-panel-'+winId);
+  const btn = document.getElementById('win-btn-'+winId);
+  if(panel) panel.classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(winId === 'departments') renderDeptGrid();
+}
+
+function renderDeptGrid(){
+  const container = document.getElementById('dept-cards-container');
+  if(!container) return;
+  const userDepts = (CU && CU.departments) ? CU.departments : [];
+  const sup = CU && CU.role === 'super';
+  // Show all depts for super admin, only assigned ones for others
+  const visibleDepts = DEPT_DEFS.filter(d => sup || userDepts.includes(d.id));
+  if(visibleDepts.length === 0){
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-light);font-size:0.88rem;">No departments assigned.<br>Contact your admin.</div>';
+    return;
+  }
+  container.innerHTML = visibleDepts.map(d => `
+    <div class="dept-card" onclick="openDept('${d.id}')" style="border-color:${d.border};background:${d.color};">
+      <div class="dept-icon">${d.icon}</div>
+      <div class="dept-name">${d.name}</div>
+    </div>`).join('');
+}
+
+function openDept(deptId){
+  const d = DEPT_DEFS.find(x=>x.id===deptId);
+  if(!d) return;
+  document.getElementById('dept-grid-view').style.display = 'none';
+  const dv = document.getElementById('dept-detail-view');
+  dv.style.display = 'flex';
+  document.getElementById('dept-detail-icon').textContent = d.icon;
+  document.getElementById('dept-detail-name').textContent = d.name;
+  document.getElementById('dept-detail-badge').textContent = d.name;
+  document.getElementById('dept-detail-body').innerHTML = `
+    <div class="empty" style="padding:30px 0;">
+      <span class="eico">${d.icon}</span>
+      <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:8px;"><strong>${d.name} Department</strong></p>
+      <p style="color:var(--text-light);font-size:0.82rem;">Content for this department will appear here.<br>Super admins can manage this section.</p>
+    </div>`;
+}
+
+function showDeptGrid(){
+  document.getElementById('dept-grid-view').style.display = 'block';
+  document.getElementById('dept-detail-view').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── SPECIAL EVENT MENU ──
+// ═══════════════════════════════════════════════════════════════
+
+const K_SPECIAL_EVENT = 'mom_specialevent_v1';
+const K_EV_MENUS = 'mom_evmenus_v1';
+
+function getSpecialEventEnabled(){ return ld(K_SPECIAL_EVENT, false); }
+function setSpecialEventEnabled(val){ sv(K_SPECIAL_EVENT, val); }
+
+const DEFAULT_EV_MENUS = [
+  { id:'ev-walawi',   name:'EVENT WALAWI',   icon:'📋', title:'Event Ratiba ya Walawi',   desc:'Ministers', builtin:true, visible:true, evBuiltin:true },
+  { id:'ev-kawaida',  name:'EVENT KAWAIDA',  icon:'🗓️', title:'Event Ratiba ya Kawaida',  desc:'Program',   builtin:true, visible:true, evBuiltin:true },
+  { id:'ev-ushuhuda', name:'EVENT USHUHUDA', icon:'🎤', title:'Event Ushuhuda',           desc:'Live',      builtin:true, visible:true, evBuiltin:true },
+];
+
+function getEvMenus(){
+  const saved = localStorage.getItem(K_EV_MENUS);
+  if(saved){ try{ return JSON.parse(saved); }catch(e){} }
+  return JSON.parse(JSON.stringify(DEFAULT_EV_MENUS));
+}
+function saveEvMenus(m){ localStorage.setItem(K_EV_MENUS, JSON.stringify(m)); }
+
+// ═══════════════════════════════════════════════════════════════
+// ── ADD WINDOWS & DEPARTMENTS TO EDIT USER MODAL ──
+
 
 loadSess();
 applyBrandingOnLoad();
