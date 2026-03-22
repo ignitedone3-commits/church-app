@@ -1832,6 +1832,21 @@ html, body {
           </div>
         </div>
 
+
+        <!-- Sync Users Card -->
+        <div class="card" id="sync-users-card">
+          <div class="card-hdr"><span>🔄</span><h2>Sync Users Across Devices</h2></div>
+          <div class="card-body">
+            <p style="font-size:0.84rem;color:var(--text-mid);margin-bottom:14px;line-height:1.5;">
+              Since this app is hosted on Vercel, password changes are saved only in <em>this</em> browser.
+              Use the options below to push updates to all devices.
+            </p>
+            <button class="btn-sm" style="width:100%;padding:11px;margin-bottom:8px;background:linear-gradient(135deg,#1d4ed8,#1e40af);" onclick="openSyncModal()">
+              💾 Sync / Export / Import Users
+            </button>
+          </div>
+        </div>
+
         <!-- Edit User Modal -->
         <div id="edit-user-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99998;align-items:center;justify-content:center;padding:16px;">
           <div style="background:white;border-radius:20px;padding:22px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
@@ -7300,5 +7315,170 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 </script>
+
+<!-- ── Sync Users Modal ── -->
+<div id="sync-users-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:white;border-radius:20px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.35);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <h3 style="font-family:'Cinzel',serif;color:#1e40af;font-size:1rem;margin:0;">🔄 Sync Users Across Devices</h3>
+      <button onclick="closeSyncModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;line-height:1;">✕</button>
+    </div>
+
+    <!-- Download Updated HTML -->
+    <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:13px;padding:14px;margin-bottom:14px;">
+      <div style="font-weight:800;font-size:0.88rem;color:#1e40af;margin-bottom:6px;">🌐 Option 1 — Download Updated HTML</div>
+      <p style="font-size:0.8rem;color:#475569;margin:0 0 10px;line-height:1.5;">
+        Bakes the current user list (with updated passwords) into the HTML file.
+        Re-upload this file to Vercel so <strong>all browsers</strong> see the new defaults.
+      </p>
+      <button onclick="syncDownloadHTML()" style="width:100%;padding:10px;background:linear-gradient(135deg,#1d4ed8,#1e40af);color:white;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;cursor:pointer;">
+        ⬇️ Download Updated HTML File
+      </button>
+      <div id="sync-dl-status" style="font-size:0.78rem;color:#16a34a;margin-top:7px;display:none;text-align:center;font-weight:700;"></div>
+    </div>
+
+    <!-- Export JSON -->
+    <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:13px;padding:14px;margin-bottom:14px;">
+      <div style="font-weight:800;font-size:0.88rem;color:#15803d;margin-bottom:6px;">📤 Option 2 — Export Users JSON</div>
+      <p style="font-size:0.8rem;color:#475569;margin:0 0 10px;line-height:1.5;">
+        Copy the current user data and paste it into another browser using Option 3 below.
+      </p>
+      <button onclick="syncExportJSON()" style="width:100%;padding:10px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;cursor:pointer;">
+        📋 Copy Users JSON to Clipboard
+      </button>
+      <div id="sync-export-status" style="font-size:0.78rem;color:#16a34a;margin-top:7px;display:none;text-align:center;font-weight:700;"></div>
+    </div>
+
+    <!-- Import JSON -->
+    <div style="background:#fefce8;border:1.5px solid #fde047;border-radius:13px;padding:14px;margin-bottom:18px;">
+      <div style="font-weight:800;font-size:0.88rem;color:#854d0e;margin-bottom:6px;">📥 Option 3 — Import Users JSON</div>
+      <p style="font-size:0.8rem;color:#475569;margin:0 0 8px;line-height:1.5;">
+        Paste the JSON exported from another browser to sync user data here.
+      </p>
+      <textarea id="sync-import-txt" rows="5" placeholder="Paste users JSON here..." style="width:100%;box-sizing:border-box;padding:10px;border:2px solid #fde047;border-radius:9px;font-family:'Courier New',monospace;font-size:0.75rem;outline:none;resize:vertical;background:#fefce8;"></textarea>
+      <button onclick="syncImportJSON()" style="width:100%;padding:10px;margin-top:8px;background:linear-gradient(135deg,#ca8a04,#854d0e);color:white;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;cursor:pointer;">
+        ✅ Apply Imported Users
+      </button>
+      <div id="sync-import-status" style="font-size:0.78rem;margin-top:7px;display:none;text-align:center;font-weight:700;"></div>
+    </div>
+
+    <button onclick="closeSyncModal()" style="width:100%;padding:10px;background:#f1f5f9;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;color:#64748b;">Close</button>
+  </div>
+</div>
+
+<script>
+// ── Sync Users Modal ──
+(function(){
+  window.openSyncModal = function(){
+    var m = document.getElementById('sync-users-modal');
+    m.style.display = 'flex';
+    document.getElementById('sync-import-txt').value = '';
+    document.getElementById('sync-import-status').style.display = 'none';
+    document.getElementById('sync-export-status').style.display = 'none';
+    document.getElementById('sync-dl-status').style.display = 'none';
+  };
+
+  window.closeSyncModal = function(){
+    document.getElementById('sync-users-modal').style.display = 'none';
+  };
+
+  // Close on backdrop click
+  document.addEventListener('click', function(e){
+    var m = document.getElementById('sync-users-modal');
+    if(e.target === m) m.style.display = 'none';
+  });
+
+  // Option 1: Download Updated HTML with baked-in DA
+  window.syncDownloadHTML = function(){
+    var status = document.getElementById('sync-dl-status');
+    status.style.display = 'block';
+    status.style.color = '#2563eb';
+    status.textContent = '⏳ Fetching page…';
+
+    fetch(location.href)
+      .then(function(r){ return r.text(); })
+      .then(function(html){
+        var users = ld(K.admins, DA);
+        var newDA = 'const DA=' + JSON.stringify(users, null, 0) + ';';
+        // Replace const DA=[...]; including the original multiline form
+        var updated = html.replace(/const DA=\[[\s\S]*?\];/, newDA);
+        if(updated === html){
+          status.style.color = '#dc2626';
+          status.textContent = '❌ Could not locate DA array — try refreshing and trying again.';
+          return;
+        }
+        var blob = new Blob([updated], {type:'text/html'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'Windows Panel (Updated).html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        status.style.color = '#16a34a';
+        status.textContent = '✅ Downloaded! Upload this file to Vercel to sync all browsers.';
+      })
+      .catch(function(err){
+        status.style.color = '#dc2626';
+        status.textContent = '❌ Fetch failed: ' + err.message + '. Try downloading the file manually from the Vercel dashboard.';
+      });
+  };
+
+  // Option 2: Export JSON to clipboard
+  window.syncExportJSON = function(){
+    var users = ld(K.admins, DA);
+    var json = JSON.stringify(users, null, 2);
+    var status = document.getElementById('sync-export-status');
+    status.style.display = 'block';
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(json).then(function(){
+        status.style.color = '#16a34a';
+        status.textContent = '✅ Copied! (' + users.length + ' users)';
+      }).catch(function(){
+        fallbackCopy(json, status);
+      });
+    } else {
+      fallbackCopy(json, status);
+    }
+  };
+
+  function fallbackCopy(text, statusEl){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      statusEl.style.color = '#16a34a';
+      statusEl.textContent = '✅ Copied to clipboard!';
+    } catch(e){
+      statusEl.style.color = '#dc2626';
+      statusEl.textContent = '❌ Copy failed — please select and copy the text manually.';
+    }
+    document.body.removeChild(ta);
+  }
+
+  // Option 3: Import JSON
+  window.syncImportJSON = function(){
+    var raw = (document.getElementById('sync-import-txt').value || '').trim();
+    var status = document.getElementById('sync-import-status');
+    status.style.display = 'block';
+    if(!raw){ status.style.color='#dc2626'; status.textContent='❌ Nothing to import.'; return; }
+    var users;
+    try { users = JSON.parse(raw); } catch(e){ status.style.color='#dc2626'; status.textContent='❌ Invalid JSON: '+e.message; return; }
+    if(!Array.isArray(users)||!users.length){ status.style.color='#dc2626'; status.textContent='❌ Expected a non-empty array of users.'; return; }
+    // Basic validation: each item should have at least username & password
+    var valid = users.every(function(u){ return u && typeof u.username === 'string' && typeof u.password === 'string'; });
+    if(!valid){ status.style.color='#dc2626'; status.textContent='❌ Some users are missing username or password fields.'; return; }
+    sv(K.admins, users);
+    status.style.color = '#16a34a';
+    status.textContent = '✅ Imported ' + users.length + ' users! Passwords are now synced in this browser.';
+    if(typeof renderUsers === 'function') renderUsers();
+    if(typeof showToast === 'function') showToast('Users synced successfully', 'success');
+  };
+})();
+</script>
+
 </body>
 </html>
