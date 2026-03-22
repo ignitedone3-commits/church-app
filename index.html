@@ -214,6 +214,128 @@ html, body {
   pointer-events: auto !important;
 }
 
+/* ── 2026 Church Calendar ── */
+.cal2026-wrap { padding:10px 6px 24px; }
+.cal2026-title { text-align:center; font-family:'Cinzel',serif; font-size:1.15rem; font-weight:800; color:var(--blue-deep); letter-spacing:2px; margin-bottom:6px; }
+.cal2026-legend { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.cal2026-legend span { display:flex; align-items:center; gap:5px; font-size:0.7rem; font-weight:700; color:var(--text); }
+.cal2026-legend i { display:inline-block; width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.leg-lent  { background:#f9a8d4; }
+.leg-advent{ background:#c4b5fd; }
+.leg-feast { background:#fde68a; border-radius:50% !important; }
+.leg-hw    { background:#fed7aa; border-radius:50% !important; }
+.leg-sol   { background:#fca5a5; border-radius:50% !important; }
+.leg-pent  { background:#f87171; border-radius:50% !important; }
+.cal2026-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+@media(max-width:640px){ .cal2026-grid { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:360px){ .cal2026-grid { grid-template-columns:1fr; } }
+.cal-month { background:white; border-radius:12px; border:1.5px solid var(--border); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.06); cursor:pointer; transition:transform 0.15s,box-shadow 0.15s; }
+.cal-month:hover { transform:translateY(-2px); box-shadow:0 5px 16px rgba(0,0,0,.14); }
+.cal-month-name { background:var(--blue-deep); color:white; font-family:'Cinzel',serif; font-size:0.7rem; font-weight:700; text-align:center; padding:5px 4px; letter-spacing:1px; }
+.cal-dow-row { display:grid; grid-template-columns:repeat(7,1fr); background:var(--blue-pale); }
+.cal-dow { font-size:0.6rem; font-weight:800; color:var(--blue-mid); text-align:center; padding:3px 0; }
+.cal-days { display:grid; grid-template-columns:repeat(7,1fr); }
+.cal-day { font-size:0.65rem; text-align:center; padding:2px 1px; min-height:22px; display:flex; align-items:center; justify-content:center; color:var(--text); position:relative; cursor:default; }
+.cal-day.empty { color:transparent; pointer-events:none; }
+.cal-day.lent   { background:#fce7f3; color:#9d174d; font-weight:700; }
+.cal-day.advent { background:#ede9fe; color:#5b21b6; font-weight:700; }
+.cal-hday span.hnum { display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; border-radius:50%; font-size:0.65rem; font-weight:800; line-height:1; }
+.hday-feast    span.hnum { background:#fde68a; color:#78350f; }
+.hday-holyweek span.hnum { background:#fed7aa; color:#7c2d12; }
+.hday-solemn   span.hnum { background:#fca5a5; color:#7f1d1d; }
+.hday-pent     span.hnum { background:#f87171; color:#7f1d1d; }
+.hday-special  span.hnum { background:#bfdbfe; color:#1e3a5f; }
+/* Holiday list */
+.cal-hlist { margin-top:18px; }
+.cal-hlist-title { font-family:'Cinzel',serif; font-size:0.82rem; font-weight:800; color:var(--blue-deep); letter-spacing:1px; margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid var(--border); }
+.cal-hlist-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
+@media(max-width:480px){ .cal-hlist-grid { grid-template-columns:1fr; } }
+.cal-hlist-item { display:flex; align-items:center; gap:9px; background:white; border:1.5px solid var(--border); border-radius:10px; padding:7px 10px; }
+.cal-hlist-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+.dot-feast { background:#eab308; } .dot-holyweek { background:#f97316; } .dot-solemn { background:#ef4444; } .dot-pent { background:#dc2626; } .dot-special { background:#60a5fa; }
+.dot-lent   { background:#f9a8d4; border:1.5px solid #ec4899; }
+.dot-advent { background:#c4b5fd; border:1.5px solid #8b5cf6; }
+.cal-hlist-name { font-size:0.75rem; font-weight:800; color:var(--blue-deep); }
+.cal-hlist-date { font-size:0.68rem; color:var(--text-light); margin-top:1px; }
+.cal-hlist-remove { display:none; margin-left:auto; flex-shrink:0; background:#fca5a5; border:none; border-radius:6px; padding:3px 8px; font-size:0.68rem; font-weight:800; color:#7f1d1d; cursor:pointer; }
+.cal-admin-mode .cal-hlist-remove { display:block; }
+/* Calendar filter bar */
+.cal-filter-bar { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.cal-filter-label { font-size:0.75rem; font-weight:800; color:var(--blue-deep); }
+.cal-filter-select { border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; font-size:0.77rem; font-family:'Nunito',sans-serif; background:white; color:var(--text); cursor:pointer; }
+/* Super admin toolbar */
+.cal-admin-bar { display:none; background:linear-gradient(135deg,#1e3a5f,#1e40af); border-radius:12px; padding:10px 14px; margin-bottom:12px; gap:8px; flex-wrap:wrap; align-items:center; }
+.cal-admin-bar.visible { display:flex; }
+.cal-admin-bar-label { font-size:0.72rem; font-weight:800; color:rgba(255,255,255,0.55); }
+.cal-admin-btn { background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:8px; padding:6px 12px; font-size:0.74rem; font-weight:700; color:white; cursor:pointer; font-family:'Nunito',sans-serif; transition:background 0.15s; }
+.cal-admin-btn:hover { background:rgba(255,255,255,0.3); }
+/* Month detail view */
+.cal-mv-topbar { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.cal-mv-back { background:var(--blue-mid); color:white; border:none; border-radius:8px; padding:7px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; }
+.cal-mv-back:hover { background:var(--blue-deep); }
+.cal-mv-nav { display:flex; gap:6px; margin-left:auto; }
+.cal-mv-nav button { width:32px; height:32px; border-radius:8px; border:1.5px solid var(--border); background:white; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; font-family:'Nunito',sans-serif; }
+.cal-mv-nav button:hover { background:var(--blue-pale); }
+.cal-mv-hdr { background:#1a1a1a; border-radius:12px 12px 0 0; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
+.cal-mv-hdr-month { font-family:'Cinzel',serif; font-size:1.55rem; font-weight:800; color:white; letter-spacing:1px; }
+.cal-mv-hdr-year  { font-family:'Cinzel',serif; font-size:1.55rem; font-weight:800; color:#eab308; }
+.cal-mv-body { background:white; border:1.5px solid #222; border-top:none; border-radius:0 0 12px 12px; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; }
+.cal-mv-col:first-child { border-right:1px solid #ddd; }
+.cal-mv-row { display:flex; align-items:stretch; border-bottom:1px solid #e5e7eb; min-height:30px; }
+.cal-mv-col .cal-mv-row:last-child { border-bottom:none; }
+.cal-mv-row.mv-alt    { background:#fef9c3; }
+.cal-mv-row.mv-lent   { background:#fce7f3; }
+.cal-mv-row.mv-advent { background:#ede9fe; }
+.cal-mv-row.mv-hday   { background:#fff7ed; }
+.cal-mv-daynum  { width:26px; flex-shrink:0; font-size:0.78rem; font-weight:800; color:#111; display:flex; align-items:center; justify-content:center; border-right:1px solid #e5e7eb; }
+.cal-mv-dayname { width:34px; flex-shrink:0; font-size:0.7rem; font-weight:700; color:#6b7280; display:flex; align-items:center; padding:0 4px; border-right:1px solid #e5e7eb; }
+.cal-mv-events  { flex:1; font-size:0.68rem; padding:3px 6px; display:flex; flex-direction:column; justify-content:center; gap:1px; min-width:0; }
+.cal-mv-hday-lbl { font-size:0.67rem; color:#b45309; font-weight:700; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-mv-act { display:flex; align-items:center; gap:3px; }
+.cal-mv-act-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+.cal-mv-act-txt { font-size:0.67rem; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* Calendar modals */
+.cmod-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9100; align-items:center; justify-content:center; padding:16px; box-sizing:border-box; }
+.cmod-bg.open { display:flex; }
+.cmod { background:white; border-radius:18px; padding:22px 20px; width:100%; max-width:420px; max-height:88vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.35); }
+.cmod h3 { font-family:'Cinzel',serif; font-size:0.95rem; font-weight:800; color:var(--blue-deep); margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+.cmod label { display:block; font-size:0.73rem; font-weight:800; color:var(--blue-deep); margin:10px 0 3px; }
+.cmod input,.cmod select,.cmod textarea { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:8px 10px; font-size:0.8rem; font-family:'Nunito',sans-serif; box-sizing:border-box; background:white; }
+.cmod textarea { height:58px; resize:vertical; }
+.cmod-btns { display:flex; gap:8px; margin-top:16px; }
+.cmod-save   { flex:1; background:var(--blue-mid); color:white; border:none; border-radius:10px; padding:10px; font-size:0.8rem; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; }
+.cmod-save:hover { background:var(--blue-deep); }
+.cmod-cancel { flex:1; background:var(--blue-pale); color:var(--blue-deep); border:none; border-radius:10px; padding:10px; font-size:0.8rem; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; }
+.cmod-sec { font-size:0.7rem; font-weight:800; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin:14px 0 6px; }
+.cmod-li { display:flex; align-items:center; gap:8px; background:var(--blue-pale); border-radius:8px; padding:7px 10px; margin-bottom:6px; }
+.cmod-li-name { flex:1; font-size:0.78rem; font-weight:700; color:var(--blue-deep); }
+.cmod-li-sub  { font-size:0.68rem; color:var(--text-light); }
+.cmod-rm { background:#fca5a5; border:none; border-radius:6px; padding:4px 9px; font-size:0.7rem; font-weight:800; color:#7f1d1d; cursor:pointer; flex-shrink:0; }
+.cmod-rm:hover { background:#f87171; color:white; }
+.cmod-add-row { display:flex; gap:8px; margin-top:8px; }
+.cmod-add-row input { flex:1; }
+.cmod-add-row button { background:var(--blue-mid); color:white; border:none; border-radius:8px; padding:8px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; flex-shrink:0; }
+.cmod-add-row button:hover { background:var(--blue-deep); }
+/* Activity edit icon in month view */
+.cal-mv-act { position:relative; }
+.cal-mv-act-edit { display:none; background:none; border:none; cursor:pointer; font-size:0.68rem; padding:0 2px; color:var(--blue-mid); flex-shrink:0; line-height:1; }
+.cal-mv-act:hover .cal-mv-act-edit { display:inline; }
+.cal-mv-act-range { font-size:0.6rem; color:var(--text-light); margin-left:2px; white-space:nowrap; flex-shrink:0; }
+/* Activity list modal */
+.cmod-act-row { display:flex; align-items:flex-start; gap:8px; background:var(--blue-pale); border-radius:8px; padding:8px 10px; margin-bottom:6px; }
+.cmod-act-row-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+.cmod-act-row-body { flex:1; min-width:0; }
+.cmod-act-row-title { font-size:0.78rem; font-weight:800; color:var(--blue-deep); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cmod-act-row-meta  { font-size:0.67rem; color:var(--text-light); margin-top:1px; }
+.cmod-act-row-btns  { display:flex; gap:5px; flex-shrink:0; }
+.cmod-act-edit-btn { background:#dbeafe; border:1.5px solid #93c5fd; border-radius:6px; padding:3px 8px; font-size:0.7rem; font-weight:800; color:#1d4ed8; cursor:pointer; }
+.cmod-act-edit-btn:hover { background:#93c5fd; }
+.cmod-act-del-btn  { background:#fca5a5; border:none; border-radius:6px; padding:3px 8px; font-size:0.7rem; font-weight:800; color:#7f1d1d; cursor:pointer; }
+.cmod-act-del-btn:hover  { background:#f87171; color:white; }
+.cmod-modal-del { flex:1; background:#fca5a5; color:#7f1d1d; border:none; border-radius:10px; padding:10px; font-size:0.8rem; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; display:none; }
+.cmod-modal-del.visible { display:block; }
+.cmod-modal-del:hover { background:#f87171; color:white; }
+
 </style>
 <style>
 #screen-draft { display: flex; flex-direction: column; }
@@ -836,12 +958,168 @@ html, body {
       <div class="content">
         <div class="card">
           <div class="card-hdr"><span>📆</span><h2>Church Calendar</h2><span class="badge">Events</span></div>
-          <div class="card-body">
-            <div class="empty" style="padding:30px 0;">
-              <span class="eico">📆</span>
-              <p style="color:var(--text-light);font-size:0.86rem;margin-bottom:6px;"><strong>Church Calendar</strong></p>
-              <p style="color:var(--text-light);font-size:0.82rem;">Content for this window will appear here.</p>
-            </div>
+          <div class="card-body" style="padding:10px 6px;">
+            <div class="cal2026-wrap" id="cal2026-wrap">
+
+              <!-- Calendar filter dropdown -->
+              <div class="cal-filter-bar" id="cal-filter-bar">
+                <span class="cal-filter-label">📆 View:</span>
+                <select class="cal-filter-select" id="cal-calendar-filter" onchange="calFilterChanged()">
+                  <option value="general">General Calendar</option>
+                </select>
+              </div>
+
+              <!-- Super admin toolbar (visible only to super admin) -->
+              <div class="cal-admin-bar" id="cal-admin-bar">
+                <span class="cal-admin-bar-label">⚙ Admin:</span>
+                <button class="cal-admin-btn" onclick="openCMod('activity')">＋ Add Activity</button>
+                <button class="cal-admin-btn" id="cal-admin-actlist-btn" onclick="openCMod('actlist')">📋 Activities</button>
+                <button class="cal-admin-btn" onclick="openCMod('holidays')">✦ Holidays</button>
+                <button class="cal-admin-btn" onclick="openCMod('pastor')">👁 Pastor Access</button>
+                <button class="cal-admin-btn" onclick="openCMod('depts')">🏛 Departments</button>
+              </div>
+
+              <!-- Year view -->
+              <div id="cal-yr-view">
+                <div class="cal2026-title">2026 CALENDAR</div>
+                <div class="cal2026-legend">
+                  <span><i class="leg-lent"></i>Lent</span>
+                  <span><i class="leg-advent"></i>Advent</span>
+                  <span><i class="leg-feast"></i>Major Feast</span>
+                  <span><i class="leg-hw"></i>Holy Week</span>
+                  <span><i class="leg-sol"></i>Good Friday</span>
+                  <span><i class="leg-pent"></i>Pentecost</span>
+                </div>
+                <p style="text-align:center;font-size:0.7rem;color:var(--text-light);margin-bottom:10px;">Tap a month to open the detailed view</p>
+                <div class="cal2026-grid" id="cal2026-grid"></div>
+                <div class="cal-hlist">
+                  <div class="cal-hlist-title">✝ Major Christian Holidays 2026</div>
+                  <div class="cal-hlist-grid" id="cal-hlist-grid"></div>
+                </div>
+              </div>
+
+              <!-- Month detail view -->
+              <div id="cal-mv-view" style="display:none;">
+                <div class="cal-mv-topbar">
+                  <button class="cal-mv-back" onclick="calShowYearView()">◄ Year View</button>
+                  <div class="cal-mv-nav">
+                    <button onclick="calMonthNav(-1)" title="Previous month">&#8249;</button>
+                    <button onclick="calMonthNav(1)"  title="Next month">&#8250;</button>
+                  </div>
+                </div>
+                <div id="cal-mv-content"></div>
+              </div>
+
+              <!-- ── MODALS ── -->
+
+              <!-- Add / Edit Activity -->
+              <div class="cmod-bg" id="cmod-activity">
+                <div class="cmod">
+                  <h3 id="cmod-act-title-hdr">＋ Add Activity</h3>
+                  <input type="hidden" id="cmod-act-edit-id">
+                  <label>Title</label>
+                  <input type="text" id="cmod-act-title" placeholder="Activity name">
+                  <label>Start Date</label>
+                  <input type="date" id="cmod-act-start">
+                  <label>End Date <span style="font-weight:400;font-size:0.68rem;">(optional — leave blank for single day)</span></label>
+                  <input type="date" id="cmod-act-end">
+                  <label>Calendar</label>
+                  <select id="cmod-act-cal">
+                    <option value="general">General Calendar</option>
+                  </select>
+                  <label>Notes (optional)</label>
+                  <textarea id="cmod-act-notes" placeholder="Short description..."></textarea>
+                  <label>Color</label>
+                  <select id="cmod-act-color">
+                    <option value="#3b82f6">Blue</option>
+                    <option value="#10b981">Green</option>
+                    <option value="#f59e0b">Amber</option>
+                    <option value="#ef4444">Red</option>
+                    <option value="#8b5cf6">Purple</option>
+                    <option value="#ec4899">Pink</option>
+                  </select>
+                  <div class="cmod-btns">
+                    <button class="cmod-cancel" onclick="closeCMod('activity')">Cancel</button>
+                    <button class="cmod-modal-del" id="cmod-act-del-btn" onclick="calDeleteActivity()">🗑 Delete</button>
+                    <button class="cmod-save" onclick="calSaveActivity()">Save</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Activities List -->
+              <div class="cmod-bg" id="cmod-actlist">
+                <div class="cmod">
+                  <h3>📋 All Activities</h3>
+                  <div class="cmod-sec">Saved Activities</div>
+                  <div id="cmod-actlist-body" style="max-height:55vh;overflow-y:auto;"></div>
+                  <div class="cmod-btns" style="margin-top:14px;">
+                    <button class="cmod-cancel" onclick="closeCMod('actlist')">Close</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Manage Holidays -->
+              <div class="cmod-bg" id="cmod-holidays">
+                <div class="cmod">
+                  <h3>✦ Manage Holidays</h3>
+                  <div class="cmod-sec">Current Holidays</div>
+                  <div id="cmod-hday-list"></div>
+                  <div class="cmod-sec">Add Custom Holiday</div>
+                  <label>Name</label>
+                  <input type="text" id="cmod-hday-name" placeholder="Holiday name">
+                  <label>Month</label>
+                  <select id="cmod-hday-month">
+                    <option value="1">January</option><option value="2">February</option>
+                    <option value="3">March</option><option value="4">April</option>
+                    <option value="5">May</option><option value="6">June</option>
+                    <option value="7">July</option><option value="8">August</option>
+                    <option value="9">September</option><option value="10">October</option>
+                    <option value="11">November</option><option value="12">December</option>
+                  </select>
+                  <label>Day</label>
+                  <input type="number" id="cmod-hday-day" min="1" max="31" placeholder="Day number">
+                  <div class="cmod-btns">
+                    <button class="cmod-cancel" onclick="closeCMod('holidays')">Close</button>
+                    <button class="cmod-save"   onclick="calAddHoliday()">Add Holiday</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pastor Calendar Access -->
+              <div class="cmod-bg" id="cmod-pastor">
+                <div class="cmod">
+                  <h3>👁 Senior Pastor Calendar Access</h3>
+                  <div class="cmod-sec">Users with access</div>
+                  <div id="cmod-pastor-list"></div>
+                  <div class="cmod-sec">Grant Access</div>
+                  <div class="cmod-add-row">
+                    <input type="text" id="cmod-pastor-input" placeholder="Enter username">
+                    <button onclick="calGrantPastorAccess()">Add</button>
+                  </div>
+                  <div class="cmod-btns" style="margin-top:14px;">
+                    <button class="cmod-cancel" onclick="closeCMod('pastor')">Close</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Department Calendars -->
+              <div class="cmod-bg" id="cmod-depts">
+                <div class="cmod">
+                  <h3>🏛 Department Calendars</h3>
+                  <div class="cmod-sec">Current Departments</div>
+                  <div id="cmod-dept-list"></div>
+                  <div class="cmod-sec">Add Department</div>
+                  <div class="cmod-add-row">
+                    <input type="text" id="cmod-dept-input" placeholder="Department name">
+                    <button onclick="calAddDept()">Add</button>
+                  </div>
+                  <div class="cmod-btns" style="margin-top:14px;">
+                    <button class="cmod-cancel" onclick="closeCMod('depts')">Close</button>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- end cal2026-wrap -->
           </div>
         </div>
       </div>
@@ -1674,6 +1952,7 @@ html, body {
           <div class="card-hdr"><span>🪟</span><h2>Window Manager</h2><span class="badge">Navigation</span></div>
           <div class="card-body">
             <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:14px;line-height:1.5;">Manage navigation windows. Edit icon and name of any window. Add custom windows below.</p>
+            <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:0.74rem;color:#1d4ed8;line-height:1.5;"><strong>📆 Calendar Editors:</strong> To add activities, manage holidays, or set Senior Pastor calendar access — go to the main app and open the <strong>Church Calendar</strong> window. The admin toolbar will appear at the top for authorized users.</div>
 
             <div id="win-mgr-list">
               <div style="display:flex;align-items:center;gap:10px;background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
@@ -6537,6 +6816,492 @@ document.addEventListener('DOMContentLoaded', function(){
 
 // Expose so goMain can call it
 window._stickyNoteInit = _noteInit;
+
+// ── 2026 Church Calendar ──
+(function(){
+  var MONTHS = [
+    {name:'JANUARY',   start:4, days:31},
+    {name:'FEBRUARY',  start:0, days:28},
+    {name:'MARCH',     start:0, days:31},
+    {name:'APRIL',     start:3, days:30},
+    {name:'MAY',       start:5, days:31},
+    {name:'JUNE',      start:1, days:30},
+    {name:'JULY',      start:3, days:31},
+    {name:'AUGUST',    start:6, days:31},
+    {name:'SEPTEMBER', start:2, days:30},
+    {name:'OCTOBER',   start:4, days:31},
+    {name:'NOVEMBER',  start:0, days:30},
+    {name:'DECEMBER',  start:2, days:31}
+  ];
+  var MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var DOW    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  var DEFAULT_HOLIDAYS = [
+    {m:1,  d:1,  name:"New Year's Day",        label:'January 1',    cls:'hday-feast',    dot:'dot-feast'},
+    {m:1,  d:6,  name:'Epiphany',              label:'January 6',    cls:'hday-feast',    dot:'dot-feast'},
+    {m:2,  d:18, name:'Ash Wednesday',         label:'February 18',  cls:'hday-special',  dot:'dot-lent'},
+    {m:3,  d:29, name:'Palm Sunday',           label:'March 29',     cls:'hday-holyweek', dot:'dot-holyweek'},
+    {m:4,  d:2,  name:'Maundy Thursday',       label:'April 2',      cls:'hday-holyweek', dot:'dot-holyweek'},
+    {m:4,  d:3,  name:'Good Friday',           label:'April 3',      cls:'hday-solemn',   dot:'dot-solemn'},
+    {m:4,  d:4,  name:'Holy Saturday',         label:'April 4',      cls:'hday-holyweek', dot:'dot-holyweek'},
+    {m:4,  d:5,  name:'Easter Sunday',         label:'April 5',      cls:'hday-feast',    dot:'dot-feast'},
+    {m:5,  d:14, name:'Ascension Day',         label:'May 14',       cls:'hday-feast',    dot:'dot-feast'},
+    {m:5,  d:24, name:'Pentecost Sunday',      label:'May 24',       cls:'hday-pent',     dot:'dot-pent'},
+    {m:5,  d:31, name:'Trinity Sunday',        label:'May 31',       cls:'hday-feast',    dot:'dot-feast'},
+    {m:10, d:11, name:'Special Day',           label:'October 11',   cls:'hday-feast',    dot:'dot-feast'},
+    {m:11, d:1,  name:"All Saints' Day",       label:'November 1',   cls:'hday-feast',    dot:'dot-feast'},
+    {m:11, d:29, name:'1st Sunday of Advent',  label:'November 29',  cls:'hday-special',  dot:'dot-advent'},
+    {m:12, d:25, name:'Christmas Day',         label:'December 25',  cls:'hday-feast',    dot:'dot-feast'}
+  ];
+
+  // ── localStorage helpers ──
+  function calLoad(k,d){ try{ var v=localStorage.getItem(k); return v!==null?JSON.parse(v):d; }catch(e){ return d; } }
+  function calSave(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+  function getRemovedH(){ return calLoad('cc_removed_hdays',[]); }
+  function getCustomH(){  return calLoad('cc_custom_hdays',[]); }
+  function getActivities(){ return calLoad('cc_activities',[]); }
+  function getDepts(){    return calLoad('cc_depts',[]); }
+  function getPastorAcc(){ return calLoad('cc_pastor_access',[]); }
+
+  function getAllHolidays(){
+    var removed = getRemovedH();
+    var out = DEFAULT_HOLIDAYS.filter(function(h){ return removed.indexOf(h.m+'-'+h.d)===-1; });
+    return out.concat(getCustomH());
+  }
+  function buildHmap(mNum){
+    var map={};
+    getAllHolidays().forEach(function(h){ if(h.m===mNum) map[h.d]=h; });
+    return map;
+  }
+  function getRangeClass(m,d){
+    if((m===2&&d>=18)||m===3||(m===4&&d<=4)) return 'lent';
+    if((m===11&&d>=29)||m===12) return 'advent';
+    return '';
+  }
+  function isSuperAdmin(){ var cu=CU; return cu&&cu.role==='super'; }
+  function canSeePastor(){
+    var cu=CU; if(!cu) return false;
+    if(cu.role==='super') return true;
+    var acc=getPastorAcc();
+    return acc.indexOf(cu.name)!==-1||(cu.email&&acc.indexOf(cu.email)!==-1);
+  }
+
+  // ── UI initialisation (called every time calendar window is opened) ──
+  function canEditCal(){ return isSuperAdmin() || canSeePastor(); }
+
+  function calInitUI(){
+    // Super admin sees full toolbar; calendar editors (pastor access) see Add Activity only
+    var adminBar=document.getElementById('cal-admin-bar');
+    if(adminBar){
+      if(isSuperAdmin()) {
+        adminBar.classList.add('visible');
+        // Show all buttons
+        adminBar.querySelectorAll('.cal-admin-btn').forEach(function(b){ b.style.display=''; });
+      } else if(canSeePastor()) {
+        adminBar.classList.add('visible');
+        // Show only Add Activity button; hide management buttons
+        var btns = adminBar.querySelectorAll('.cal-admin-btn');
+        btns.forEach(function(b,i){ b.style.display = (i===0)?'':'none'; });
+      } else {
+        adminBar.classList.remove('visible');
+      }
+    }
+    // Filter dropdown
+    var sel=document.getElementById('cal-calendar-filter');
+    if(sel){
+      while(sel.options.length>1) sel.remove(1);
+      if(canSeePastor()){
+        var po=document.createElement('option'); po.value='pastor'; po.textContent='👤 Senior Pastor'; sel.appendChild(po);
+      }
+      getDepts().forEach(function(d){
+        var o=document.createElement('option'); o.value='dept_'+encodeURIComponent(d); o.textContent='🏛 '+d; sel.appendChild(o);
+      });
+    }
+    // Admin mode flag on wrapper
+    var wrap=document.getElementById('cal2026-wrap');
+    if(wrap){ if(isSuperAdmin()) wrap.classList.add('cal-admin-mode'); else wrap.classList.remove('cal-admin-mode'); }
+  }
+
+  // ── Year view ──
+  function renderYearView(){
+    var grid=document.getElementById('cal2026-grid');
+    if(!grid) return;
+    var HMAP={};
+    getAllHolidays().forEach(function(h){ HMAP[h.m+'-'+h.d]=h; });
+    var html='';
+    MONTHS.forEach(function(mo,idx){
+      var mNum=idx+1;
+      html+='<div class="cal-month" onclick="calShowMonthView('+idx+')" title="Open '+mo.name+'">';
+      html+='<div class="cal-month-name">'+mo.name+'</div>';
+      html+='<div class="cal-dow-row">';
+      DOW.forEach(function(d){ html+='<div class="cal-dow">'+d.slice(0,2)+'</div>'; });
+      html+='</div><div class="cal-days">';
+      for(var e=0;e<mo.start;e++) html+='<div class="cal-day empty"></div>';
+      for(var d=1;d<=mo.days;d++){
+        var rc=getRangeClass(mNum,d);
+        var hol=HMAP[mNum+'-'+d];
+        var cls=(rc?' '+rc:'')+(hol?' cal-hday '+hol.cls:'');
+        var ta=hol?' title="'+hol.name+'"':'';
+        var ct=hol?'<span class="hnum">'+d+'</span>':d;
+        html+='<div class="cal-day'+cls+'"'+ta+'>'+ct+'</div>';
+      }
+      html+='</div></div>';
+    });
+    grid.innerHTML=html;
+    // Holiday list
+    var listGrid=document.getElementById('cal-hlist-grid');
+    if(listGrid){
+      var isAdmin=isSuperAdmin();
+      listGrid.innerHTML=getAllHolidays().map(function(h){
+        return '<div class="cal-hlist-item">'
+          +'<div class="cal-hlist-dot '+(h.dot||'dot-feast')+'"></div>'
+          +'<div style="flex:1"><div class="cal-hlist-name">'+h.name+'</div>'
+          +'<div class="cal-hlist-date">'+h.label+'</div></div>'
+          +(isAdmin?'<button class="cal-hlist-remove" onclick="calRemoveHoliday(\''+h.m+'-'+h.d+'\','+!!h._custom+')">✕</button>':'')
+          +'</div>';
+      }).join('');
+    }
+  }
+
+  // ── Month detail view ──
+  var curMonthIdx = 0;
+
+  window.calShowMonthView = function(idx){
+    curMonthIdx = idx;
+    document.getElementById('cal-yr-view').style.display = 'none';
+    document.getElementById('cal-mv-view').style.display = 'block';
+    renderMonthDetail();
+  };
+  window.calShowYearView = function(){
+    document.getElementById('cal-mv-view').style.display = 'none';
+    document.getElementById('cal-yr-view').style.display = 'block';
+  };
+  window.calMonthNav = function(dir){
+    curMonthIdx = (curMonthIdx+dir+12)%12;
+    renderMonthDetail();
+  };
+  window.calFilterChanged = function(){
+    if(document.getElementById('cal-mv-view').style.display!=='none') renderMonthDetail();
+  };
+
+  function renderMonthDetail(){
+    var mo=MONTHS[curMonthIdx], mNum=curMonthIdx+1;
+    var hmap=buildHmap(mNum);
+    var filter=(document.getElementById('cal-calendar-filter')||{value:'general'}).value;
+    // Gather activities for this month+filter — support date ranges
+    var actMap={};
+    getActivities().forEach(function(a){
+      if(a.calType!==filter) return;
+      var startStr=a.dateStart||a.date; if(!startStr) return;
+      var endStr=a.dateEnd||startStr;
+      var start=new Date(startStr), end=new Date(endStr);
+      for(var d=1;d<=mo.days;d++){
+        var dayDate=new Date(2026,mNum-1,d);
+        if(dayDate>=start&&dayDate<=end){
+          if(!actMap[d]) actMap[d]=[];
+          actMap[d].push(a);
+        }
+      }
+    });
+    var left='', right='';
+    for(var d=1;d<=mo.days;d++){
+      var dowIdx=(mo.start+d-1)%7;
+      var rc=getRangeClass(mNum,d);
+      var hol=hmap[d];
+      var rowCls='cal-mv-row';
+      if(rc==='lent') rowCls+=' mv-lent';
+      else if(rc==='advent') rowCls+=' mv-advent';
+      else if(hol) rowCls+=' mv-hday';
+      else if(d%2===0) rowCls+=' mv-alt';
+      var evHtml='';
+      if(hol) evHtml+='<div class="cal-mv-hday-lbl">'+hol.name+'</div>';
+      (actMap[d]||[]).forEach(function(a){
+        var isRange=a.dateEnd&&a.dateEnd!==(a.dateStart||a.date);
+        var rangeTag=isRange?'<span class="cal-mv-act-range">↔</span>':'';
+        var editBtn=canEditCal()?'<button class="cal-mv-act-edit" onclick="calEditActivity('+a.id+')" title="Edit activity">✏</button>':'';
+        evHtml+='<div class="cal-mv-act"><div class="cal-mv-act-dot" style="background:'+a.color+'"></div><span class="cal-mv-act-txt">'+a.title+'</span>'+rangeTag+editBtn+'</div>';
+      });
+      var row='<div class="'+rowCls+'">'
+        +'<div class="cal-mv-daynum">'+d+'</div>'
+        +'<div class="cal-mv-dayname">'+DOW[dowIdx]+'</div>'
+        +'<div class="cal-mv-events">'+evHtml+'</div>'
+        +'</div>';
+      if(d<=16) left+=row; else right+=row;
+    }
+    document.getElementById('cal-mv-content').innerHTML=
+      '<div class="cal-mv-hdr">'
+      +'<span class="cal-mv-hdr-month">'+mo.name+'</span>'
+      +'<span class="cal-mv-hdr-year">2026</span>'
+      +'</div>'
+      +'<div class="cal-mv-body">'
+      +'<div class="cal-mv-col">'+left+'</div>'
+      +'<div class="cal-mv-col">'+right+'</div>'
+      +'</div>';
+  }
+
+  // ── Modals ──
+  window.openCMod = function(type, editId){
+    if(type==='holidays') refreshCModH();
+    if(type==='pastor')   refreshCModPastor();
+    if(type==='depts')    refreshCModDepts();
+    if(type==='activity') refreshCModActivity(editId||null);
+    if(type==='actlist')  refreshCModActList();
+    document.getElementById('cmod-'+type).classList.add('open');
+  };
+  window.calEditActivity = function(id){ openCMod('activity', id); };
+  window.closeCMod = function(type){
+    document.getElementById('cmod-'+type).classList.remove('open');
+  };
+
+  // Activity modal
+  var CAL_TYPE_LABELS = {general:'General', pastor:'Senior Pastor'};
+  function actCalLabel(calType){
+    if(CAL_TYPE_LABELS[calType]) return CAL_TYPE_LABELS[calType];
+    var depts=getDepts(), enc=calType.replace('dept_','');
+    try{ enc=decodeURIComponent(enc); }catch(e){}
+    return enc || calType;
+  }
+
+  function refreshCModActivity(editId){
+    var sel=document.getElementById('cmod-act-cal');
+    if(!sel) return;
+    while(sel.options.length>1) sel.remove(1);
+    if(canSeePastor()){
+      var po=document.createElement('option'); po.value='pastor'; po.textContent='Senior Pastor'; sel.appendChild(po);
+    }
+    getDepts().forEach(function(d){
+      var o=document.createElement('option'); o.value='dept_'+encodeURIComponent(d); o.textContent=d; sel.appendChild(o);
+    });
+    // Load existing activity if editing
+    var act = editId ? getActivities().filter(function(a){ return a.id===editId; })[0] : null;
+    var hdr = document.getElementById('cmod-act-title-hdr');
+    var delBtn = document.getElementById('cmod-act-del-btn');
+    if(hdr) hdr.textContent = act ? '✏️ Edit Activity' : '＋ Add Activity';
+    if(delBtn){ if(act) delBtn.classList.add('visible'); else delBtn.classList.remove('visible'); }
+    document.getElementById('cmod-act-edit-id').value = act ? act.id : '';
+    document.getElementById('cmod-act-title').value   = act ? act.title : '';
+    document.getElementById('cmod-act-start').value   = act ? (act.dateStart||act.date||'') : '';
+    document.getElementById('cmod-act-end').value     = act ? (act.dateEnd||'') : '';
+    document.getElementById('cmod-act-notes').value   = act ? (act.notes||'') : '';
+    document.getElementById('cmod-act-color').value   = act ? act.color : '#3b82f6';
+    if(act && sel) sel.value = act.calType;
+  }
+
+  window.calSaveActivity = function(){
+    var title     = (document.getElementById('cmod-act-title').value||'').trim();
+    var dateStart = document.getElementById('cmod-act-start').value;
+    var dateEnd   = document.getElementById('cmod-act-end').value || null;
+    var editIdRaw = document.getElementById('cmod-act-edit-id').value;
+    var editId    = editIdRaw ? parseInt(editIdRaw) : null;
+    if(!title||!dateStart){ alert('Please enter a title and start date.'); return; }
+    if(dateEnd && dateEnd < dateStart){ alert('End date cannot be before start date.'); return; }
+    var newAct = {
+      id:       editId || Date.now(),
+      title:    title,
+      dateStart:dateStart,
+      dateEnd:  dateEnd,
+      calType:  document.getElementById('cmod-act-cal').value,
+      notes:    (document.getElementById('cmod-act-notes').value||'').trim(),
+      color:    document.getElementById('cmod-act-color').value
+    };
+    var acts = getActivities();
+    if(editId){
+      var idx = -1;
+      for(var i=0;i<acts.length;i++){ if(acts[i].id===editId){ idx=i; break; } }
+      if(idx>=0) acts[idx]=newAct; else acts.push(newAct);
+    } else {
+      acts.push(newAct);
+    }
+    calSave('cc_activities', acts);
+    // Reset form
+    document.getElementById('cmod-act-edit-id').value='';
+    document.getElementById('cmod-act-title').value='';
+    document.getElementById('cmod-act-start').value='';
+    document.getElementById('cmod-act-end').value='';
+    document.getElementById('cmod-act-notes').value='';
+    closeCMod('activity');
+    renderCalendar();
+    if(document.getElementById('cal-mv-view').style.display!=='none') renderMonthDetail();
+  };
+
+  window.calDeleteActivity = function(){
+    var editIdRaw = document.getElementById('cmod-act-edit-id').value;
+    if(!editIdRaw) return;
+    var editId = parseInt(editIdRaw);
+    if(!confirm('Delete this activity?')) return;
+    calSave('cc_activities', getActivities().filter(function(a){ return a.id!==editId; }));
+    closeCMod('activity');
+    renderCalendar();
+    if(document.getElementById('cal-mv-view').style.display!=='none') renderMonthDetail();
+  };
+
+  function refreshCModActList(){
+    var body = document.getElementById('cmod-actlist-body');
+    if(!body) return;
+    var acts = getActivities().slice().sort(function(a,b){
+      return (a.dateStart||a.date||'').localeCompare(b.dateStart||b.date||'');
+    });
+    if(!acts.length){
+      body.innerHTML='<p style="font-size:0.75rem;color:var(--text-light);text-align:center;padding:16px;">No activities saved yet.</p>';
+      return;
+    }
+    body.innerHTML = acts.map(function(a){
+      var dateStr = a.dateStart||a.date||'';
+      var dateLbl = dateStr;
+      if(a.dateEnd && a.dateEnd!==dateStr) dateLbl += ' → '+a.dateEnd;
+      return '<div class="cmod-act-row">'
+        +'<div class="cmod-act-row-dot" style="background:'+a.color+'"></div>'
+        +'<div class="cmod-act-row-body">'
+        +'<div class="cmod-act-row-title">'+a.title+'</div>'
+        +'<div class="cmod-act-row-meta">'+dateLbl+' &nbsp;·&nbsp; '+actCalLabel(a.calType)+'</div>'
+        +'</div>'
+        +'<div class="cmod-act-row-btns">'
+        +'<button class="cmod-act-edit-btn" onclick="calActListEdit('+a.id+')">✏ Edit</button>'
+        +'<button class="cmod-act-del-btn"  onclick="calActListDel('+a.id+')">🗑</button>'
+        +'</div></div>';
+    }).join('');
+  }
+
+  window.calActListEdit = function(id){
+    closeCMod('actlist');
+    openCMod('activity', id);
+  };
+  window.calActListDel = function(id){
+    if(!confirm('Delete this activity?')) return;
+    calSave('cc_activities', getActivities().filter(function(a){ return a.id!==id; }));
+    refreshCModActList();
+    if(document.getElementById('cal-mv-view').style.display!=='none') renderMonthDetail();
+  };
+
+  // Holidays modal
+  function refreshCModH(){
+    var c=document.getElementById('cmod-hday-list');
+    if(!c) return;
+    var all=getAllHolidays();
+    if(!all.length){ c.innerHTML='<p style="font-size:0.75rem;color:var(--text-light);">No holidays.</p>'; return; }
+    c.innerHTML=all.map(function(h){
+      return '<div class="cmod-li">'
+        +'<div style="flex:1"><div class="cmod-li-name">'+h.name+'</div>'
+        +'<div class="cmod-li-sub">'+h.label+'</div></div>'
+        +'<button class="cmod-rm" onclick="calRemoveHoliday(\''+h.m+'-'+h.d+'\','+!!h._custom+')">Remove</button>'
+        +'</div>';
+    }).join('');
+  }
+  window.calAddHoliday = function(){
+    var name=(document.getElementById('cmod-hday-name').value||'').trim();
+    var m=parseInt(document.getElementById('cmod-hday-month').value);
+    var d=parseInt(document.getElementById('cmod-hday-day').value);
+    if(!name||!d||d<1||d>31){ alert('Please fill in all fields.'); return; }
+    var h={m:m,d:d,name:name,label:MNAMES[m-1]+' '+d,cls:'hday-feast',dot:'dot-feast',_custom:true};
+    var custom=getCustomH(); custom.push(h); calSave('cc_custom_hdays',custom);
+    document.getElementById('cmod-hday-name').value='';
+    document.getElementById('cmod-hday-day').value='';
+    refreshCModH(); renderCalendar();
+  };
+  window.calRemoveHoliday = function(key,isCustom){
+    if(isCustom){
+      var pts=key.split('-'), m=parseInt(pts[0]), d=parseInt(pts[1]);
+      calSave('cc_custom_hdays', getCustomH().filter(function(h){ return !(h.m===m&&h.d===d); }));
+    } else {
+      var rem=getRemovedH(); if(rem.indexOf(key)===-1) rem.push(key); calSave('cc_removed_hdays',rem);
+    }
+    refreshCModH(); renderCalendar();
+  };
+
+  // Pastor access modal
+  function refreshCModPastor(){
+    var c=document.getElementById('cmod-pastor-list');
+    if(!c) return;
+    var acc=getPastorAcc();
+    if(!acc.length){ c.innerHTML='<p style="font-size:0.75rem;color:var(--text-light);">No users granted access yet.</p>'; return; }
+    c.innerHTML=acc.map(function(u,i){
+      return '<div class="cmod-li"><div class="cmod-li-name">'+u+'</div>'
+        +'<button class="cmod-rm" onclick="calRevokePastor('+i+')">Remove</button></div>';
+    }).join('');
+  }
+  window.calGrantPastorAccess = function(){
+    var inp=document.getElementById('cmod-pastor-input');
+    var name=(inp.value||'').trim(); if(!name) return;
+    var acc=getPastorAcc(); if(acc.indexOf(name)===-1) acc.push(name);
+    calSave('cc_pastor_access',acc); inp.value='';
+    refreshCModPastor(); calInitUI();
+  };
+  window.calRevokePastor = function(i){
+    var acc=getPastorAcc(); acc.splice(i,1); calSave('cc_pastor_access',acc);
+    refreshCModPastor(); calInitUI();
+  };
+
+  // Departments modal
+  function refreshCModDepts(){
+    var c=document.getElementById('cmod-dept-list');
+    if(!c) return;
+    var depts=getDepts();
+    if(!depts.length){ c.innerHTML='<p style="font-size:0.75rem;color:var(--text-light);">No departments added yet.</p>'; return; }
+    c.innerHTML=depts.map(function(d,i){
+      return '<div class="cmod-li"><div class="cmod-li-name">🏛 '+d+'</div>'
+        +'<button class="cmod-rm" onclick="calRemoveDept('+i+')">Remove</button></div>';
+    }).join('');
+  }
+  window.calAddDept = function(){
+    var inp=document.getElementById('cmod-dept-input');
+    var name=(inp.value||'').trim(); if(!name) return;
+    var depts=getDepts(); if(depts.indexOf(name)===-1) depts.push(name);
+    calSave('cc_depts',depts); inp.value='';
+    refreshCModDepts(); calInitUI();
+  };
+  window.calRemoveDept = function(i){
+    var depts=getDepts(); depts.splice(i,1); calSave('cc_depts',depts);
+    refreshCModDepts(); calInitUI();
+  };
+
+  // ── Modal backdrop click to close ──
+  var _cmodSetup=false;
+  function setupBackdrops(){
+    if(_cmodSetup) return; _cmodSetup=true;
+    ['activity','holidays','pastor','depts'].forEach(function(t){
+      var bg=document.getElementById('cmod-'+t);
+      if(bg) bg.addEventListener('click',function(e){ if(e.target===bg) closeCMod(t); });
+    });
+  }
+
+  // ── Main render ──
+  function renderCalendar(){
+    calInitUI();
+    renderYearView();
+    setupBackdrops();
+  }
+
+  // Patch switchWindow to refresh when user opens calendar
+  var _origSW = window.switchWindow;
+  window.switchWindow = function(winId,silent){
+    var r = _origSW ? _origSW.apply(this,arguments) : undefined;
+    if(winId==='church-calendar'){ setTimeout(renderCalendar,100); setTimeout(renderCalendar,400); }
+    return r;
+  };
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', renderCalendar);
+  } else {
+    renderCalendar();
+  }
+  window.renderChurchCalendar2026 = renderCalendar;
+})();
+</script>
+
+<script>
+// Fix: admin modals are inside #screen-main which has opacity:0 (stacking context z-index:1)
+// when screen-admin is active. Moving them to <body> gives them true global z-index ordering.
+document.addEventListener('DOMContentLoaded', function(){
+  var modalIds = [
+    'edit-win-modal','add-dept-modal','wasim-sched-edit-modal','usher-sched-edit-modal',
+    'cmod-activity','cmod-actlist','cmod-holidays','cmod-pastor','cmod-depts'
+  ];
+  modalIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
 </script>
 </body>
 </html>
